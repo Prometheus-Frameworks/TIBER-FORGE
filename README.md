@@ -57,6 +57,7 @@ This PR provides:
 - health, readiness, and config validation
 - OpenAPI documentation with request/response schemas
 - focused HTTP and contract tests
+- internal parity regression fixtures and ordering assertions to guard against future heuristic drift
 
 ## Non-goals
 
@@ -105,6 +106,8 @@ npm run build
 ```bash
 FORGE_SERVICE_MODE=bootstrap-demo npm test
 ```
+
+The test suite includes an internal fixture-driven parity regression pack (`tests/fixtures/forgeParityFixtures.ts`) that locks in deterministic ordering, penalty, and confidence expectations for core bootstrap scenarios.
 
 ### Run locally
 

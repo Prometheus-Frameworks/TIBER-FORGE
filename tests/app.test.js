@@ -3,6 +3,7 @@ const assert = require('node:assert/strict');
 const { createServer } = require('node:http');
 const { loadConfig } = require('../dist/src/config/env.js');
 const { createRequestListener } = require('../dist/src/app.js');
+const { forgeParityPlayers } = require('../dist/tests/fixtures/forgeParityFixtures.js');
 
 const validEvaluateRequest = {
   requestId: 'req-eval-1',
@@ -28,68 +29,8 @@ const validEvaluateRequest = {
   }
 };
 
-const parityFixturePlayers = [
-  {
-    playerId: 'elite-1',
-    playerName: 'Elite Alpha',
-    team: 'AAA',
-    opponent: 'BBB',
-    position: 'PG',
-    salary: 9300,
-    projectedMinutes: 37,
-    recentFantasyPoints: 48,
-    injuryStatus: 'healthy',
-    tags: ['starter', 'ceiling']
-  },
-  {
-    playerId: 'mid-1',
-    playerName: 'Mid Stable',
-    team: 'CCC',
-    opponent: 'DDD',
-    position: 'SF',
-    salary: 7000,
-    projectedMinutes: 32,
-    recentFantasyPoints: 33,
-    injuryStatus: 'healthy',
-    tags: ['starter']
-  },
-  {
-    playerId: 'volatile-1',
-    playerName: 'Volatile Flash',
-    team: 'EEE',
-    opponent: 'FFF',
-    position: 'SG',
-    salary: 7600,
-    projectedMinutes: 24,
-    recentFantasyPoints: 37,
-    injuryStatus: 'questionable',
-    tags: ['boom-bust']
-  },
-  {
-    playerId: 'weak-1',
-    playerName: 'Weak Opportunity',
-    team: 'GGG',
-    opponent: 'HHH',
-    position: 'PF',
-    salary: 5800,
-    projectedMinutes: 16,
-    recentFantasyPoints: 18,
-    injuryStatus: 'healthy',
-    tags: []
-  },
-  {
-    playerId: 'lowavail-1',
-    playerName: 'Low Availability',
-    team: 'III',
-    opponent: 'JJJ',
-    position: 'C',
-    salary: 6800,
-    projectedMinutes: 28,
-    recentFantasyPoints: 31,
-    injuryStatus: 'doubtful',
-    tags: ['starter']
-  }
-];
+const parityFixturePlayers = forgeParityPlayers;
+
 
 async function withServer(fn) {
   process.env.FORGE_SERVICE_MODE = 'bootstrap-demo';
@@ -214,26 +155,26 @@ test('POST /api/forge/rankings returns aligned ranked outputs for parity-style c
         requestId: 'req-rank-1',
         players: parityFixturePlayers,
         context: validEvaluateRequest.context,
-        limit: 5,
+        limit: 6,
         includeExplanations: true
       })
     });
     const body = await response.json();
 
     assert.equal(response.status, 200);
-    assert.equal(body.count, 5);
-    assert.equal(body.metadata.totalCandidates, 5);
-    assert.equal(body.metadata.returnedCount, 5);
-    assert.equal(body.metadata.limitApplied, 5);
+    assert.equal(body.count, 6);
+    assert.equal(body.metadata.totalCandidates, 6);
+    assert.equal(body.metadata.returnedCount, 6);
+    assert.equal(body.metadata.limitApplied, 6);
     assert.equal(body.metadata.includeExplanations, true);
     assert.deepEqual(
       body.rankings.map((entry) => entry.player.playerId),
-      ['elite-1', 'mid-1', 'volatile-1', 'weak-1', 'lowavail-1']
+      ['elite-1', 'steady-1', 'mid-1', 'volatile-1', 'weak-1', 'lowavail-1']
     );
     assert.equal(body.rankings[0].rank, 1);
     assert.equal(body.rankings[0].score.tier, 'core');
     assert.equal(body.rankings[1].score.tier, 'core');
-    assert.equal(body.rankings[4].score.tier, 'neutral');
+    assert.equal(body.rankings[5].score.tier, 'neutral');
     assert.equal(body.rankings[0].score.components.length, 4);
   });
 });
