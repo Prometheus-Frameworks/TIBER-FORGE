@@ -1,13 +1,17 @@
 import {
+  allowedComponentKeys,
+  allowedConfidenceLabels,
   allowedContestTypes,
   allowedErrorCategories,
   allowedInjuryStatuses,
   allowedModes,
   allowedPositions,
+  allowedTiers,
   ErrorEnvelope,
   EvaluateRequest,
   EvaluateResponse,
   EvaluationContext,
+  EvaluationMetadata,
   PlayerInput,
   RankingsRequest,
   RankingsResponse,
@@ -32,6 +36,14 @@ function isObject(value: unknown): value is Record<string, unknown> {
 function ensureString(value: unknown, path: string, errors: string[]): string | undefined {
   if (typeof value !== 'string' || value.trim().length === 0) {
     errors.push(`${path} must be a non-empty string.`);
+    return undefined;
+  }
+  return value;
+}
+
+function ensureBoolean(value: unknown, path: string, errors: string[]): boolean | undefined {
+  if (typeof value !== 'boolean') {
+    errors.push(`${path} must be a boolean.`);
     return undefined;
   }
   return value;
@@ -165,7 +177,7 @@ export function validateRankingsRequest(value: unknown): RankingsRequest {
 
   const requestId = value.requestId === undefined ? undefined : ensureString(value.requestId, 'requestId', errors);
   const context = validateContext(value.context, 'context', errors);
-  const includeExplanations = value.includeExplanations === undefined ? true : Boolean(value.includeExplanations);
+  const includeExplanations = value.includeExplanations === undefined ? true : ensureBoolean(value.includeExplanations, 'includeExplanations', errors);
 
   if (!Array.isArray(value.players) || value.players.length === 0 || value.players.length > 100) {
     errors.push('players must be an array containing between 1 and 100 players.');
@@ -179,7 +191,7 @@ export function validateRankingsRequest(value: unknown): RankingsRequest {
 
   const limit = value.limit === undefined ? undefined : ensureNumber(value.limit, 'limit', errors, { min: 1, max: 100, integer: true });
 
-  if (errors.length > 0 || !context) {
+  if (errors.length > 0 || !context || includeExplanations === undefined) {
     throw new ValidationError('INVALID_REQUEST_BODY', errors);
   }
 
@@ -191,10 +203,31 @@ function validateScoreComponent(component: unknown, path: string, errors: string
     errors.push(`${path} must be an object.`);
     return false;
   }
-  ensureString(component.name, `${path}.name`, errors);
+  ensureEnum(component.key, allowedComponentKeys, `${path}.key`, errors);
+  ensureString(component.label, `${path}.label`, errors);
   ensureNumber(component.weight, `${path}.weight`, errors, { min: 0, max: 1 });
   ensureNumber(component.score, `${path}.score`, errors, { min: 0, max: 100 });
   ensureString(component.reason, `${path}.reason`, errors);
+  return true;
+}
+
+function validateMetadata(metadata: unknown, path: string, errors: string[]): metadata is EvaluationMetadata {
+  if (!isObject(metadata)) {
+    errors.push(`${path} must be an object.`);
+    return false;
+  }
+
+  ensureString(metadata.slateId, `${path}.slateId`, errors);
+  ensureIsoDate(metadata.slateDate, `${path}.slateDate`, errors);
+  ensureString(metadata.sport, `${path}.sport`, errors);
+  ensureString(metadata.site, `${path}.site`, errors);
+  ensureEnum(metadata.contestType, allowedContestTypes, `${path}.contestType`, errors);
+  ensureEnum(metadata.mode, allowedModes, `${path}.mode`, errors);
+  ensureEnum(metadata.injuryStatus, allowedInjuryStatuses, `${path}.injuryStatus`, errors);
+  ensureArrayOfStrings(metadata.tags, `${path}.tags`, errors);
+  if (metadata.bootstrap !== true) {
+    errors.push(`${path}.bootstrap must be true.`);
+  }
   return true;
 }
 
@@ -210,6 +243,7 @@ function validateSourceMetadata(source: unknown, path: string, errors: string[])
     errors.push(`${path}.deterministic must be true.`);
   }
   ensureString(source.parityStatus, `${path}.parityStatus`, errors);
+  ensureString(source.specAlignment, `${path}.specAlignment`, errors);
   ensureIsoDate(source.generatedAt, `${path}.generatedAt`, errors);
   return true;
 }
@@ -221,28 +255,50 @@ export function validateEvaluateResponse(value: unknown): EvaluateResponse {
   }
 
   ensureString(value.requestId, 'requestId', errors);
-  ensureString(value.playerId, 'playerId', errors);
-  ensureNumber(value.score, 'score', errors, { min: 0, max: 100 });
-  ensureString(value.tier, 'tier', errors);
-  ensureNumber(value.rankingHint, 'rankingHint', errors, { min: 1, integer: true });
 
-  if (!Array.isArray(value.components) || value.components.length !== 4) {
-    errors.push('components must contain exactly 4 entries.');
+  if (!isObject(value.player)) {
+    errors.push('player must be an object.');
   } else {
-    value.components.forEach((component, index) => validateScoreComponent(component, `components[${index}]`, errors));
+    ensureString(value.player.playerId, 'player.playerId', errors);
+    ensureString(value.player.playerName, 'player.playerName', errors);
+    ensureString(value.player.team, 'player.team', errors);
+    ensureString(value.player.opponent, 'player.opponent', errors);
+    ensureEnum(value.player.position, allowedPositions, 'player.position', errors);
+    if (value.player.salary !== undefined) {
+      ensureNumber(value.player.salary, 'player.salary', errors, { min: 1, integer: true });
+    }
+  }
+
+  if (!isObject(value.score)) {
+    errors.push('score must be an object.');
+  } else {
+    ensureNumber(value.score.overall, 'score.overall', errors, { min: 0, max: 100 });
+    ensureEnum(value.score.tier, allowedTiers, 'score.tier', errors);
+    ensureNumber(value.score.rankHint, 'score.rankHint', errors, { min: 1, integer: true });
+
+    if (!Array.isArray(value.score.components) || value.score.components.length !== 4) {
+      errors.push('score.components must contain exactly 4 entries.');
+    } else {
+      value.score.components.forEach((component, index) => validateScoreComponent(component, `score.components[${index}]`, errors));
+    }
   }
 
   if (!isObject(value.confidence)) {
     errors.push('confidence must be an object.');
   } else {
     ensureNumber(value.confidence.score, 'confidence.score', errors, { min: 0, max: 1 });
-    ensureString(value.confidence.label, 'confidence.label', errors);
+    ensureEnum(value.confidence.label, allowedConfidenceLabels, 'confidence.label', errors);
+    if (value.confidence.deterministic !== true) {
+      errors.push('confidence.deterministic must be true.');
+    }
+    ensureString(value.confidence.reason, 'confidence.reason', errors);
   }
 
   if (!Array.isArray(value.reasons) || value.reasons.length === 0) {
     errors.push('reasons must be a non-empty array.');
   }
 
+  validateMetadata(value.metadata, 'metadata', errors);
   validateSourceMetadata(value.source, 'source', errors);
 
   if (!Array.isArray(value.warnings)) {
@@ -256,6 +312,66 @@ export function validateEvaluateResponse(value: unknown): EvaluateResponse {
   return value as unknown as EvaluateResponse;
 }
 
+function validateRankedEvaluation(item: unknown, path: string, errors: string[], includeExplanations: boolean): void {
+  if (!isObject(item)) {
+    errors.push(`${path} must be an object.`);
+    return;
+  }
+
+  ensureNumber(item.rank, `${path}.rank`, errors, { min: 1, integer: true });
+  ensureString(item.requestId, `${path}.requestId`, errors);
+
+  if (!isObject(item.player)) {
+    errors.push(`${path}.player must be an object.`);
+  } else {
+    ensureString(item.player.playerId, `${path}.player.playerId`, errors);
+    ensureString(item.player.playerName, `${path}.player.playerName`, errors);
+    ensureString(item.player.team, `${path}.player.team`, errors);
+    ensureString(item.player.opponent, `${path}.player.opponent`, errors);
+    ensureEnum(item.player.position, allowedPositions, `${path}.player.position`, errors);
+  }
+
+  if (!isObject(item.score)) {
+    errors.push(`${path}.score must be an object.`);
+  } else {
+    ensureNumber(item.score.overall, `${path}.score.overall`, errors, { min: 0, max: 100 });
+    ensureEnum(item.score.tier, allowedTiers, `${path}.score.tier`, errors);
+    ensureNumber(item.score.rankHint, `${path}.score.rankHint`, errors, { min: 1, integer: true });
+    if (!Array.isArray(item.score.components)) {
+      errors.push(`${path}.score.components must be an array.`);
+    } else if (includeExplanations) {
+      if (item.score.components.length !== 4) {
+        errors.push(`${path}.score.components must contain exactly 4 entries when includeExplanations=true.`);
+      }
+      item.score.components.forEach((component, index) => validateScoreComponent(component, `${path}.score.components[${index}]`, errors));
+    } else if (item.score.components.length !== 0) {
+      errors.push(`${path}.score.components must be empty when includeExplanations=false.`);
+    }
+  }
+
+  if (!isObject(item.confidence)) {
+    errors.push(`${path}.confidence must be an object.`);
+  } else {
+    ensureNumber(item.confidence.score, `${path}.confidence.score`, errors, { min: 0, max: 1 });
+    ensureEnum(item.confidence.label, allowedConfidenceLabels, `${path}.confidence.label`, errors);
+    if (item.confidence.deterministic !== true) {
+      errors.push(`${path}.confidence.deterministic must be true.`);
+    }
+    ensureString(item.confidence.reason, `${path}.confidence.reason`, errors);
+  }
+
+  if (!Array.isArray(item.reasons) || item.reasons.length === 0) {
+    errors.push(`${path}.reasons must be a non-empty array.`);
+  }
+
+  validateMetadata(item.metadata, `${path}.metadata`, errors);
+  validateSourceMetadata(item.source, `${path}.source`, errors);
+
+  if (!Array.isArray(item.warnings)) {
+    errors.push(`${path}.warnings must be an array.`);
+  }
+}
+
 export function validateRankingsResponse(value: unknown): RankingsResponse {
   const errors: string[] = [];
   if (!isObject(value)) {
@@ -264,24 +380,26 @@ export function validateRankingsResponse(value: unknown): RankingsResponse {
 
   ensureString(value.requestId, 'requestId', errors);
   ensureNumber(value.count, 'count', errors, { min: 0, integer: true });
+
+  const includeExplanations = isObject(value.metadata) && typeof value.metadata.includeExplanations === 'boolean' ? value.metadata.includeExplanations : true;
+
+  if (!isObject(value.metadata)) {
+    errors.push('metadata must be an object.');
+  } else {
+    ensureNumber(value.metadata.totalCandidates, 'metadata.totalCandidates', errors, { min: 0, integer: true });
+    ensureNumber(value.metadata.returnedCount, 'metadata.returnedCount', errors, { min: 0, integer: true });
+    if (value.metadata.limitApplied !== null && value.metadata.limitApplied !== undefined) {
+      ensureNumber(value.metadata.limitApplied, 'metadata.limitApplied', errors, { min: 1, integer: true });
+    }
+    ensureBoolean(value.metadata.includeExplanations, 'metadata.includeExplanations', errors);
+  }
+
   validateSourceMetadata(value.source, 'source', errors);
 
   if (!Array.isArray(value.rankings)) {
     errors.push('rankings must be an array.');
   } else {
-    value.rankings.forEach((item, index) => {
-      if (!isObject(item)) {
-        errors.push(`rankings[${index}] must be an object.`);
-        return;
-      }
-      ensureNumber(item.rank, `rankings[${index}].rank`, errors, { min: 1, integer: true });
-      try {
-        validateEvaluateResponse(item.evaluation);
-      } catch (error) {
-        const detail = error instanceof ValidationError ? error.details : 'Unknown evaluation validation error';
-        errors.push(`rankings[${index}].evaluation is invalid: ${JSON.stringify(detail)}`);
-      }
-    });
+    value.rankings.forEach((item, index) => validateRankedEvaluation(item, `rankings[${index}]`, errors, includeExplanations));
   }
 
   if (!Array.isArray(value.warnings)) {

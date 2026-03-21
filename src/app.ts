@@ -5,6 +5,8 @@ import { ValidationError, validateEvaluateRequest, validateRankingsRequest } fro
 import { openApiDocument } from './openapi/document';
 import { evaluatePlayer, rankPlayers } from './services/forgeService';
 
+const SERVICE_VERSION = '0.2.0';
+
 interface AppState {
   readonly config: AppConfig;
   readonly ready: boolean;
@@ -38,6 +40,10 @@ function json(statusCode: number, body: unknown): JsonResponse {
   return { statusCode, body };
 }
 
+function traceId(category: ErrorCategory, code: string): string {
+  return `trace-${category.toLowerCase()}-${code.toLowerCase()}`;
+}
+
 function errorEnvelope(statusCode: number, category: ErrorCategory, code: string, message: string, details?: unknown): JsonResponse {
   return json(statusCode, {
     error: {
@@ -45,7 +51,7 @@ function errorEnvelope(statusCode: number, category: ErrorCategory, code: string
       code,
       message,
       details,
-      traceId: `trace-${Date.now()}`
+      traceId: traceId(category, code)
     }
   });
 }
@@ -58,8 +64,8 @@ export async function handleRequest(request: IncomingMessage, state: AppState): 
     return json(200, {
       service: 'tiber-forge',
       mode: state.config.FORGE_SERVICE_MODE,
-      version: '0.1.0',
-      description: 'Bootstrap standalone FORGE service for future adapter-backed TIBER-Fantasy integration.'
+      version: SERVICE_VERSION,
+      description: 'Bootstrap standalone FORGE service aligned to the PR72 transition contract without claiming full parity.'
     });
   }
 
