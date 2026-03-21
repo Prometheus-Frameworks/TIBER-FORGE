@@ -1,0 +1,16 @@
+{
+  "name": "tiber-forge",
+  "version": "0.1.0",
+  "description": "Standalone external FORGE bootstrap service for TIBER-Fantasy",
+  "private": true,
+  "type": "commonjs",
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "dev": "node --experimental-strip-types src/server.ts",
+    "start": "node dist/server.js",
+    "test": "npm run build && node --test tests/*.test.js"
+  }
+}
