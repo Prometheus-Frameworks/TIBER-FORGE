@@ -1,7 +1,7 @@
 {
   "name": "tiber-forge",
-  "version": "0.1.0",
-  "description": "Standalone external FORGE bootstrap service for TIBER-Fantasy",
+  "version": "0.2.0",
+  "description": "Standalone external FORGE service transition-aligned bootstrap for TIBER-Fantasy",
   "private": true,
   "type": "commonjs",
   "engines": {

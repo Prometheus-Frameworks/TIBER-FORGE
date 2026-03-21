@@ -1,7 +1,8 @@
-import { EvaluateRequest, EvaluateResponse, PlayerInput, RankingsRequest, RankingsResponse } from '../contracts/forge';
+import { EvaluateRequest, EvaluateResponse, PlayerInput, RankingsRequest, RankingsResponse, ScoreComponent } from '../contracts/forge';
 import { validateEvaluateResponse, validateRankingsResponse } from '../contracts/validation';
 
-const SOURCE_VERSION = '0.1.0';
+const SOURCE_VERSION = '0.2.0';
+const BOOTSTRAP_WARNING = 'Bootstrap scaffold only; fields align to the PR72 transition contract, but legacy FORGE parity remains intentionally deferred.';
 
 function round(value: number): number {
   return Math.round(value * 100) / 100;
@@ -30,7 +31,7 @@ function confidenceLabel(score: number): EvaluateResponse['confidence']['label']
   return 'low';
 }
 
-function tierForScore(score: number): EvaluateResponse['tier'] {
+function tierForScore(score: number): EvaluateResponse['score']['tier'] {
   if (score >= 82) {
     return 'core';
   }
@@ -50,102 +51,148 @@ function buildSource(generatedAt: string): EvaluateResponse['source'] {
     mode: 'bootstrap-demo',
     deterministic: true,
     parityStatus: 'bootstrap-scaffold',
+    specAlignment: 'pr72-transition',
     generatedAt
   };
 }
 
-function scorePlayer(player: PlayerInput, generatedAt: string): Omit<EvaluateResponse, 'requestId'> {
+function buildComponents(player: PlayerInput): ScoreComponent[] {
   const projectedMinutes = player.projectedMinutes ?? 24;
   const recentFantasyPoints = player.recentFantasyPoints ?? 20;
   const salary = player.salary ?? 7000;
+  const availability = availabilityScore(player.injuryStatus);
 
   const opportunity = Math.min(100, round(30 + projectedMinutes * 1.8));
   const recentForm = Math.min(100, round(20 + recentFantasyPoints * 2.1));
   const salaryEfficiency = Math.min(100, round((recentFantasyPoints / Math.max(salary, 1)) * 12000));
-  const availability = availabilityScore(player.injuryStatus);
 
-  const components: EvaluateResponse['components'] = [
+  return [
     {
-      name: 'opportunity',
+      key: 'opportunity',
+      label: 'Opportunity',
       weight: 0.35,
       score: opportunity,
-      reason: `Projected minutes (${projectedMinutes}) drive bootstrap opportunity scoring.`
+      reason: `Projected minutes (${projectedMinutes}) drive the deterministic bootstrap opportunity component.`
     },
     {
-      name: 'recent-form',
+      key: 'recent_form',
+      label: 'Recent Form',
       weight: 0.3,
       score: recentForm,
       reason: `Recent fantasy points (${recentFantasyPoints}) feed the deterministic recent-form component.`
     },
     {
-      name: 'salary-efficiency',
+      key: 'salary_efficiency',
+      label: 'Salary Efficiency',
       weight: 0.2,
       score: salaryEfficiency,
       reason: `Salary (${salary}) is compared with recent production to estimate placeholder value efficiency.`
     },
     {
-      name: 'availability',
+      key: 'availability',
+      label: 'Availability',
       weight: 0.15,
       score: availability,
       reason: `Injury status (${player.injuryStatus}) applies a deterministic availability adjustment.`
     }
   ];
+}
 
-  const score = round(components.reduce((sum, component) => sum + component.score * component.weight, 0));
-  const confidence = round(
+function scorePlayer(player: PlayerInput, request: EvaluateRequest): EvaluateResponse {
+  const generatedAt = request.context.slateDate;
+  const projectedMinutes = player.projectedMinutes ?? 24;
+  const availability = availabilityScore(player.injuryStatus);
+  const components = buildComponents(player);
+  const overall = round(components.reduce((sum, component) => sum + component.score * component.weight, 0));
+  const confidenceScore = round(
     Math.min(1, 0.35 + availability / 400 + Math.min(projectedMinutes, 36) / 100 + (player.tags.length > 0 ? 0.05 : 0))
   );
+  const primaryComponent = components.slice().sort((left, right) => right.score - left.score)[0];
 
-  return {
-    playerId: player.playerId,
-    score,
-    tier: tierForScore(score),
-    rankingHint: Math.max(1, 101 - Math.round(score)),
-    components,
+  return validateEvaluateResponse({
+    requestId: request.requestId ?? `eval-${player.playerId}-${request.context.slateId}`,
+    player: {
+      playerId: player.playerId,
+      playerName: player.playerName,
+      team: player.team,
+      opponent: player.opponent,
+      position: player.position,
+      salary: player.salary
+    },
+    score: {
+      overall,
+      tier: tierForScore(overall),
+      rankHint: Math.max(1, 101 - Math.round(overall)),
+      components
+    },
     confidence: {
-      score: confidence,
-      label: confidenceLabel(confidence)
+      score: confidenceScore,
+      label: confidenceLabel(confidenceScore),
+      deterministic: true,
+      reason: 'Confidence is a deterministic bootstrap heuristic derived from availability, projected minutes, and simple tag presence.'
     },
     reasons: [
-      `${player.playerName} receives a bootstrap FORGE score of ${score}.`,
-      'This service currently uses deterministic placeholder heuristics, not legacy FORGE parity logic.',
-      `Top driver: ${components.slice().sort((a, b) => b.score - a.score)[0].name}.`
+      `${player.playerName} receives a bootstrap FORGE score of ${overall}.`,
+      'This service currently returns a transition-aligned scaffold rather than full legacy FORGE parity.',
+      `Top component driver: ${primaryComponent.key}.`
     ],
+    metadata: {
+      slateId: request.context.slateId,
+      slateDate: request.context.slateDate,
+      sport: request.context.sport,
+      site: request.context.site,
+      contestType: request.context.contestType,
+      mode: request.context.mode,
+      injuryStatus: player.injuryStatus,
+      tags: player.tags,
+      bootstrap: true
+    },
     source: buildSource(generatedAt),
-    warnings: ['Bootstrap/demo scoring only; legacy FORGE parity is intentionally deferred.']
-  };
+    warnings: [BOOTSTRAP_WARNING]
+  });
 }
 
 export function evaluatePlayer(request: EvaluateRequest): EvaluateResponse {
-  const requestId = request.requestId ?? `eval-${request.player.playerId}-${request.context.slateId}`;
-  const generatedAt = request.context.slateDate;
-  return validateEvaluateResponse({
-    requestId,
-    ...scorePlayer(request.player, generatedAt)
-  });
+  return scorePlayer(request.player, request);
 }
 
 export function rankPlayers(request: RankingsRequest): RankingsResponse {
   const requestId = request.requestId ?? `rank-${request.context.slateId}`;
-  const generatedAt = request.context.slateDate;
-  const evaluations = request.players.map((player) =>
-    evaluatePlayer({
-      requestId: `${requestId}-${player.playerId}`,
-      player,
-      context: request.context
-    })
-  );
-
-  const rankings = evaluations
-    .sort((left, right) => right.score - left.score || left.playerId.localeCompare(right.playerId))
-    .slice(0, request.limit ?? evaluations.length)
-    .map((evaluation, index) => ({ rank: index + 1, evaluation }));
+  const limitApplied = request.limit ?? null;
+  const rankings = request.players
+    .map((player) =>
+      scorePlayer(player, {
+        requestId: `${requestId}-${player.playerId}`,
+        player,
+        context: request.context
+      })
+    )
+    .sort((left, right) => right.score.overall - left.score.overall || left.player.playerId.localeCompare(right.player.playerId))
+    .slice(0, request.limit ?? request.players.length)
+    .map((evaluation, index) => ({
+      rank: index + 1,
+      ...evaluation,
+      reasons: request.includeExplanations === false ? ['Explanation output suppressed by includeExplanations=false during bootstrap mode.'] : evaluation.reasons,
+      score: {
+        ...evaluation.score,
+        components: request.includeExplanations === false ? [] : evaluation.score.components
+      }
+    }));
 
   return validateRankingsResponse({
     requestId,
     count: rankings.length,
     rankings,
-    source: buildSource(generatedAt),
-    warnings: ['Rankings are bootstrap/demo outputs and intentionally do not represent full legacy FORGE parity.']
+    metadata: {
+      totalCandidates: request.players.length,
+      returnedCount: rankings.length,
+      limitApplied,
+      includeExplanations: request.includeExplanations ?? true
+    },
+    source: buildSource(request.context.slateDate),
+    warnings: [
+      BOOTSTRAP_WARNING,
+      request.includeExplanations === false ? 'Rankings explanations were intentionally omitted per includeExplanations=false.' : 'Rankings include deterministic bootstrap explanations.'
+    ]
   });
 }
