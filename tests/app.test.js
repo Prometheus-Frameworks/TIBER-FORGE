@@ -28,6 +28,69 @@ const validEvaluateRequest = {
   }
 };
 
+const parityFixturePlayers = [
+  {
+    playerId: 'elite-1',
+    playerName: 'Elite Alpha',
+    team: 'AAA',
+    opponent: 'BBB',
+    position: 'PG',
+    salary: 9300,
+    projectedMinutes: 37,
+    recentFantasyPoints: 48,
+    injuryStatus: 'healthy',
+    tags: ['starter', 'ceiling']
+  },
+  {
+    playerId: 'mid-1',
+    playerName: 'Mid Stable',
+    team: 'CCC',
+    opponent: 'DDD',
+    position: 'SF',
+    salary: 7000,
+    projectedMinutes: 32,
+    recentFantasyPoints: 33,
+    injuryStatus: 'healthy',
+    tags: ['starter']
+  },
+  {
+    playerId: 'volatile-1',
+    playerName: 'Volatile Flash',
+    team: 'EEE',
+    opponent: 'FFF',
+    position: 'SG',
+    salary: 7600,
+    projectedMinutes: 24,
+    recentFantasyPoints: 37,
+    injuryStatus: 'questionable',
+    tags: ['boom-bust']
+  },
+  {
+    playerId: 'weak-1',
+    playerName: 'Weak Opportunity',
+    team: 'GGG',
+    opponent: 'HHH',
+    position: 'PF',
+    salary: 5800,
+    projectedMinutes: 16,
+    recentFantasyPoints: 18,
+    injuryStatus: 'healthy',
+    tags: []
+  },
+  {
+    playerId: 'lowavail-1',
+    playerName: 'Low Availability',
+    team: 'III',
+    opponent: 'JJJ',
+    position: 'C',
+    salary: 6800,
+    projectedMinutes: 28,
+    recentFantasyPoints: 31,
+    injuryStatus: 'doubtful',
+    tags: ['starter']
+  }
+];
+
 async function withServer(fn) {
   process.env.FORGE_SERVICE_MODE = 'bootstrap-demo';
   delete process.env.PORT;
@@ -78,16 +141,17 @@ test('POST /api/forge/evaluate returns transition-aligned deterministic response
     assert.equal(response.status, 200);
     assert.equal(body.requestId, 'req-eval-1');
     assert.equal(body.player.playerId, 'player-1');
-    assert.equal(body.score.overall, 88.46);
+    assert.equal(body.score.overall, 90.52);
     assert.equal(body.score.tier, 'core');
-    assert.equal(body.score.rankHint, 13);
+    assert.equal(body.score.rankHint, 10);
     assert.equal(body.score.components.length, 4);
     assert.deepEqual(body.score.components.map((component) => component.key), ['opportunity', 'recent_form', 'salary_efficiency', 'availability']);
-    assert.equal(body.confidence.score, 0.98);
+    assert.equal(body.confidence.score, 0.99);
     assert.equal(body.confidence.deterministic, true);
     assert.equal(body.metadata.bootstrap, true);
     assert.equal(body.source.mode, 'bootstrap-demo');
     assert.equal(body.source.specAlignment, 'pr72-transition');
+    assert.match(body.confidence.reason, /scaffold logic rather than full legacy parity/);
     assert.match(body.warnings[0], /legacy FORGE parity remains intentionally deferred/);
   });
 });
@@ -141,45 +205,62 @@ test('POST /api/forge/evaluate rejects invalid request bodies with stable envelo
   });
 });
 
-test('POST /api/forge/rankings returns aligned ranked outputs', async () => {
+test('POST /api/forge/rankings returns aligned ranked outputs for parity-style core scenarios', async () => {
   await withServer(async (baseUrl) => {
     const response = await fetch(`${baseUrl}/api/forge/rankings`, {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
       body: JSON.stringify({
         requestId: 'req-rank-1',
-        players: [
-          validEvaluateRequest.player,
-          {
-            playerId: 'player-2',
-            playerName: 'Value Wing',
-            team: 'CCC',
-            opponent: 'DDD',
-            position: 'SF',
-            salary: 6100,
-            projectedMinutes: 30,
-            recentFantasyPoints: 28,
-            injuryStatus: 'questionable',
-            tags: []
-          }
-        ],
+        players: parityFixturePlayers,
         context: validEvaluateRequest.context,
-        limit: 2,
+        limit: 5,
         includeExplanations: true
       })
     });
     const body = await response.json();
 
     assert.equal(response.status, 200);
-    assert.equal(body.count, 2);
-    assert.equal(body.metadata.totalCandidates, 2);
-    assert.equal(body.metadata.returnedCount, 2);
-    assert.equal(body.metadata.limitApplied, 2);
+    assert.equal(body.count, 5);
+    assert.equal(body.metadata.totalCandidates, 5);
+    assert.equal(body.metadata.returnedCount, 5);
+    assert.equal(body.metadata.limitApplied, 5);
     assert.equal(body.metadata.includeExplanations, true);
+    assert.deepEqual(
+      body.rankings.map((entry) => entry.player.playerId),
+      ['elite-1', 'mid-1', 'volatile-1', 'weak-1', 'lowavail-1']
+    );
     assert.equal(body.rankings[0].rank, 1);
-    assert.equal(body.rankings[0].player.playerId, 'player-1');
-    assert.equal(body.rankings[1].player.playerId, 'player-2');
+    assert.equal(body.rankings[0].score.tier, 'core');
+    assert.equal(body.rankings[1].score.tier, 'core');
+    assert.equal(body.rankings[4].score.tier, 'neutral');
     assert.equal(body.rankings[0].score.components.length, 4);
+  });
+});
+
+test('POST /api/forge/rankings penalizes weak opportunity and low availability scenarios', async () => {
+  await withServer(async (baseUrl) => {
+    const response = await fetch(`${baseUrl}/api/forge/rankings`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({
+        requestId: 'req-rank-penalties',
+        players: parityFixturePlayers,
+        context: validEvaluateRequest.context,
+        includeExplanations: true
+      })
+    });
+    const body = await response.json();
+    const byId = Object.fromEntries(body.rankings.map((entry) => [entry.player.playerId, entry]));
+
+    assert.equal(response.status, 200);
+    assert.ok(byId['weak-1'].score.overall < byId['mid-1'].score.overall);
+    assert.ok(byId['weak-1'].score.components.find((component) => component.key === 'opportunity').score < 50);
+    assert.match(byId['weak-1'].score.components.find((component) => component.key === 'opportunity').reason, /weak-opportunity range/);
+    assert.ok(byId['lowavail-1'].score.overall < byId['weak-1'].score.overall);
+    assert.ok(byId['lowavail-1'].score.components.find((component) => component.key === 'availability').score < 30);
+    assert.equal(byId['lowavail-1'].confidence.label, 'low');
+    assert.equal(byId['elite-1'].confidence.label, 'high');
   });
 });
 

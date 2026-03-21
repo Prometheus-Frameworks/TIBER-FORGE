@@ -8,14 +8,18 @@ function round(value: number): number {
   return Math.round(value * 100) / 100;
 }
 
+function clamp(value: number, min: number, max: number): number {
+  return Math.min(max, Math.max(min, value));
+}
+
 function availabilityScore(status: PlayerInput['injuryStatus']): number {
   switch (status) {
     case 'healthy':
-      return 95;
+      return 96;
     case 'questionable':
-      return 68;
+      return 62;
     case 'doubtful':
-      return 35;
+      return 8;
     case 'out':
       return 0;
   }
@@ -62,38 +66,46 @@ function buildComponents(player: PlayerInput): ScoreComponent[] {
   const salary = player.salary ?? 7000;
   const availability = availabilityScore(player.injuryStatus);
 
-  const opportunity = Math.min(100, round(30 + projectedMinutes * 1.8));
-  const recentForm = Math.min(100, round(20 + recentFantasyPoints * 2.1));
-  const salaryEfficiency = Math.min(100, round((recentFantasyPoints / Math.max(salary, 1)) * 12000));
+  const weakOpportunityPenalty = projectedMinutes < 20 ? (20 - projectedMinutes) * 2.5 : 0;
+  const opportunity = round(clamp(18 + projectedMinutes * 2 - weakOpportunityPenalty, 0, 100));
+  const recentForm = round(clamp(15 + recentFantasyPoints * 1.9, 0, 100));
+  const fantasyPointsPerThousand = recentFantasyPoints / Math.max(salary / 1000, 1);
+  const salaryEfficiency = round(clamp(20 + fantasyPointsPerThousand * 12, 0, 100));
 
   return [
     {
       key: 'opportunity',
       label: 'Opportunity',
-      weight: 0.35,
+      weight: 0.4,
       score: opportunity,
-      reason: `Projected minutes (${projectedMinutes}) drive the deterministic bootstrap opportunity component.`
+      reason:
+        projectedMinutes < 20
+          ? `Projected minutes (${projectedMinutes}) fall into a weak-opportunity range, so the deterministic bootstrap logic applies an extra minutes penalty.`
+          : `Projected minutes (${projectedMinutes}) anchor the deterministic bootstrap opportunity component.`
     },
     {
       key: 'recent_form',
       label: 'Recent Form',
-      weight: 0.3,
+      weight: 0.26,
       score: recentForm,
-      reason: `Recent fantasy points (${recentFantasyPoints}) feed the deterministic recent-form component.`
+      reason: `Recent fantasy points (${recentFantasyPoints}) feed the deterministic recent-form component with a capped, repeatable scaling curve.`
     },
     {
       key: 'salary_efficiency',
       label: 'Salary Efficiency',
-      weight: 0.2,
+      weight: 0.08,
       score: salaryEfficiency,
-      reason: `Salary (${salary}) is compared with recent production to estimate placeholder value efficiency.`
+      reason: `Salary (${salary}) is compared with recent production to estimate placeholder value efficiency without changing the response contract.`
     },
     {
       key: 'availability',
       label: 'Availability',
-      weight: 0.15,
+      weight: 0.26,
       score: availability,
-      reason: `Injury status (${player.injuryStatus}) applies a deterministic availability adjustment.`
+      reason:
+        player.injuryStatus === 'healthy'
+          ? 'Healthy status preserves a strong deterministic availability component.'
+          : `Injury status (${player.injuryStatus}) applies a stronger deterministic availability penalty in bootstrap parity mode.`
     }
   ];
 }
@@ -101,13 +113,21 @@ function buildComponents(player: PlayerInput): ScoreComponent[] {
 function scorePlayer(player: PlayerInput, request: EvaluateRequest): EvaluateResponse {
   const generatedAt = request.context.slateDate;
   const projectedMinutes = player.projectedMinutes ?? 24;
+  const recentFantasyPoints = player.recentFantasyPoints ?? 20;
   const availability = availabilityScore(player.injuryStatus);
   const components = buildComponents(player);
   const overall = round(components.reduce((sum, component) => sum + component.score * component.weight, 0));
+  const fragilityPenalty =
+    (player.injuryStatus === 'questionable' ? 0.12 : 0) +
+    (player.injuryStatus === 'doubtful' ? 0.24 : 0) +
+    (player.injuryStatus === 'out' ? 0.5 : 0) +
+    (projectedMinutes < 20 ? 0.08 : 0);
   const confidenceScore = round(
-    Math.min(1, 0.35 + availability / 400 + Math.min(projectedMinutes, 36) / 100 + (player.tags.length > 0 ? 0.05 : 0))
+    clamp(0.18 + availability / 260 + Math.min(projectedMinutes, 36) / 110 + Math.min(recentFantasyPoints, 45) / 220 + (player.tags.length > 0 ? 0.03 : 0) - fragilityPenalty, 0.05, 0.99)
   );
-  const primaryComponent = components.slice().sort((left, right) => right.score - left.score)[0];
+  const primaryComponent = components
+    .slice()
+    .sort((left, right) => right.score * right.weight - left.score * left.weight || left.key.localeCompare(right.key))[0];
 
   return validateEvaluateResponse({
     requestId: request.requestId ?? `eval-${player.playerId}-${request.context.slateId}`,
@@ -129,12 +149,13 @@ function scorePlayer(player: PlayerInput, request: EvaluateRequest): EvaluateRes
       score: confidenceScore,
       label: confidenceLabel(confidenceScore),
       deterministic: true,
-      reason: 'Confidence is a deterministic bootstrap heuristic derived from availability, projected minutes, and simple tag presence.'
+      reason:
+        'Confidence is a deterministic bootstrap heuristic derived from availability, projected minutes, recent form, and explicit fragility penalties; it remains scaffold logic rather than full legacy parity.'
     },
     reasons: [
       `${player.playerName} receives a bootstrap FORGE score of ${overall}.`,
-      'This service currently returns a transition-aligned scaffold rather than full legacy FORGE parity.',
-      `Top component driver: ${primaryComponent.key}.`
+      'This service still returns a transition-aligned scaffold rather than full legacy FORGE parity.',
+      `Top weighted component driver: ${primaryComponent.key}.`
     ],
     metadata: {
       slateId: request.context.slateId,

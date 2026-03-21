@@ -26,6 +26,8 @@ This revision aligns the bootstrap surface around:
 
 This service still returns **bootstrap scaffold** values, not parity-grade legacy FORGE results.
 
+Recent parity-oriented improvements in this repo are intentionally narrow: the bootstrap scorer now leans more heavily on opportunity and availability, applies a clearer minutes penalty for weak-opportunity cases, uses stronger low-availability penalties, and keeps confidence behavior explicit and deterministic. Those changes are meant to reduce obvious fixture drift without claiming full legacy FORGE reimplementation.
+
 The following fields are deterministic placeholders today:
 
 - component scores
@@ -51,6 +53,7 @@ This PR provides:
 - `POST /api/forge/evaluate` for single-player evaluation
 - `POST /api/forge/rankings` for deterministic multi-player rankings
 - deterministic bootstrap/demo scoring logic with explicit placeholder semantics
+- parity-oriented heuristic tuning for elite, stable mid-tier, volatile, weak-opportunity, and low-availability fixture-style scenarios
 - health, readiness, and config validation
 - OpenAPI documentation with request/response schemas
 - focused HTTP and contract tests
@@ -158,27 +161,27 @@ FORGE_SERVICE_MODE=bootstrap-demo npm start
     "salary": 8200
   },
   "score": {
-    "overall": 88.46,
+    "overall": 90.52,
     "tier": "core",
-    "rankHint": 13,
+    "rankHint": 10,
     "components": [
       {
         "key": "opportunity",
         "label": "Opportunity",
-        "weight": 0.35,
-        "score": 91.2,
-        "reason": "Projected minutes (34) drive the deterministic bootstrap opportunity component."
+        "weight": 0.4,
+        "score": 86,
+        "reason": "Projected minutes (34) anchor the deterministic bootstrap opportunity component."
       }
     ]
   },
   "confidence": {
-    "score": 0.98,
+    "score": 0.99,
     "label": "high",
     "deterministic": true,
-    "reason": "Confidence is a deterministic bootstrap heuristic derived from availability, projected minutes, and simple tag presence."
+    "reason": "Confidence is a deterministic bootstrap heuristic derived from availability, projected minutes, recent form, and explicit fragility penalties; it remains scaffold logic rather than full legacy parity."
   },
   "reasons": [
-    "Demo Guard receives a bootstrap FORGE score of 88.46."
+    "Demo Guard receives a bootstrap FORGE score of 90.52."
   ],
   "metadata": {
     "slateId": "slate-2026-03-21-main",
@@ -232,7 +235,7 @@ Validation, readiness, not-found, and unexpected failures all return a stable en
 
 The following are still deferred to later PRs:
 
-- parity-grade scoring logic and calibration
+- full parity-grade scoring logic and calibration beyond the current fixture-oriented heuristic tuning
 - real data provenance and upstream source attribution
 - spec verification against the unavailable upstream markdown file
 - adapter wiring from `TIBER-Fantasy`
