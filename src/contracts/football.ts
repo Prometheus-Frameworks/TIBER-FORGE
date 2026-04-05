@@ -1,8 +1,6 @@
 import { EvaluationContext, InjuryStatus } from './forge';
 
 export type PracticeParticipation = 'full' | 'limited' | 'did_not_practice' | 'none';
-export type ActiveProjection = 'active' | 'game_time_decision' | 'inactive' | 'unknown';
-export type DataConfidenceHint = 'high' | 'medium' | 'low' | 'unknown';
 export type OpponentDefenseTier = 'elite' | 'strong' | 'neutral' | 'weak';
 export type ExpectedGameScript = 'positive' | 'neutral' | 'negative';
 
@@ -40,13 +38,13 @@ export interface ForgeWeeklyPlayerInput {
   expectedGameScript?: ExpectedGameScript;
   injuryStatus?: InjuryStatus;
   practiceParticipation?: PracticeParticipation;
-  activeProjection?: ActiveProjection;
+  activeProjection?: string;
   roleVolatility?: number;
   sourceUpdatedAt: string;
   sourceSetId: string;
   featureCoverage: number;
   qualityFlags?: string[];
-  dataConfidenceHint?: DataConfidenceHint;
+  dataConfidenceHint?: string;
 }
 
 export interface FootballEvaluateRequest {

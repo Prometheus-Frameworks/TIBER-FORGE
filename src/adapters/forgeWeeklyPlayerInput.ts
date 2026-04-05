@@ -7,12 +7,18 @@ function clamp(value: number, min: number, max: number): number {
 export function adaptForgeWeeklyPlayerInput(input: ForgeWeeklyPlayerInput): NormalizedFootballScoringInput {
   const injuryStatus = input.injuryStatus ?? 'healthy';
   const practiceParticipation = input.practiceParticipation ?? 'none';
+  const activeProjectionHint = input.activeProjection?.trim().toLowerCase() ?? '';
+  const confidenceHint = input.dataConfidenceHint?.trim().toLowerCase() ?? '';
   const activeProjection =
-    input.activeProjection === 'inactive'
+    activeProjectionHint.includes('inactive') || activeProjectionHint.includes('out')
       ? 'expected_inactive'
-      : input.activeProjection === 'game_time_decision'
+      : activeProjectionHint.includes('game') ||
+        activeProjectionHint.includes('decision') ||
+        activeProjectionHint.includes('questionable') ||
+        activeProjectionHint.includes('limited') ||
+        activeProjectionHint.includes('risk')
       ? 'risky'
-      : input.activeProjection === 'unknown'
+      : activeProjectionHint.length === 0 || activeProjectionHint.includes('unknown')
       ? injuryStatus === 'out'
         ? 'expected_inactive'
         : 'risky'
@@ -20,11 +26,11 @@ export function adaptForgeWeeklyPlayerInput(input: ForgeWeeklyPlayerInput): Norm
   const opponentDefenseTier = input.opponentDefenseTier ?? 'neutral';
   const expectedGameScript = input.expectedGameScript ?? 'neutral';
   const dataConfidenceHint =
-    input.dataConfidenceHint === 'high'
+    confidenceHint.includes('high') || confidenceHint.includes('strong')
       ? 0.92
-      : input.dataConfidenceHint === 'medium'
+      : confidenceHint.includes('medium') || confidenceHint.includes('moderate')
       ? 0.72
-      : input.dataConfidenceHint === 'low'
+      : confidenceHint.includes('low') || confidenceHint.includes('weak')
       ? 0.46
       : input.featureCoverage;
 
