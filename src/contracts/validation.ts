@@ -203,7 +203,8 @@ export function validateRankingsRequest(value: unknown): RankingsRequest {
 
 const footballPositions = ['QB', 'RB', 'WR', 'TE'] as const;
 const practiceParticipations = ['full', 'limited', 'did_not_practice', 'none'] as const;
-const activeProjections = ['expected_active', 'risky', 'expected_inactive'] as const;
+const activeProjections = ['active', 'game_time_decision', 'inactive', 'unknown'] as const;
+const dataConfidenceHints = ['high', 'medium', 'low', 'unknown'] as const;
 const opponentDefenseTiers = ['elite', 'strong', 'neutral', 'weak'] as const;
 const expectedGameScripts = ['positive', 'neutral', 'negative'] as const;
 
@@ -216,7 +217,7 @@ function validateForgeWeeklyPlayerInput(value: unknown, path: string, errors: st
   const playerId = ensureString(value.playerId, `${path}.playerId`, errors);
   const playerName = ensureString(value.playerName, `${path}.playerName`, errors);
   const team = ensureString(value.team, `${path}.team`, errors);
-  const opponent = ensureString(value.opponent, `${path}.opponent`, errors);
+  const opponent = value.opponent === undefined ? undefined : ensureString(value.opponent, `${path}.opponent`, errors);
   const position = ensureEnum(value.position, footballPositions, `${path}.position`, errors);
   const season = ensureNumber(value.season, `${path}.season`, errors, { min: 2000, max: 2100, integer: true });
   const week = ensureNumber(value.week, `${path}.week`, errors, { min: 1, max: 25, integer: true });
@@ -240,7 +241,7 @@ function validateForgeWeeklyPlayerInput(value: unknown, path: string, errors: st
 
   const qualityFlags = value.qualityFlags === undefined ? undefined : ensureArrayOfStrings(value.qualityFlags, `${path}.qualityFlags`, errors);
 
-  if (!playerId || !playerName || !team || !opponent || !position || !season || !week || !asOf || !sourceUpdatedAt || !sourceSetId || featureCoverage === undefined) {
+  if (!playerId || !playerName || !team || !position || !season || !week || !asOf || !sourceUpdatedAt || !sourceSetId || featureCoverage === undefined) {
     return undefined;
   }
 
@@ -280,7 +281,10 @@ function validateForgeWeeklyPlayerInput(value: unknown, path: string, errors: st
     spread: parseOpt('spread', -40, 40),
     paceProxy: parseOpt('paceProxy', 0, 2),
     roleVolatility: parseOpt('roleVolatility', 0, 1),
-    dataConfidenceHint: parseOpt('dataConfidenceHint', 0, 1),
+    dataConfidenceHint:
+      value.dataConfidenceHint === undefined
+        ? undefined
+        : ensureEnum(value.dataConfidenceHint, dataConfidenceHints, `${path}.dataConfidenceHint`, errors),
     injuryStatus,
     practiceParticipation,
     activeProjection,

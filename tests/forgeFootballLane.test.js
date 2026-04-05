@@ -28,4 +28,5 @@ test('football fixture ordering rewards opportunity and penalizes fragile low-co
   assert.ok(byId['qb-dual-1'].score.overall > byId['fragile-wr-1'].score.overall);
   assert.equal(byId['fragile-wr-1'].confidence.label, 'low');
   assert.equal(byId['wr-featured-1'].source.inputContract, 'ForgeWeeklyPlayerInput/v1');
+  assert.equal(byId['qb-dual-1'].player.opponent, 'UNK');
 });

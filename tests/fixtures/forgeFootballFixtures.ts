@@ -39,10 +39,10 @@ export const forgeFootballInputs: ForgeWeeklyPlayerInput[] = [
     expectedGameScript: 'neutral',
     injuryStatus: 'healthy',
     practiceParticipation: 'full',
-    activeProjection: 'expected_active',
+    activeProjection: 'active',
     roleVolatility: 0.11,
     featureCoverage: 0.98,
-    dataConfidenceHint: 0.93,
+    dataConfidenceHint: 'high',
     qualityFlags: []
   },
   {
@@ -50,7 +50,6 @@ export const forgeFootballInputs: ForgeWeeklyPlayerInput[] = [
     playerId: 'qb-dual-1',
     playerName: 'Dual Threat QB',
     team: 'BUF',
-    opponent: 'MIA',
     position: 'QB',
     snapShare: 1,
     routeParticipation: 0,
@@ -66,10 +65,10 @@ export const forgeFootballInputs: ForgeWeeklyPlayerInput[] = [
     expectedGameScript: 'negative',
     injuryStatus: 'healthy',
     practiceParticipation: 'limited',
-    activeProjection: 'expected_active',
+    activeProjection: 'unknown',
     roleVolatility: 0.2,
     featureCoverage: 0.94,
-    dataConfidenceHint: 0.9,
+    dataConfidenceHint: 'medium',
     qualityFlags: []
   },
   {
@@ -92,10 +91,10 @@ export const forgeFootballInputs: ForgeWeeklyPlayerInput[] = [
     expectedGameScript: 'negative',
     injuryStatus: 'questionable',
     practiceParticipation: 'did_not_practice',
-    activeProjection: 'risky',
+    activeProjection: 'game_time_decision',
     roleVolatility: 0.74,
     featureCoverage: 0.61,
-    dataConfidenceHint: 0.44,
+    dataConfidenceHint: 'low',
     qualityFlags: ['thin_sample', 'injury_noise']
   }
 ];

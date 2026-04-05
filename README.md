@@ -74,6 +74,10 @@ TIBER-FORGE now includes a **small football-specific deterministic lane** that a
 - Existing bootstrap demo endpoints and behavior remain intact
 - No DB, no live ingestion pipeline, and no full parity claim in this step
 
+### Contract-boundary correction (post-PR6)
+
+PR6 introduced the football lane. A follow-up boundary correction now keeps that lane intact while aligning the public football input contract more closely to canonical `TIBER-Data` `ForgeWeeklyPlayerInput/v1` semantics (including optional `opponent`, descriptive `dataConfidenceHint`, and adapter-side normalization of `activeProjection`).
+
 ## Non-goals
 
 This repository intentionally does **not** yet include:

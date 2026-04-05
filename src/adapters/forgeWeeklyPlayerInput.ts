@@ -7,15 +7,32 @@ function clamp(value: number, min: number, max: number): number {
 export function adaptForgeWeeklyPlayerInput(input: ForgeWeeklyPlayerInput): NormalizedFootballScoringInput {
   const injuryStatus = input.injuryStatus ?? 'healthy';
   const practiceParticipation = input.practiceParticipation ?? 'none';
-  const activeProjection = input.activeProjection ?? 'expected_active';
+  const activeProjection =
+    input.activeProjection === 'inactive'
+      ? 'expected_inactive'
+      : input.activeProjection === 'game_time_decision'
+      ? 'risky'
+      : input.activeProjection === 'unknown'
+      ? injuryStatus === 'out'
+        ? 'expected_inactive'
+        : 'risky'
+      : 'expected_active';
   const opponentDefenseTier = input.opponentDefenseTier ?? 'neutral';
   const expectedGameScript = input.expectedGameScript ?? 'neutral';
+  const dataConfidenceHint =
+    input.dataConfidenceHint === 'high'
+      ? 0.92
+      : input.dataConfidenceHint === 'medium'
+      ? 0.72
+      : input.dataConfidenceHint === 'low'
+      ? 0.46
+      : input.featureCoverage;
 
   return {
     playerId: input.playerId,
     playerName: input.playerName,
     team: input.team,
-    opponent: input.opponent,
+    opponent: input.opponent ?? 'UNK',
     position: input.position,
     injuryStatus,
     tags: [`football-week-${input.week}`, `football-season-${input.season}`],
@@ -46,7 +63,7 @@ export function adaptForgeWeeklyPlayerInput(input: ForgeWeeklyPlayerInput): Norm
       activeProjection,
       roleVolatility: clamp(input.roleVolatility ?? 0.35, 0, 1),
       featureCoverage: clamp(input.featureCoverage, 0, 1),
-      dataConfidenceHint: clamp(input.dataConfidenceHint ?? input.featureCoverage, 0, 1)
+      dataConfidenceHint: clamp(dataConfidenceHint, 0, 1)
     },
     provenance: {
       sourceSetId: input.sourceSetId,
