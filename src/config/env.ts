@@ -25,7 +25,7 @@ function parseLogLevel(rawLevel: string | undefined): AppConfig['LOG_LEVEL'] {
 }
 
 function parseArtifactPath(rawPath: string | undefined): string {
-  const artifactPath = rawPath ?? 'data/gold/forge/forge_weekly_player_input_2025_w12.sample.json';
+  const artifactPath = rawPath ?? '../TIBER-Data/data/gold/forge/forge_weekly_player_input_2025_w12.sample.json';
   if (artifactPath.trim().length === 0) {
     throw new Error('Invalid FORGE_WEEKLY_INPUT_ARTIFACT_PATH. Expected a non-empty local file path.');
   }

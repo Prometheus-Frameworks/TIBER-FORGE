@@ -1,6 +1,7 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const { createServer } = require('node:http');
+const path = require('node:path');
 const { loadConfig } = require('../dist/src/config/env.js');
 const { createRequestListener } = require('../dist/src/app.js');
 const { forgeParityPlayers } = require('../dist/tests/fixtures/forgeParityFixtures.js');
@@ -35,6 +36,7 @@ const parityFixturePlayers = forgeParityPlayers;
 
 async function withServer(fn) {
   process.env.FORGE_SERVICE_MODE = 'bootstrap-demo';
+  process.env.FORGE_WEEKLY_INPUT_ARTIFACT_PATH = path.resolve(process.cwd(), 'tests/fixtures/artifacts/forge_weekly_player_input_local_fallback.sample.json');
   delete process.env.PORT;
   const config = loadConfig(process.env);
   const server = createServer(createRequestListener(config));
