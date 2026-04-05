@@ -19,12 +19,12 @@
     "expectedGameScript": "neutral",
     "injuryStatus": "healthy",
     "practiceParticipation": "full",
-    "activeProjection": "expected_active",
+    "activeProjection": 0.94,
     "roleVolatility": 0.11,
     "sourceUpdatedAt": "2025-11-22T18:05:00Z",
     "sourceSetId": "td-weekly-2025-w12-sample-v1",
     "featureCoverage": 0.98,
-    "dataConfidenceHint": 0.92
+    "dataConfidenceHint": "high-confidence upstream feed"
   },
   {
     "playerId": "qb-dual-1",
@@ -44,12 +44,12 @@
     "expectedGameScript": "negative",
     "injuryStatus": "healthy",
     "practiceParticipation": "limited",
-    "activeProjection": "risky",
+    "activeProjection": 0.62,
     "roleVolatility": 0.2,
     "sourceUpdatedAt": "2025-11-22T18:05:00Z",
     "sourceSetId": "td-weekly-2025-w12-sample-v1",
     "featureCoverage": 0.94,
-    "dataConfidenceHint": 0.72
+    "dataConfidenceHint": "moderate confidence"
   },
   {
     "playerId": "fragile-wr-1",
@@ -71,12 +71,12 @@
     "expectedGameScript": "negative",
     "injuryStatus": "questionable",
     "practiceParticipation": "did_not_practice",
-    "activeProjection": "risky",
+    "activeProjection": 0.38,
     "roleVolatility": 0.74,
     "sourceUpdatedAt": "2025-11-22T18:05:00Z",
     "sourceSetId": "td-weekly-2025-w12-sample-v1",
     "featureCoverage": 0.61,
-    "dataConfidenceHint": 0.46,
+    "dataConfidenceHint": "low-confidence due to sparse sample",
     "qualityFlags": ["thin_sample", "injury_noise"]
   }
 ]

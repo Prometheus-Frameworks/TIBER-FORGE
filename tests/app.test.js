@@ -288,7 +288,7 @@ test('POST /api/forge/rankings-football stays deterministic with stable ordering
   });
 });
 
-test('POST /api/forge/evaluate-football enforces upstream-compatible numeric hint shape', async () => {
+test('POST /api/forge/evaluate-football enforces upstream-compatible string hint semantics', async () => {
   await withServer(async (baseUrl) => {
     const response = await fetch(`${baseUrl}/api/forge/evaluate-football`, {
       method: 'POST',
@@ -297,7 +297,7 @@ test('POST /api/forge/evaluate-football enforces upstream-compatible numeric hin
         ...forgeFootballEvaluateFixture,
         input: {
           ...forgeFootballEvaluateFixture.input,
-          dataConfidenceHint: 'high-confidence upstream feed'
+          dataConfidenceHint: 0.91
         }
       })
     });

@@ -5,9 +5,15 @@ function clamp(value: number, min: number, max: number): number {
 }
 
 function normalizeActiveProjection(input: ForgeWeeklyPlayerInput): 'expected_active' | 'risky' | 'expected_inactive' {
-  const projection = input.activeProjection;
-  if (projection === 'expected_active' || projection === 'risky' || projection === 'expected_inactive') {
-    return projection;
+  const activeProjection = input.activeProjection;
+  if (typeof activeProjection === 'number') {
+    if (activeProjection <= 0.2) {
+      return 'expected_inactive';
+    }
+    if (activeProjection < 0.75) {
+      return 'risky';
+    }
+    return 'expected_active';
   }
 
   if (input.injuryStatus === 'out') {
@@ -17,13 +23,27 @@ function normalizeActiveProjection(input: ForgeWeeklyPlayerInput): 'expected_act
   return 'risky';
 }
 
+function normalizeDataConfidenceHint(input: ForgeWeeklyPlayerInput): number {
+  const confidenceHint = input.dataConfidenceHint?.trim().toLowerCase() ?? '';
+  if (confidenceHint.includes('high') || confidenceHint.includes('strong')) {
+    return 0.92;
+  }
+  if (confidenceHint.includes('medium') || confidenceHint.includes('moderate')) {
+    return 0.72;
+  }
+  if (confidenceHint.includes('low') || confidenceHint.includes('weak')) {
+    return 0.46;
+  }
+  return input.featureCoverage;
+}
+
 export function adaptForgeWeeklyPlayerInput(input: ForgeWeeklyPlayerInput): NormalizedFootballScoringInput {
   const injuryStatus = input.injuryStatus ?? 'healthy';
   const practiceParticipation = input.practiceParticipation ?? 'none';
   const activeProjection = normalizeActiveProjection(input);
   const opponentDefenseTier = input.opponentDefenseTier ?? 'neutral';
   const expectedGameScript = input.expectedGameScript ?? 'neutral';
-  const dataConfidenceHint = input.dataConfidenceHint ?? input.featureCoverage;
+  const dataConfidenceHint = normalizeDataConfidenceHint(input);
 
   return {
     playerId: input.playerId,

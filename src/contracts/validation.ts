@@ -205,7 +205,6 @@ const footballPositions = ['QB', 'RB', 'WR', 'TE'] as const;
 const practiceParticipations = ['full', 'limited', 'did_not_practice', 'none'] as const;
 const opponentDefenseTiers = ['elite', 'strong', 'neutral', 'weak'] as const;
 const expectedGameScripts = ['positive', 'neutral', 'negative'] as const;
-const activeProjections = ['expected_active', 'risky', 'expected_inactive'] as const;
 
 function validateForgeWeeklyPlayerInput(value: unknown, path: string, errors: string[]): ForgeWeeklyPlayerInput | undefined {
   if (!isObject(value)) {
@@ -232,7 +231,7 @@ function validateForgeWeeklyPlayerInput(value: unknown, path: string, errors: st
   const injuryStatus = value.injuryStatus === undefined ? undefined : ensureEnum(value.injuryStatus, allowedInjuryStatuses, `${path}.injuryStatus`, errors);
   const practiceParticipation =
     value.practiceParticipation === undefined ? undefined : ensureEnum(value.practiceParticipation, practiceParticipations, `${path}.practiceParticipation`, errors);
-  const activeProjection = value.activeProjection === undefined ? undefined : ensureEnum(value.activeProjection, activeProjections, `${path}.activeProjection`, errors);
+  const activeProjection = value.activeProjection === undefined ? undefined : ensureNumber(value.activeProjection, `${path}.activeProjection`, errors, { min: 0, max: 1 });
   const opponentDefenseTier =
     value.opponentDefenseTier === undefined ? undefined : ensureEnum(value.opponentDefenseTier, opponentDefenseTiers, `${path}.opponentDefenseTier`, errors);
   const expectedGameScript =
@@ -280,7 +279,7 @@ function validateForgeWeeklyPlayerInput(value: unknown, path: string, errors: st
     spread: parseOpt('spread', -40, 40),
     paceProxy: parseOpt('paceProxy', 0, 2),
     roleVolatility: parseOpt('roleVolatility', 0, 1),
-    dataConfidenceHint: value.dataConfidenceHint === undefined ? undefined : ensureNumber(value.dataConfidenceHint, `${path}.dataConfidenceHint`, errors, { min: 0, max: 1 }),
+    dataConfidenceHint: value.dataConfidenceHint === undefined ? undefined : ensureString(value.dataConfidenceHint, `${path}.dataConfidenceHint`, errors),
     injuryStatus,
     practiceParticipation,
     activeProjection,
