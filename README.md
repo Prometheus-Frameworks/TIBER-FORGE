@@ -82,7 +82,7 @@ PR6 introduced the football lane. A follow-up boundary correction now keeps that
 
 TIBER-FORGE can now ingest a canonical sample `ForgeWeeklyPlayerInput` artifact file from disk (defaulting to the upstream handoff path `../TIBER-Data/data/gold/forge/forge_weekly_player_input_2025_w12.sample.json`, override via `FORGE_WEEKLY_INPUT_ARTIFACT_PATH`) and run the existing deterministic football rankings lane through `POST /api/forge/rankings-football/from-artifact`.
 
-This is an operator/development ingestion path only: no live network pull from TIBER-Data, no DB, and no full production parity claim. The direct football request path and bootstrap lane remain available. Local fallback artifacts used in this repo are test fixtures, not canonical upstream sources.
+This is an operator/development ingestion path only: no live network pull from TIBER-Data, no DB, and no full production parity claim. The direct football request path and bootstrap lane remain available. Local fallback artifacts used in this repo are test fixtures, not canonical upstream sources; compatibility tests target an upstream-semantic mirror fixture.
 
 
 ## Non-goals

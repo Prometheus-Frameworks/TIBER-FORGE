@@ -4,35 +4,26 @@ function clamp(value: number, min: number, max: number): number {
   return Math.min(max, Math.max(min, value));
 }
 
+function normalizeActiveProjection(input: ForgeWeeklyPlayerInput): 'expected_active' | 'risky' | 'expected_inactive' {
+  const projection = input.activeProjection;
+  if (projection === 'expected_active' || projection === 'risky' || projection === 'expected_inactive') {
+    return projection;
+  }
+
+  if (input.injuryStatus === 'out') {
+    return 'expected_inactive';
+  }
+
+  return 'risky';
+}
+
 export function adaptForgeWeeklyPlayerInput(input: ForgeWeeklyPlayerInput): NormalizedFootballScoringInput {
   const injuryStatus = input.injuryStatus ?? 'healthy';
   const practiceParticipation = input.practiceParticipation ?? 'none';
-  const activeProjectionHint = input.activeProjection?.trim().toLowerCase() ?? '';
-  const confidenceHint = input.dataConfidenceHint?.trim().toLowerCase() ?? '';
-  const activeProjection =
-    activeProjectionHint.includes('inactive') || activeProjectionHint.includes('out')
-      ? 'expected_inactive'
-      : activeProjectionHint.includes('game') ||
-        activeProjectionHint.includes('decision') ||
-        activeProjectionHint.includes('questionable') ||
-        activeProjectionHint.includes('limited') ||
-        activeProjectionHint.includes('risk')
-      ? 'risky'
-      : activeProjectionHint.length === 0 || activeProjectionHint.includes('unknown')
-      ? injuryStatus === 'out'
-        ? 'expected_inactive'
-        : 'risky'
-      : 'expected_active';
+  const activeProjection = normalizeActiveProjection(input);
   const opponentDefenseTier = input.opponentDefenseTier ?? 'neutral';
   const expectedGameScript = input.expectedGameScript ?? 'neutral';
-  const dataConfidenceHint =
-    confidenceHint.includes('high') || confidenceHint.includes('strong')
-      ? 0.92
-      : confidenceHint.includes('medium') || confidenceHint.includes('moderate')
-      ? 0.72
-      : confidenceHint.includes('low') || confidenceHint.includes('weak')
-      ? 0.46
-      : input.featureCoverage;
+  const dataConfidenceHint = input.dataConfidenceHint ?? input.featureCoverage;
 
   return {
     playerId: input.playerId,

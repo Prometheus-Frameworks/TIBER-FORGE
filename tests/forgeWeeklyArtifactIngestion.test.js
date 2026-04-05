@@ -5,10 +5,10 @@ const os = require('node:os');
 const path = require('node:path');
 const { ingestForgeWeeklyArtifact } = require('../dist/src/ingestion/forgeWeeklyArtifact.js');
 
-const localFallbackArtifactPath = path.resolve(process.cwd(), 'tests/fixtures/artifacts/forge_weekly_player_input_local_fallback.sample.json');
+const upstreamCompatMirrorPath = path.resolve(process.cwd(), 'tests/fixtures/artifacts/forge_weekly_player_input_2025_w12.upstream_compat.mirror.json');
 
-test('ingestForgeWeeklyArtifact reads and validates local fallback sample artifact', async () => {
-  const records = await ingestForgeWeeklyArtifact(localFallbackArtifactPath);
+test('ingestForgeWeeklyArtifact reads and validates upstream-compatible mirror artifact', async () => {
+  const records = await ingestForgeWeeklyArtifact(upstreamCompatMirrorPath);
 
   assert.equal(records.length, 3);
   assert.equal(records[0].playerId, 'wr-featured-1');

@@ -39,10 +39,10 @@ export const forgeFootballInputs: ForgeWeeklyPlayerInput[] = [
     expectedGameScript: 'neutral',
     injuryStatus: 'healthy',
     practiceParticipation: 'full',
-    activeProjection: 'likely active',
+    activeProjection: 'expected_active',
     roleVolatility: 0.11,
     featureCoverage: 0.98,
-    dataConfidenceHint: 'high-confidence upstream feed',
+    dataConfidenceHint: 0.92,
     qualityFlags: []
   },
   {
@@ -65,10 +65,10 @@ export const forgeFootballInputs: ForgeWeeklyPlayerInput[] = [
     expectedGameScript: 'negative',
     injuryStatus: 'healthy',
     practiceParticipation: 'limited',
-    activeProjection: 'game-time decision',
+    activeProjection: 'risky',
     roleVolatility: 0.2,
     featureCoverage: 0.94,
-    dataConfidenceHint: 'moderate confidence',
+    dataConfidenceHint: 0.72,
     qualityFlags: []
   },
   {
@@ -91,10 +91,10 @@ export const forgeFootballInputs: ForgeWeeklyPlayerInput[] = [
     expectedGameScript: 'negative',
     injuryStatus: 'questionable',
     practiceParticipation: 'did_not_practice',
-    activeProjection: 'risky start window',
+    activeProjection: 'risky',
     roleVolatility: 0.74,
     featureCoverage: 0.61,
-    dataConfidenceHint: 'low-confidence due to sparse sample',
+    dataConfidenceHint: 0.46,
     qualityFlags: ['thin_sample', 'injury_noise']
   }
 ];

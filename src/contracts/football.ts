@@ -38,13 +38,13 @@ export interface ForgeWeeklyPlayerInput {
   expectedGameScript?: ExpectedGameScript;
   injuryStatus?: InjuryStatus;
   practiceParticipation?: PracticeParticipation;
-  activeProjection?: string;
+  activeProjection?: 'expected_active' | 'risky' | 'expected_inactive';
   roleVolatility?: number;
   sourceUpdatedAt: string;
   sourceSetId: string;
   featureCoverage: number;
   qualityFlags?: string[];
-  dataConfidenceHint?: string;
+  dataConfidenceHint?: number;
 }
 
 export interface FootballEvaluateRequest {

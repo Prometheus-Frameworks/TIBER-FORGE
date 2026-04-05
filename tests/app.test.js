@@ -36,7 +36,7 @@ const parityFixturePlayers = forgeParityPlayers;
 
 async function withServer(fn) {
   process.env.FORGE_SERVICE_MODE = 'bootstrap-demo';
-  process.env.FORGE_WEEKLY_INPUT_ARTIFACT_PATH = path.resolve(process.cwd(), 'tests/fixtures/artifacts/forge_weekly_player_input_local_fallback.sample.json');
+  process.env.FORGE_WEEKLY_INPUT_ARTIFACT_PATH = path.resolve(process.cwd(), 'tests/fixtures/artifacts/forge_weekly_player_input_2025_w12.upstream_compat.mirror.json');
   delete process.env.PORT;
   const config = loadConfig(process.env);
   const server = createServer(createRequestListener(config));
@@ -288,7 +288,7 @@ test('POST /api/forge/rankings-football stays deterministic with stable ordering
   });
 });
 
-test('POST /api/forge/evaluate-football enforces canonical v1 hint shape instead of local numeric variant', async () => {
+test('POST /api/forge/evaluate-football enforces upstream-compatible numeric hint shape', async () => {
   await withServer(async (baseUrl) => {
     const response = await fetch(`${baseUrl}/api/forge/evaluate-football`, {
       method: 'POST',
@@ -297,7 +297,7 @@ test('POST /api/forge/evaluate-football enforces canonical v1 hint shape instead
         ...forgeFootballEvaluateFixture,
         input: {
           ...forgeFootballEvaluateFixture.input,
-          dataConfidenceHint: 0.91
+          dataConfidenceHint: 'high-confidence upstream feed'
         }
       })
     });
