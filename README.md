@@ -59,6 +59,10 @@ This PR provides:
 - focused HTTP and contract tests
 - internal parity regression fixtures and ordering assertions to guard against future heuristic drift
 
+## Architecture specs
+
+- `docs/architecture/TIBER_DATA_TO_FORGE_INGESTION_SPEC.md` - spec-first boundary and candidate contract for canonical weekly TIBER-Data -> TIBER-FORGE ingestion (no runtime integration in this PR).
+
 ## Non-goals
 
 This repository intentionally does **not** yet include:
