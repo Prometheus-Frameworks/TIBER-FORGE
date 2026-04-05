@@ -5,7 +5,7 @@ export const allowedInjuryStatuses = ['healthy', 'questionable', 'doubtful', 'ou
 export const allowedErrorCategories = ['VALIDATION_ERROR', 'CONFIG_ERROR', 'NOT_READY', 'NOT_FOUND', 'INTERNAL_ERROR'] as const;
 export const allowedConfidenceLabels = ['low', 'medium', 'high'] as const;
 export const allowedTiers = ['core', 'strong', 'neutral', 'avoid'] as const;
-export const allowedComponentKeys = ['opportunity', 'recent_form', 'salary_efficiency', 'availability'] as const;
+export const allowedComponentKeys = ['opportunity', 'recent_form', 'salary_efficiency', 'availability', 'efficiency', 'environment', 'stability'] as const;
 
 export type Position = (typeof allowedPositions)[number];
 export type ContestType = (typeof allowedContestTypes)[number];
@@ -84,17 +84,19 @@ export interface EvaluationMetadata {
   mode: ForgeMode;
   injuryStatus: InjuryStatus;
   tags: string[];
-  bootstrap: true;
+  bootstrap: boolean;
+  inputContract?: string;
 }
 
 export interface SourceMetadata {
-  provider: 'tiber-forge-bootstrap';
+  provider: 'tiber-forge-bootstrap' | 'tiber-forge-football-lane';
   version: string;
   mode: 'bootstrap-demo';
   deterministic: true;
-  parityStatus: 'bootstrap-scaffold';
-  specAlignment: 'pr72-transition';
+  parityStatus: 'bootstrap-scaffold' | 'football-lane-v1';
+  specAlignment: 'pr72-transition' | 'tiber-data-forge-ingestion-v1';
   generatedAt: string;
+  inputContract?: 'ForgeWeeklyPlayerInput/v1';
 }
 
 export interface EvaluateResponse {

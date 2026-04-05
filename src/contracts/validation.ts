@@ -18,6 +18,7 @@ import {
   ScoreComponent,
   SourceMetadata
 } from './forge';
+import { FootballEvaluateRequest, FootballRankingsRequest, ForgeWeeklyPlayerInput } from './football';
 
 export class ValidationError extends Error {
   constructor(
@@ -198,6 +199,141 @@ export function validateRankingsRequest(value: unknown): RankingsRequest {
   return { requestId, players, context, limit, includeExplanations };
 }
 
+
+
+const footballPositions = ['QB', 'RB', 'WR', 'TE'] as const;
+const practiceParticipations = ['full', 'limited', 'did_not_practice', 'none'] as const;
+const activeProjections = ['expected_active', 'risky', 'expected_inactive'] as const;
+const opponentDefenseTiers = ['elite', 'strong', 'neutral', 'weak'] as const;
+const expectedGameScripts = ['positive', 'neutral', 'negative'] as const;
+
+function validateForgeWeeklyPlayerInput(value: unknown, path: string, errors: string[]): ForgeWeeklyPlayerInput | undefined {
+  if (!isObject(value)) {
+    errors.push(`${path} must be an object.`);
+    return undefined;
+  }
+
+  const playerId = ensureString(value.playerId, `${path}.playerId`, errors);
+  const playerName = ensureString(value.playerName, `${path}.playerName`, errors);
+  const team = ensureString(value.team, `${path}.team`, errors);
+  const opponent = ensureString(value.opponent, `${path}.opponent`, errors);
+  const position = ensureEnum(value.position, footballPositions, `${path}.position`, errors);
+  const season = ensureNumber(value.season, `${path}.season`, errors, { min: 2000, max: 2100, integer: true });
+  const week = ensureNumber(value.week, `${path}.week`, errors, { min: 1, max: 25, integer: true });
+  const asOf = ensureIsoDate(value.asOf, `${path}.asOf`, errors);
+
+  const sourceUpdatedAt = ensureIsoDate(value.sourceUpdatedAt, `${path}.sourceUpdatedAt`, errors);
+  const sourceSetId = ensureString(value.sourceSetId, `${path}.sourceSetId`, errors);
+  const featureCoverage = ensureNumber(value.featureCoverage, `${path}.featureCoverage`, errors, { min: 0, max: 1 });
+
+  const parseOpt = (name: string, min: number, max: number) =>
+    value[name] === undefined ? undefined : ensureNumber(value[name], `${path}.${name}`, errors, { min, max });
+
+  const injuryStatus = value.injuryStatus === undefined ? undefined : ensureEnum(value.injuryStatus, allowedInjuryStatuses, `${path}.injuryStatus`, errors);
+  const practiceParticipation =
+    value.practiceParticipation === undefined ? undefined : ensureEnum(value.practiceParticipation, practiceParticipations, `${path}.practiceParticipation`, errors);
+  const activeProjection = value.activeProjection === undefined ? undefined : ensureEnum(value.activeProjection, activeProjections, `${path}.activeProjection`, errors);
+  const opponentDefenseTier =
+    value.opponentDefenseTier === undefined ? undefined : ensureEnum(value.opponentDefenseTier, opponentDefenseTiers, `${path}.opponentDefenseTier`, errors);
+  const expectedGameScript =
+    value.expectedGameScript === undefined ? undefined : ensureEnum(value.expectedGameScript, expectedGameScripts, `${path}.expectedGameScript`, errors);
+
+  const qualityFlags = value.qualityFlags === undefined ? undefined : ensureArrayOfStrings(value.qualityFlags, `${path}.qualityFlags`, errors);
+
+  if (!playerId || !playerName || !team || !opponent || !position || !season || !week || !asOf || !sourceUpdatedAt || !sourceSetId || featureCoverage === undefined) {
+    return undefined;
+  }
+
+  return {
+    playerId,
+    playerName,
+    team,
+    opponent,
+    position,
+    season,
+    week,
+    asOf,
+    sourceUpdatedAt,
+    sourceSetId,
+    featureCoverage,
+    externalPlayerIds: isObject(value.externalPlayerIds)
+      ? {
+          gsisId: value.externalPlayerIds.gsisId === undefined ? undefined : ensureString(value.externalPlayerIds.gsisId, `${path}.externalPlayerIds.gsisId`, errors),
+          pfrId: value.externalPlayerIds.pfrId === undefined ? undefined : ensureString(value.externalPlayerIds.pfrId, `${path}.externalPlayerIds.pfrId`, errors),
+          sleeperId: value.externalPlayerIds.sleeperId === undefined ? undefined : ensureString(value.externalPlayerIds.sleeperId, `${path}.externalPlayerIds.sleeperId`, errors)
+        }
+      : undefined,
+    snaps: parseOpt('snaps', 0, 120),
+    snapShare: parseOpt('snapShare', 0, 1),
+    routesRun: parseOpt('routesRun', 0, 80),
+    routeParticipation: parseOpt('routeParticipation', 0, 1),
+    rushAttempts: parseOpt('rushAttempts', 0, 50),
+    targets: parseOpt('targets', 0, 30),
+    redZoneTouches: parseOpt('redZoneTouches', 0, 20),
+    goalLineTouches: parseOpt('goalLineTouches', 0, 10),
+    yardsPerRouteRun: parseOpt('yardsPerRouteRun', 0, 6),
+    yardsPerCarry: parseOpt('yardsPerCarry', 0, 10),
+    catchRate: parseOpt('catchRate', 0, 1),
+    fantasyPointsPerOpportunity: parseOpt('fantasyPointsPerOpportunity', 0, 3),
+    explosivePlayRate: parseOpt('explosivePlayRate', 0, 1),
+    impliedTeamTotal: parseOpt('impliedTeamTotal', 0, 60),
+    spread: parseOpt('spread', -40, 40),
+    paceProxy: parseOpt('paceProxy', 0, 2),
+    roleVolatility: parseOpt('roleVolatility', 0, 1),
+    dataConfidenceHint: parseOpt('dataConfidenceHint', 0, 1),
+    injuryStatus,
+    practiceParticipation,
+    activeProjection,
+    opponentDefenseTier,
+    expectedGameScript,
+    qualityFlags
+  };
+}
+
+export function validateFootballEvaluateRequest(value: unknown): FootballEvaluateRequest {
+  const errors: string[] = [];
+  if (!isObject(value)) {
+    throw new ValidationError('INVALID_REQUEST_BODY', ['Body must be a JSON object.']);
+  }
+
+  const requestId = value.requestId === undefined ? undefined : ensureString(value.requestId, 'requestId', errors);
+  const input = validateForgeWeeklyPlayerInput(value.input, 'input', errors);
+  const context = validateContext(value.context, 'context', errors);
+
+  if (errors.length > 0 || !input || !context) {
+    throw new ValidationError('INVALID_REQUEST_BODY', errors);
+  }
+
+  return { requestId, input, context };
+}
+
+export function validateFootballRankingsRequest(value: unknown): FootballRankingsRequest {
+  const errors: string[] = [];
+  if (!isObject(value)) {
+    throw new ValidationError('INVALID_REQUEST_BODY', ['Body must be a JSON object.']);
+  }
+
+  const requestId = value.requestId === undefined ? undefined : ensureString(value.requestId, 'requestId', errors);
+  const context = validateContext(value.context, 'context', errors);
+  const includeExplanations = value.includeExplanations === undefined ? true : ensureBoolean(value.includeExplanations, 'includeExplanations', errors);
+
+  if (!Array.isArray(value.inputs) || value.inputs.length === 0 || value.inputs.length > 100) {
+    errors.push('inputs must be an array containing between 1 and 100 records.');
+  }
+
+  const inputs = Array.isArray(value.inputs)
+    ? value.inputs.map((input, index) => validateForgeWeeklyPlayerInput(input, `inputs[${index}]`, errors)).filter((input): input is ForgeWeeklyPlayerInput => Boolean(input))
+    : [];
+
+  const limit = value.limit === undefined ? undefined : ensureNumber(value.limit, 'limit', errors, { min: 1, max: 100, integer: true });
+
+  if (errors.length > 0 || !context || includeExplanations === undefined) {
+    throw new ValidationError('INVALID_REQUEST_BODY', errors);
+  }
+
+  return { requestId, context, inputs, limit, includeExplanations };
+}
+
 function validateScoreComponent(component: unknown, path: string, errors: string[]): component is ScoreComponent {
   if (!isObject(component)) {
     errors.push(`${path} must be an object.`);
@@ -225,8 +361,8 @@ function validateMetadata(metadata: unknown, path: string, errors: string[]): me
   ensureEnum(metadata.mode, allowedModes, `${path}.mode`, errors);
   ensureEnum(metadata.injuryStatus, allowedInjuryStatuses, `${path}.injuryStatus`, errors);
   ensureArrayOfStrings(metadata.tags, `${path}.tags`, errors);
-  if (metadata.bootstrap !== true) {
-    errors.push(`${path}.bootstrap must be true.`);
+  if (typeof metadata.bootstrap !== 'boolean') {
+    errors.push(`${path}.bootstrap must be a boolean.`);
   }
   return true;
 }

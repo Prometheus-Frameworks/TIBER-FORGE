@@ -4,6 +4,7 @@ const { createServer } = require('node:http');
 const { loadConfig } = require('../dist/src/config/env.js');
 const { createRequestListener } = require('../dist/src/app.js');
 const { forgeParityPlayers } = require('../dist/tests/fixtures/forgeParityFixtures.js');
+const { forgeFootballEvaluateFixture, forgeFootballInputs, footballFixtureContext } = require('../dist/tests/fixtures/forgeFootballFixtures.js');
 
 const validEvaluateRequest = {
   requestId: 'req-eval-1',
@@ -224,6 +225,63 @@ test('POST /api/forge/rankings supports includeExplanations=false deterministica
     assert.equal(body.metadata.includeExplanations, false);
     assert.equal(body.rankings[0].score.components.length, 0);
     assert.deepEqual(body.rankings[0].reasons, ['Explanation output suppressed by includeExplanations=false during bootstrap mode.']);
+  });
+});
+
+
+
+test('POST /api/forge/evaluate-football returns FORGE-shaped deterministic football-lane response', async () => {
+  await withServer(async (baseUrl) => {
+    const response = await fetch(`${baseUrl}/api/forge/evaluate-football`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify(forgeFootballEvaluateFixture)
+    });
+    const body = await response.json();
+
+    assert.equal(response.status, 200);
+    assert.equal(body.requestId, 'football-eval-featured');
+    assert.equal(body.player.playerId, 'wr-featured-1');
+    assert.deepEqual(body.score.components.map((component) => component.key), ['opportunity', 'efficiency', 'environment', 'stability']);
+    assert.equal(body.source.provider, 'tiber-forge-football-lane');
+    assert.equal(body.source.inputContract, 'ForgeWeeklyPlayerInput/v1');
+    assert.equal(body.source.parityStatus, 'football-lane-v1');
+    assert.equal(body.metadata.bootstrap, false);
+    assert.equal(body.metadata.inputContract, 'ForgeWeeklyPlayerInput/v1');
+  });
+});
+
+test('POST /api/forge/rankings-football stays deterministic with stable ordering for fixture pack', async () => {
+  await withServer(async (baseUrl) => {
+    const payload = JSON.stringify({
+      requestId: 'football-rankings-1',
+      inputs: forgeFootballInputs,
+      context: footballFixtureContext,
+      includeExplanations: true
+    });
+
+    const [firstResponse, secondResponse] = await Promise.all([
+      fetch(`${baseUrl}/api/forge/rankings-football`, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: payload
+      }),
+      fetch(`${baseUrl}/api/forge/rankings-football`, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: payload
+      })
+    ]);
+
+    const firstBody = await firstResponse.json();
+    const secondBody = await secondResponse.json();
+
+    assert.equal(firstResponse.status, 200);
+    assert.equal(secondResponse.status, 200);
+    assert.deepEqual(secondBody, firstBody);
+    assert.deepEqual(firstBody.rankings.map((entry) => entry.player.playerId), ['wr-featured-1', 'qb-dual-1', 'fragile-wr-1']);
+    assert.equal(firstBody.rankings[0].confidence.label, 'high');
+    assert.equal(firstBody.rankings[2].confidence.label, 'low');
   });
 });
 

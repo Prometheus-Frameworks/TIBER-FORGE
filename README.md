@@ -63,6 +63,17 @@ This PR provides:
 
 - `docs/architecture/TIBER_DATA_TO_FORGE_INGESTION_SPEC.md` - spec-first boundary and candidate contract for canonical weekly TIBER-Data -> TIBER-FORGE ingestion (no runtime integration in this PR).
 
+
+## Initial football lane (ForgeWeeklyPlayerInput v1)
+
+TIBER-FORGE now includes a **small football-specific deterministic lane** that accepts canonical `ForgeWeeklyPlayerInput`-shaped payloads and maps them through a narrow adapter into FORGE-shaped evaluate/rankings outputs.
+
+- New lane endpoints: `POST /api/forge/evaluate-football` and `POST /api/forge/rankings-football`
+- Uses football-oriented components (`opportunity`, `efficiency`, `environment`, `stability`) with deterministic scoring
+- Source metadata explicitly marks this as `football-lane-v1` with `inputContract: "ForgeWeeklyPlayerInput/v1"`
+- Existing bootstrap demo endpoints and behavior remain intact
+- No DB, no live ingestion pipeline, and no full parity claim in this step
+
 ## Non-goals
 
 This repository intentionally does **not** yet include:

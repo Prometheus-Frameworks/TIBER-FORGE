@@ -1,9 +1,10 @@
 import { IncomingMessage, ServerResponse } from 'node:http';
 import { AppConfig } from './config/env';
 import { ErrorCategory } from './contracts/forge';
-import { ValidationError, validateEvaluateRequest, validateRankingsRequest } from './contracts/validation';
+import { ValidationError, validateEvaluateRequest, validateFootballEvaluateRequest, validateFootballRankingsRequest, validateRankingsRequest } from './contracts/validation';
 import { openApiDocument } from './openapi/document';
 import { evaluatePlayer, rankPlayers } from './services/forgeService';
+import { evaluateFootballPlayer, rankFootballPlayers } from './services/footballForgeService';
 
 const SERVICE_VERSION = '0.2.0';
 
@@ -91,6 +92,17 @@ export async function handleRequest(request: IncomingMessage, state: AppState): 
   if (method === 'POST' && url.pathname === '/api/forge/rankings') {
     const payload = await readJsonBody(request);
     return json(200, rankPlayers(validateRankingsRequest(payload)));
+  }
+
+
+  if (method === 'POST' && url.pathname === '/api/forge/evaluate-football') {
+    const payload = await readJsonBody(request);
+    return json(200, evaluateFootballPlayer(validateFootballEvaluateRequest(payload)));
+  }
+
+  if (method === 'POST' && url.pathname === '/api/forge/rankings-football') {
+    const payload = await readJsonBody(request);
+    return json(200, rankFootballPlayers(validateFootballRankingsRequest(payload)));
   }
 
   return errorEnvelope(404, 'NOT_FOUND', 'ROUTE_NOT_FOUND', 'Route not found.');
