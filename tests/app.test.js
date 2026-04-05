@@ -280,8 +280,29 @@ test('POST /api/forge/rankings-football stays deterministic with stable ordering
     assert.equal(secondResponse.status, 200);
     assert.deepEqual(secondBody, firstBody);
     assert.deepEqual(firstBody.rankings.map((entry) => entry.player.playerId), ['wr-featured-1', 'qb-dual-1', 'fragile-wr-1']);
+    assert.equal(firstBody.rankings[1].player.opponent, 'UNK');
     assert.equal(firstBody.rankings[0].confidence.label, 'high');
     assert.equal(firstBody.rankings[2].confidence.label, 'low');
+  });
+});
+
+test('POST /api/forge/evaluate-football enforces canonical v1 hint shape instead of local numeric variant', async () => {
+  await withServer(async (baseUrl) => {
+    const response = await fetch(`${baseUrl}/api/forge/evaluate-football`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({
+        ...forgeFootballEvaluateFixture,
+        input: {
+          ...forgeFootballEvaluateFixture.input,
+          dataConfidenceHint: 0.91
+        }
+      })
+    });
+    const body = await response.json();
+
+    assert.equal(response.status, 400);
+    assert.equal(body.error.category, 'VALIDATION_ERROR');
   });
 });
 

@@ -7,15 +7,38 @@ function clamp(value: number, min: number, max: number): number {
 export function adaptForgeWeeklyPlayerInput(input: ForgeWeeklyPlayerInput): NormalizedFootballScoringInput {
   const injuryStatus = input.injuryStatus ?? 'healthy';
   const practiceParticipation = input.practiceParticipation ?? 'none';
-  const activeProjection = input.activeProjection ?? 'expected_active';
+  const activeProjectionHint = input.activeProjection?.trim().toLowerCase() ?? '';
+  const confidenceHint = input.dataConfidenceHint?.trim().toLowerCase() ?? '';
+  const activeProjection =
+    activeProjectionHint.includes('inactive') || activeProjectionHint.includes('out')
+      ? 'expected_inactive'
+      : activeProjectionHint.includes('game') ||
+        activeProjectionHint.includes('decision') ||
+        activeProjectionHint.includes('questionable') ||
+        activeProjectionHint.includes('limited') ||
+        activeProjectionHint.includes('risk')
+      ? 'risky'
+      : activeProjectionHint.length === 0 || activeProjectionHint.includes('unknown')
+      ? injuryStatus === 'out'
+        ? 'expected_inactive'
+        : 'risky'
+      : 'expected_active';
   const opponentDefenseTier = input.opponentDefenseTier ?? 'neutral';
   const expectedGameScript = input.expectedGameScript ?? 'neutral';
+  const dataConfidenceHint =
+    confidenceHint.includes('high') || confidenceHint.includes('strong')
+      ? 0.92
+      : confidenceHint.includes('medium') || confidenceHint.includes('moderate')
+      ? 0.72
+      : confidenceHint.includes('low') || confidenceHint.includes('weak')
+      ? 0.46
+      : input.featureCoverage;
 
   return {
     playerId: input.playerId,
     playerName: input.playerName,
     team: input.team,
-    opponent: input.opponent,
+    opponent: input.opponent ?? 'UNK',
     position: input.position,
     injuryStatus,
     tags: [`football-week-${input.week}`, `football-season-${input.season}`],
@@ -46,7 +69,7 @@ export function adaptForgeWeeklyPlayerInput(input: ForgeWeeklyPlayerInput): Norm
       activeProjection,
       roleVolatility: clamp(input.roleVolatility ?? 0.35, 0, 1),
       featureCoverage: clamp(input.featureCoverage, 0, 1),
-      dataConfidenceHint: clamp(input.dataConfidenceHint ?? input.featureCoverage, 0, 1)
+      dataConfidenceHint: clamp(dataConfidenceHint, 0, 1)
     },
     provenance: {
       sourceSetId: input.sourceSetId,
