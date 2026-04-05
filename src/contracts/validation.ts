@@ -18,7 +18,7 @@ import {
   ScoreComponent,
   SourceMetadata
 } from './forge';
-import { FootballEvaluateRequest, FootballRankingsRequest, ForgeWeeklyPlayerInput } from './football';
+import { FootballArtifactRankingsRequest, FootballEvaluateRequest, FootballRankingsRequest, ForgeWeeklyPlayerInput } from './football';
 
 export class ValidationError extends Error {
   constructor(
@@ -289,6 +289,24 @@ function validateForgeWeeklyPlayerInput(value: unknown, path: string, errors: st
   };
 }
 
+
+export function validateForgeWeeklyPlayerInputArray(value: unknown, path = 'inputs'): ForgeWeeklyPlayerInput[] {
+  const errors: string[] = [];
+  if (!Array.isArray(value) || value.length === 0 || value.length > 1000) {
+    errors.push(`${path} must be an array containing between 1 and 1000 records.`);
+  }
+
+  const inputs = Array.isArray(value)
+    ? value.map((input, index) => validateForgeWeeklyPlayerInput(input, `${path}[${index}]`, errors)).filter((input): input is ForgeWeeklyPlayerInput => Boolean(input))
+    : [];
+
+  if (errors.length > 0) {
+    throw new ValidationError('INVALID_ARTIFACT_INPUT', errors, 'Artifact input validation failed.');
+  }
+
+  return inputs;
+}
+
 export function validateFootballEvaluateRequest(value: unknown): FootballEvaluateRequest {
   const errors: string[] = [];
   if (!isObject(value)) {
@@ -304,6 +322,26 @@ export function validateFootballEvaluateRequest(value: unknown): FootballEvaluat
   }
 
   return { requestId, input, context };
+}
+
+
+export function validateFootballArtifactRankingsRequest(value: unknown): FootballArtifactRankingsRequest {
+  const errors: string[] = [];
+  if (!isObject(value)) {
+    throw new ValidationError('INVALID_REQUEST_BODY', ['Body must be a JSON object.']);
+  }
+
+  const requestId = value.requestId === undefined ? undefined : ensureString(value.requestId, 'requestId', errors);
+  const artifactPath = value.artifactPath === undefined ? undefined : ensureString(value.artifactPath, 'artifactPath', errors);
+  const context = value.context === undefined ? undefined : validateContext(value.context, 'context', errors);
+  const includeExplanations = value.includeExplanations === undefined ? true : ensureBoolean(value.includeExplanations, 'includeExplanations', errors);
+  const limit = value.limit === undefined ? undefined : ensureNumber(value.limit, 'limit', errors, { min: 1, max: 1000, integer: true });
+
+  if (errors.length > 0 || includeExplanations === undefined) {
+    throw new ValidationError('INVALID_REQUEST_BODY', errors);
+  }
+
+  return { requestId, artifactPath, context, limit, includeExplanations };
 }
 
 export function validateFootballRankingsRequest(value: unknown): FootballRankingsRequest {

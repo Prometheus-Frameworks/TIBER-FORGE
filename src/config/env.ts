@@ -2,6 +2,7 @@ export interface AppConfig {
   FORGE_SERVICE_MODE: 'bootstrap-demo';
   PORT: number;
   LOG_LEVEL: 'debug' | 'info' | 'warn' | 'error';
+  FORGE_WEEKLY_INPUT_ARTIFACT_PATH: string;
 }
 
 function parsePort(rawPort: string | undefined): number {
@@ -23,6 +24,14 @@ function parseLogLevel(rawLevel: string | undefined): AppConfig['LOG_LEVEL'] {
   throw new Error('Invalid LOG_LEVEL. Expected one of: debug, info, warn, error.');
 }
 
+function parseArtifactPath(rawPath: string | undefined): string {
+  const artifactPath = rawPath ?? 'data/gold/forge/forge_weekly_player_input_2025_w12.sample.json';
+  if (artifactPath.trim().length === 0) {
+    throw new Error('Invalid FORGE_WEEKLY_INPUT_ARTIFACT_PATH. Expected a non-empty local file path.');
+  }
+  return artifactPath;
+}
+
 export function loadConfig(env: NodeJS.ProcessEnv = process.env): AppConfig {
   if (env.FORGE_SERVICE_MODE !== 'bootstrap-demo') {
     throw new Error('Missing or invalid FORGE_SERVICE_MODE. Expected FORGE_SERVICE_MODE=bootstrap-demo.');
@@ -31,6 +40,7 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): AppConfig {
   return {
     FORGE_SERVICE_MODE: 'bootstrap-demo',
     PORT: parsePort(env.PORT),
-    LOG_LEVEL: parseLogLevel(env.LOG_LEVEL)
+    LOG_LEVEL: parseLogLevel(env.LOG_LEVEL),
+    FORGE_WEEKLY_INPUT_ARTIFACT_PATH: parseArtifactPath(env.FORGE_WEEKLY_INPUT_ARTIFACT_PATH)
   };
 }

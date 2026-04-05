@@ -61,6 +61,14 @@ export interface FootballRankingsRequest {
   includeExplanations?: boolean;
 }
 
+export interface FootballArtifactRankingsRequest {
+  requestId?: string;
+  artifactPath?: string;
+  context?: EvaluationContext;
+  limit?: number;
+  includeExplanations?: boolean;
+}
+
 export interface NormalizedFootballScoringInput {
   playerId: string;
   playerName: string;

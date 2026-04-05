@@ -306,6 +306,56 @@ test('POST /api/forge/evaluate-football enforces canonical v1 hint shape instead
   });
 });
 
+
+
+test('POST /api/forge/rankings-football/from-artifact returns deterministic FORGE-shaped rankings from canonical sample artifact', async () => {
+  await withServer(async (baseUrl) => {
+    const payload = JSON.stringify({
+      requestId: 'football-artifact-rankings-1',
+      includeExplanations: true
+    });
+
+    const [firstResponse, secondResponse] = await Promise.all([
+      fetch(`${baseUrl}/api/forge/rankings-football/from-artifact`, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: payload
+      }),
+      fetch(`${baseUrl}/api/forge/rankings-football/from-artifact`, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: payload
+      })
+    ]);
+
+    const firstBody = await firstResponse.json();
+    const secondBody = await secondResponse.json();
+
+    assert.equal(firstResponse.status, 200);
+    assert.equal(secondResponse.status, 200);
+    assert.deepEqual(firstBody, secondBody);
+    assert.deepEqual(firstBody.rankings.map((entry) => entry.player.playerId), ['wr-featured-1', 'qb-dual-1', 'fragile-wr-1']);
+    assert.equal(firstBody.source.provider, 'tiber-forge-football-lane');
+    assert.ok(firstBody.warnings.some((warning) => warning.includes('Artifact ingestion path')));
+    assert.ok(firstBody.warnings.some((warning) => warning.includes('not live TIBER-Data pull parity')));
+  });
+});
+
+test('POST /api/forge/rankings-football/from-artifact fails closed for invalid artifact override', async () => {
+  await withServer(async (baseUrl) => {
+    const response = await fetch(`${baseUrl}/api/forge/rankings-football/from-artifact`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ artifactPath: 'tests/fixtures/forgeFootballFixtures.ts' })
+    });
+    const body = await response.json();
+
+    assert.equal(response.status, 400);
+    assert.equal(body.error.category, 'VALIDATION_ERROR');
+    assert.equal(body.error.code, 'ARTIFACT_INVALID_JSON');
+  });
+});
+
 test('POST /api/forge/rankings rejects malformed requests', async () => {
   await withServer(async (baseUrl) => {
     const response = await fetch(`${baseUrl}/api/forge/rankings`, {
