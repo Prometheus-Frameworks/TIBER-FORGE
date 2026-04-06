@@ -7,6 +7,7 @@ declare class Buffer {
 
 declare const process: {
   env: NodeJS.ProcessEnv;
+  cwd(): string;
 };
 
 declare namespace NodeJS {
@@ -38,4 +39,12 @@ declare module 'node:http' {
   export function createServer(
     listener: (request: IncomingMessage, response: ServerResponse) => void | Promise<void>
   ): Server;
+}
+
+declare module 'node:path' {
+  export function resolve(...paths: string[]): string;
+}
+
+declare module 'node:fs/promises' {
+  export function readFile(path: string, encoding: string): Promise<string>;
 }

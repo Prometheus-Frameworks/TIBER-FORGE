@@ -38,7 +38,7 @@ export interface ForgeWeeklyPlayerInput {
   expectedGameScript?: ExpectedGameScript;
   injuryStatus?: InjuryStatus;
   practiceParticipation?: PracticeParticipation;
-  activeProjection?: string;
+  activeProjection?: number;
   roleVolatility?: number;
   sourceUpdatedAt: string;
   sourceSetId: string;
@@ -57,6 +57,14 @@ export interface FootballRankingsRequest {
   requestId?: string;
   inputs: ForgeWeeklyPlayerInput[];
   context: EvaluationContext;
+  limit?: number;
+  includeExplanations?: boolean;
+}
+
+export interface FootballArtifactRankingsRequest {
+  requestId?: string;
+  artifactPath?: string;
+  context?: EvaluationContext;
   limit?: number;
   includeExplanations?: boolean;
 }

@@ -1,6 +1,7 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const { createServer } = require('node:http');
+const path = require('node:path');
 const { loadConfig } = require('../dist/src/config/env.js');
 const { createRequestListener } = require('../dist/src/app.js');
 const { forgeParityPlayers } = require('../dist/tests/fixtures/forgeParityFixtures.js');
@@ -35,6 +36,7 @@ const parityFixturePlayers = forgeParityPlayers;
 
 async function withServer(fn) {
   process.env.FORGE_SERVICE_MODE = 'bootstrap-demo';
+  process.env.FORGE_WEEKLY_INPUT_ARTIFACT_PATH = path.resolve(process.cwd(), 'tests/fixtures/artifacts/forge_weekly_player_input_2025_w12.upstream_compat.mirror.json');
   delete process.env.PORT;
   const config = loadConfig(process.env);
   const server = createServer(createRequestListener(config));
@@ -286,7 +288,7 @@ test('POST /api/forge/rankings-football stays deterministic with stable ordering
   });
 });
 
-test('POST /api/forge/evaluate-football enforces canonical v1 hint shape instead of local numeric variant', async () => {
+test('POST /api/forge/evaluate-football enforces upstream-compatible string hint semantics', async () => {
   await withServer(async (baseUrl) => {
     const response = await fetch(`${baseUrl}/api/forge/evaluate-football`, {
       method: 'POST',
@@ -303,6 +305,56 @@ test('POST /api/forge/evaluate-football enforces canonical v1 hint shape instead
 
     assert.equal(response.status, 400);
     assert.equal(body.error.category, 'VALIDATION_ERROR');
+  });
+});
+
+
+
+test('POST /api/forge/rankings-football/from-artifact returns deterministic FORGE-shaped rankings from canonical sample artifact', async () => {
+  await withServer(async (baseUrl) => {
+    const payload = JSON.stringify({
+      requestId: 'football-artifact-rankings-1',
+      includeExplanations: true
+    });
+
+    const [firstResponse, secondResponse] = await Promise.all([
+      fetch(`${baseUrl}/api/forge/rankings-football/from-artifact`, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: payload
+      }),
+      fetch(`${baseUrl}/api/forge/rankings-football/from-artifact`, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: payload
+      })
+    ]);
+
+    const firstBody = await firstResponse.json();
+    const secondBody = await secondResponse.json();
+
+    assert.equal(firstResponse.status, 200);
+    assert.equal(secondResponse.status, 200);
+    assert.deepEqual(firstBody, secondBody);
+    assert.deepEqual(firstBody.rankings.map((entry) => entry.player.playerId), ['wr-featured-1', 'qb-dual-1', 'fragile-wr-1']);
+    assert.equal(firstBody.source.provider, 'tiber-forge-football-lane');
+    assert.ok(firstBody.warnings.some((warning) => warning.includes('Artifact ingestion path')));
+    assert.ok(firstBody.warnings.some((warning) => warning.includes('not live TIBER-Data pull parity')));
+  });
+});
+
+test('POST /api/forge/rankings-football/from-artifact fails closed for invalid artifact override', async () => {
+  await withServer(async (baseUrl) => {
+    const response = await fetch(`${baseUrl}/api/forge/rankings-football/from-artifact`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ artifactPath: 'tests/fixtures/forgeFootballFixtures.ts' })
+    });
+    const body = await response.json();
+
+    assert.equal(response.status, 400);
+    assert.equal(body.error.category, 'VALIDATION_ERROR');
+    assert.equal(body.error.code, 'ARTIFACT_INVALID_JSON');
   });
 });
 

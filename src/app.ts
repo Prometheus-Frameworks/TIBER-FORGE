@@ -1,10 +1,12 @@
 import { IncomingMessage, ServerResponse } from 'node:http';
+import { resolve } from 'node:path';
 import { AppConfig } from './config/env';
 import { ErrorCategory } from './contracts/forge';
-import { ValidationError, validateEvaluateRequest, validateFootballEvaluateRequest, validateFootballRankingsRequest, validateRankingsRequest } from './contracts/validation';
+import { ValidationError, validateEvaluateRequest, validateFootballArtifactRankingsRequest, validateFootballEvaluateRequest, validateFootballRankingsRequest, validateRankingsRequest } from './contracts/validation';
 import { openApiDocument } from './openapi/document';
 import { evaluatePlayer, rankPlayers } from './services/forgeService';
 import { evaluateFootballPlayer, rankFootballPlayers } from './services/footballForgeService';
+import { ingestForgeWeeklyArtifact } from './ingestion/forgeWeeklyArtifact';
 
 const SERVICE_VERSION = '0.2.0';
 
@@ -57,6 +59,23 @@ function errorEnvelope(statusCode: number, category: ErrorCategory, code: string
   });
 }
 
+
+
+function artifactPathForRequest(configuredPath: string, overridePath?: string): string {
+  return resolve(process.cwd(), overridePath ?? configuredPath);
+}
+
+function defaultArtifactContext(records: Array<{ season: number; week: number; asOf: string }>) {
+  const first = records[0];
+  return {
+    slateId: `nfl-${first.season}-w${first.week}-artifact`,
+    slateDate: first.asOf,
+    sport: 'nfl',
+    site: 'artifact-sample',
+    contestType: 'simulation' as const,
+    mode: 'bootstrap-demo' as const
+  };
+}
 export async function handleRequest(request: IncomingMessage, state: AppState): Promise<JsonResponse> {
   const method = request.method ?? 'GET';
   const url = new URL(request.url ?? '/', 'http://localhost');
@@ -103,6 +122,32 @@ export async function handleRequest(request: IncomingMessage, state: AppState): 
   if (method === 'POST' && url.pathname === '/api/forge/rankings-football') {
     const payload = await readJsonBody(request);
     return json(200, rankFootballPlayers(validateFootballRankingsRequest(payload)));
+  }
+
+
+  if (method === 'POST' && url.pathname === '/api/forge/rankings-football/from-artifact') {
+    const payload = await readJsonBody(request);
+    const artifactRequest = validateFootballArtifactRankingsRequest(payload);
+    const artifactPath = artifactPathForRequest(state.config.FORGE_WEEKLY_INPUT_ARTIFACT_PATH, artifactRequest.artifactPath);
+    const inputs = await ingestForgeWeeklyArtifact(artifactPath);
+    const context = artifactRequest.context ?? defaultArtifactContext(inputs);
+
+    const rankings = rankFootballPlayers({
+      requestId: artifactRequest.requestId,
+      context,
+      inputs,
+      limit: artifactRequest.limit,
+      includeExplanations: artifactRequest.includeExplanations
+    });
+
+    return json(200, {
+      ...rankings,
+      warnings: [
+        ...rankings.warnings,
+        `Artifact ingestion path: ${artifactPath}.`,
+        'Artifact-driven rankings read a canonical sample file and are not live TIBER-Data pull parity.'
+      ]
+    });
   }
 
   return errorEnvelope(404, 'NOT_FOUND', 'ROUTE_NOT_FOUND', 'Route not found.');
