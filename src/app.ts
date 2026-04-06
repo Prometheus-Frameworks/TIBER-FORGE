@@ -61,17 +61,18 @@ function errorEnvelope(statusCode: number, category: ErrorCategory, code: string
 
 
 
-function artifactPathForRequest(configuredPath: string, overridePath?: string): string {
-  return resolve(process.cwd(), overridePath ?? configuredPath);
+function artifactPathForRequest(options: { samplePath: string; derivedPath: string; artifactKind: 'sample' | 'derived'; overridePath?: string }): string {
+  const configuredPath = options.artifactKind === 'derived' ? options.derivedPath : options.samplePath;
+  return resolve(process.cwd(), options.overridePath ?? configuredPath);
 }
 
-function defaultArtifactContext(records: Array<{ season: number; week: number; asOf: string }>) {
+function defaultArtifactContext(records: Array<{ season: number; week: number; asOf: string }>, artifactKind: 'sample' | 'derived') {
   const first = records[0];
   return {
     slateId: `nfl-${first.season}-w${first.week}-artifact`,
     slateDate: first.asOf,
     sport: 'nfl',
-    site: 'artifact-sample',
+    site: artifactKind === 'derived' ? 'artifact-derived' : 'artifact-sample',
     contestType: 'simulation' as const,
     mode: 'bootstrap-demo' as const
   };
@@ -128,9 +129,15 @@ export async function handleRequest(request: IncomingMessage, state: AppState): 
   if (method === 'POST' && url.pathname === '/api/forge/rankings-football/from-artifact') {
     const payload = await readJsonBody(request);
     const artifactRequest = validateFootballArtifactRankingsRequest(payload);
-    const artifactPath = artifactPathForRequest(state.config.FORGE_WEEKLY_INPUT_ARTIFACT_PATH, artifactRequest.artifactPath);
+    const artifactPath = artifactPathForRequest({
+      samplePath: state.config.FORGE_WEEKLY_INPUT_ARTIFACT_PATH,
+      derivedPath: state.config.FORGE_WEEKLY_DERIVED_ARTIFACT_PATH,
+      artifactKind: artifactRequest.artifactKind ?? 'sample',
+      overridePath: artifactRequest.artifactPath
+    });
+    const artifactKind = artifactRequest.artifactKind ?? 'sample';
     const inputs = await ingestForgeWeeklyArtifact(artifactPath);
-    const context = artifactRequest.context ?? defaultArtifactContext(inputs);
+    const context = artifactRequest.context ?? defaultArtifactContext(inputs, artifactKind);
 
     const rankings = rankFootballPlayers({
       requestId: artifactRequest.requestId,
@@ -144,8 +151,9 @@ export async function handleRequest(request: IncomingMessage, state: AppState): 
       ...rankings,
       warnings: [
         ...rankings.warnings,
+        `Artifact lane: ${artifactKind}${artifactRequest.artifactPath ? ' (explicit artifactPath override provided)' : ''}.`,
         `Artifact ingestion path: ${artifactPath}.`,
-        'Artifact-driven rankings read a canonical sample file and are not live TIBER-Data pull parity.'
+        'Artifact-driven rankings read disk artifacts and are not live TIBER-Data pull parity.'
       ]
     });
   }

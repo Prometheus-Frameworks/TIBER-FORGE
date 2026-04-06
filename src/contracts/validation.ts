@@ -332,16 +332,17 @@ export function validateFootballArtifactRankingsRequest(value: unknown): Footbal
   }
 
   const requestId = value.requestId === undefined ? undefined : ensureString(value.requestId, 'requestId', errors);
+  const artifactKind = value.artifactKind === undefined ? 'sample' : ensureEnum(value.artifactKind, ['sample', 'derived'] as const, 'artifactKind', errors);
   const artifactPath = value.artifactPath === undefined ? undefined : ensureString(value.artifactPath, 'artifactPath', errors);
   const context = value.context === undefined ? undefined : validateContext(value.context, 'context', errors);
   const includeExplanations = value.includeExplanations === undefined ? true : ensureBoolean(value.includeExplanations, 'includeExplanations', errors);
   const limit = value.limit === undefined ? undefined : ensureNumber(value.limit, 'limit', errors, { min: 1, max: 1000, integer: true });
 
-  if (errors.length > 0 || includeExplanations === undefined) {
+  if (errors.length > 0 || includeExplanations === undefined || artifactKind === undefined) {
     throw new ValidationError('INVALID_REQUEST_BODY', errors);
   }
 
-  return { requestId, artifactPath, context, limit, includeExplanations };
+  return { requestId, artifactKind, artifactPath, context, limit, includeExplanations };
 }
 
 export function validateFootballRankingsRequest(value: unknown): FootballRankingsRequest {
