@@ -96,6 +96,35 @@ export const forgeFootballInputs: ForgeWeeklyPlayerInput[] = [
     featureCoverage: 0.61,
     dataConfidenceHint: 'low-confidence due to sparse sample',
     qualityFlags: ['thin_sample', 'injury_noise']
+  },
+  {
+    ...baseProvenance,
+    playerId: 'rb-volume-1',
+    playerName: 'Volume Grinder RB',
+    team: 'PIT',
+    opponent: 'BAL',
+    position: 'RB',
+    snapShare: 0.78,
+    routeParticipation: 0.52,
+    rushAttempts: 21,
+    targets: 5,
+    redZoneTouches: 4,
+    goalLineTouches: 2,
+    yardsPerCarry: 3.2,
+    catchRate: 0.62,
+    fantasyPointsPerOpportunity: 0.49,
+    explosivePlayRate: 0.04,
+    impliedTeamTotal: 20,
+    spread: 4,
+    opponentDefenseTier: 'strong',
+    expectedGameScript: 'positive',
+    injuryStatus: 'healthy',
+    practiceParticipation: 'full',
+    activeProjection: 0.93,
+    roleVolatility: 0.2,
+    featureCoverage: 0.97,
+    dataConfidenceHint: 'high-confidence workload projection',
+    qualityFlags: []
   }
 ];
 
