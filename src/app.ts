@@ -65,16 +65,29 @@ function artifactPathForRequest(options: {
   samplePath: string;
   derivedQbPath: string;
   derivedSkillPath: string;
+  derivedSkillPathTemplate?: string;
   artifactKind: 'sample' | 'derived_qb' | 'derived_skill';
+  artifactWeek?: number;
   overridePath?: string;
 }): string {
+  if (options.overridePath) {
+    return resolve(process.cwd(), options.overridePath);
+  }
+
+  if (options.artifactKind === 'derived_skill' && options.artifactWeek !== undefined && options.derivedSkillPathTemplate) {
+    const week = String(options.artifactWeek).padStart(2, '0');
+    const season = '2024';
+    const fromTemplate = options.derivedSkillPathTemplate.replaceAll('{week}', week).replaceAll('{season}', season);
+    return resolve(process.cwd(), fromTemplate);
+  }
+
   const configuredPath =
     options.artifactKind === 'derived_qb'
       ? options.derivedQbPath
       : options.artifactKind === 'derived_skill'
         ? options.derivedSkillPath
         : options.samplePath;
-  return resolve(process.cwd(), options.overridePath ?? configuredPath);
+  return resolve(process.cwd(), configuredPath);
 }
 
 function defaultArtifactContext(records: Array<{ season: number; week: number; asOf: string }>, artifactKind: 'sample' | 'derived_qb' | 'derived_skill') {
@@ -150,7 +163,9 @@ export async function handleRequest(request: IncomingMessage, state: AppState): 
       samplePath: state.config.FORGE_WEEKLY_INPUT_ARTIFACT_PATH,
       derivedQbPath: state.config.FORGE_WEEKLY_DERIVED_QB_ARTIFACT_PATH,
       derivedSkillPath: state.config.FORGE_WEEKLY_DERIVED_SKILL_ARTIFACT_PATH,
+      derivedSkillPathTemplate: state.config.FORGE_WEEKLY_DERIVED_SKILL_ARTIFACT_PATH_TEMPLATE,
       artifactKind: artifactRequest.artifactKind ?? 'sample',
+      artifactWeek: artifactRequest.artifactWeek,
       overridePath: artifactRequest.artifactPath
     });
     const artifactKind = artifactRequest.artifactKind ?? 'sample';
@@ -169,7 +184,7 @@ export async function handleRequest(request: IncomingMessage, state: AppState): 
       ...rankings,
       warnings: [
         ...rankings.warnings,
-        `Artifact lane: ${artifactKind}${artifactRequest.artifactPath ? ' (explicit artifactPath override provided)' : ''}.`,
+        `Artifact lane: ${artifactKind}${artifactRequest.artifactWeek !== undefined ? ` (week ${artifactRequest.artifactWeek})` : ''}${artifactRequest.artifactPath ? ' (explicit artifactPath override provided)' : ''}.`,
         `Artifact ingestion path: ${artifactPath}.`,
         'Artifact-driven rankings read disk artifacts and are not live TIBER-Data pull parity.'
       ]

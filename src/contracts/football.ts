@@ -65,6 +65,7 @@ export interface FootballArtifactRankingsRequest {
   requestId?: string;
   artifactKind?: 'sample' | 'derived_qb' | 'derived_skill';
   artifactPath?: string;
+  artifactWeek?: number;
   context?: EvaluationContext;
   limit?: number;
   includeExplanations?: boolean;

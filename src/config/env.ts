@@ -5,6 +5,7 @@ export interface AppConfig {
   FORGE_WEEKLY_INPUT_ARTIFACT_PATH: string;
   FORGE_WEEKLY_DERIVED_QB_ARTIFACT_PATH: string;
   FORGE_WEEKLY_DERIVED_SKILL_ARTIFACT_PATH: string;
+  FORGE_WEEKLY_DERIVED_SKILL_ARTIFACT_PATH_TEMPLATE?: string;
 }
 
 function parsePort(rawPort: string | undefined): number {
@@ -50,6 +51,18 @@ function parseDerivedSkillArtifactPath(rawPath: string | undefined): string {
   return artifactPath;
 }
 
+
+function parseDerivedSkillArtifactPathTemplate(rawPath: string | undefined): string | undefined {
+  if (rawPath === undefined) {
+    return undefined;
+  }
+  const artifactPath = rawPath.trim();
+  if (artifactPath.length === 0) {
+    throw new Error('Invalid FORGE_WEEKLY_DERIVED_SKILL_ARTIFACT_PATH_TEMPLATE. Expected a non-empty local file path template.');
+  }
+  return artifactPath;
+}
+
 export function loadConfig(env: NodeJS.ProcessEnv = process.env): AppConfig {
   if (env.FORGE_SERVICE_MODE !== 'bootstrap-demo') {
     throw new Error('Missing or invalid FORGE_SERVICE_MODE. Expected FORGE_SERVICE_MODE=bootstrap-demo.');
@@ -61,6 +74,7 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): AppConfig {
     LOG_LEVEL: parseLogLevel(env.LOG_LEVEL),
     FORGE_WEEKLY_INPUT_ARTIFACT_PATH: parseArtifactPath(env.FORGE_WEEKLY_INPUT_ARTIFACT_PATH),
     FORGE_WEEKLY_DERIVED_QB_ARTIFACT_PATH: parseDerivedQbArtifactPath(env.FORGE_WEEKLY_DERIVED_QB_ARTIFACT_PATH),
-    FORGE_WEEKLY_DERIVED_SKILL_ARTIFACT_PATH: parseDerivedSkillArtifactPath(env.FORGE_WEEKLY_DERIVED_SKILL_ARTIFACT_PATH)
+    FORGE_WEEKLY_DERIVED_SKILL_ARTIFACT_PATH: parseDerivedSkillArtifactPath(env.FORGE_WEEKLY_DERIVED_SKILL_ARTIFACT_PATH),
+    FORGE_WEEKLY_DERIVED_SKILL_ARTIFACT_PATH_TEMPLATE: parseDerivedSkillArtifactPathTemplate(env.FORGE_WEEKLY_DERIVED_SKILL_ARTIFACT_PATH_TEMPLATE)
   };
 }

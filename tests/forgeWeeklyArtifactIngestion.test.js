@@ -8,6 +8,8 @@ const { ingestForgeWeeklyArtifact } = require('../dist/src/ingestion/forgeWeekly
 const upstreamCompatMirrorPath = path.resolve(process.cwd(), 'tests/fixtures/artifacts/forge_weekly_player_input_2025_w12.upstream_compat.mirror.json');
 const derivedQbSlicePath = path.resolve(process.cwd(), 'tests/fixtures/artifacts/forge_weekly_player_input_2024_w01.qb_offline_fixture.derived.json');
 const derivedSkillSlicePath = path.resolve(process.cwd(), 'tests/fixtures/artifacts/forge_weekly_player_input_2024_w01.skill_positions_offline_fixture.derived.json');
+const derivedSkillWeek2Path = path.resolve(process.cwd(), 'tests/fixtures/artifacts/forge_weekly_player_input_2024_w02.skill_positions_offline_fixture.derived.json');
+const derivedSkillWeek3Path = path.resolve(process.cwd(), 'tests/fixtures/artifacts/forge_weekly_player_input_2024_w03.skill_positions_offline_fixture.derived.json');
 
 test('ingestForgeWeeklyArtifact reads and validates upstream-compatible mirror artifact', async () => {
   const records = await ingestForgeWeeklyArtifact(upstreamCompatMirrorPath);
@@ -35,6 +37,18 @@ test('ingestForgeWeeklyArtifact reads and validates broader skill-position deriv
   assert.equal(records[0].season, 2024);
   assert.equal(records[0].week, 1);
   assert.ok(records.every((record) => record.sourceSetId === 'td-weekly-2024-w01-skill-offline-derived-v1'));
+});
+
+
+test('ingestForgeWeeklyArtifact reads and validates weekly-factory derived skill artifacts for weeks 2 and 3', async () => {
+  const [week2Records, week3Records] = await Promise.all([ingestForgeWeeklyArtifact(derivedSkillWeek2Path), ingestForgeWeeklyArtifact(derivedSkillWeek3Path)]);
+
+  assert.equal(week2Records.length, 4);
+  assert.equal(week3Records.length, 4);
+  assert.ok(week2Records.every((record) => record.week === 2));
+  assert.ok(week3Records.every((record) => record.week === 3));
+  assert.deepEqual(Array.from(new Set(week2Records.map((record) => record.position))).sort(), ['QB', 'RB', 'TE', 'WR']);
+  assert.deepEqual(Array.from(new Set(week3Records.map((record) => record.position))).sort(), ['QB', 'RB', 'TE', 'WR']);
 });
 
 test('ingestForgeWeeklyArtifact fails closed for malformed JSON', async () => {
