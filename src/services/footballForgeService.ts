@@ -53,12 +53,12 @@ function defenseAdjustment(tier: NormalizedFootballScoringInput['environment']['
 
 function gameScriptAdjustment(script: NormalizedFootballScoringInput['environment']['expectedGameScript'], position: NormalizedFootballScoringInput['position']): number {
   if (position === 'RB') {
-    return script === 'positive' ? 6 : script === 'negative' ? -4 : 1;
+    return script === 'positive' ? 5 : script === 'negative' ? -3 : 1;
   }
   if (position === 'QB') {
-    return script === 'negative' ? 4 : script === 'positive' ? 1 : 2;
+    return script === 'negative' ? 3 : script === 'positive' ? 1 : 2;
   }
-  return script === 'negative' ? 5 : script === 'positive' ? -2 : 2;
+  return script === 'negative' ? 3 : script === 'positive' ? -1 : 2;
 }
 
 function injuryPenalty(status: NormalizedFootballScoringInput['injuryStatus']): number {
@@ -74,21 +74,72 @@ function injuryPenalty(status: NormalizedFootballScoringInput['injuryStatus']): 
   }
 }
 
-function buildComponents(input: NormalizedFootballScoringInput): ScoreComponent[] {
-  const opportunityRaw =
-    input.opportunity.snapShare * 36 +
-    input.opportunity.routeParticipation * 22 +
-    input.opportunity.rushAttempts * 1.15 +
-    input.opportunity.targets * 2.2 +
-    input.opportunity.redZoneTouches * 2.6 +
-    input.opportunity.goalLineTouches * 3.5;
+function opportunityScore(input: NormalizedFootballScoringInput): number {
+  if (input.position === 'QB') {
+    return (
+      input.opportunity.snapShare * 48 +
+      input.opportunity.routeParticipation * 4 +
+      input.opportunity.rushAttempts * 1.6 +
+      input.opportunity.targets * 0.4 +
+      input.opportunity.redZoneTouches * 1.3 +
+      input.opportunity.goalLineTouches * 4
+    );
+  }
 
-  const efficiencyRaw =
-    input.efficiency.yardsPerRouteRun * 18 +
-    input.efficiency.yardsPerCarry * 7 +
-    input.efficiency.catchRate * 18 +
-    input.efficiency.fantasyPointsPerOpportunity * 24 +
-    input.efficiency.explosivePlayRate * 16;
+  if (input.position === 'RB') {
+    return (
+      input.opportunity.snapShare * 34 +
+      input.opportunity.routeParticipation * 16 +
+      input.opportunity.rushAttempts * 1.6 +
+      input.opportunity.targets * 2 +
+      input.opportunity.redZoneTouches * 2.4 +
+      input.opportunity.goalLineTouches * 3.6
+    );
+  }
+
+  return (
+    input.opportunity.snapShare * 30 +
+    input.opportunity.routeParticipation * 30 +
+    input.opportunity.rushAttempts * 0.35 +
+    input.opportunity.targets * 2.8 +
+    input.opportunity.redZoneTouches * 2.5 +
+    input.opportunity.goalLineTouches * 1.8
+  );
+}
+
+function efficiencyScore(input: NormalizedFootballScoringInput): number {
+  if (input.position === 'QB') {
+    return (
+      input.efficiency.yardsPerRouteRun * 4 +
+      input.efficiency.yardsPerCarry * 9 +
+      input.efficiency.catchRate * 4 +
+      input.efficiency.fantasyPointsPerOpportunity * 30 +
+      input.efficiency.explosivePlayRate * 22
+    );
+  }
+
+  if (input.position === 'RB') {
+    return (
+      input.efficiency.yardsPerRouteRun * 6 +
+      input.efficiency.yardsPerCarry * 11 +
+      input.efficiency.catchRate * 6 +
+      input.efficiency.fantasyPointsPerOpportunity * 28 +
+      input.efficiency.explosivePlayRate * 18
+    );
+  }
+
+  return (
+    input.efficiency.yardsPerRouteRun * 22 +
+    input.efficiency.yardsPerCarry * 2 +
+    input.efficiency.catchRate * 14 +
+    input.efficiency.fantasyPointsPerOpportunity * 30 +
+    input.efficiency.explosivePlayRate * 20
+  );
+}
+
+function buildComponents(input: NormalizedFootballScoringInput): ScoreComponent[] {
+  const opportunityRaw = opportunityScore(input);
+  const efficiencyRaw = efficiencyScore(input);
 
   const environmentRaw =
     input.environment.impliedTeamTotal * 2.1 +
@@ -97,14 +148,15 @@ function buildComponents(input: NormalizedFootballScoringInput): ScoreComponent[
     clamp(-input.environment.spread * 0.6, -8, 8);
 
   const stabilityRaw =
-    82 -
+    80 -
     injuryPenalty(input.injuryStatus) -
-    (input.stability.practiceParticipation === 'limited' ? 10 : 0) -
-    (input.stability.practiceParticipation === 'did_not_practice' ? 20 : 0) -
-    (input.stability.activeProjection === 'risky' ? 14 : 0) -
-    (input.stability.activeProjection === 'expected_inactive' ? 30 : 0) -
-    input.stability.roleVolatility * 35 +
-    input.stability.featureCoverage * 18;
+    (input.stability.practiceParticipation === 'limited' ? 8 : 0) -
+    (input.stability.practiceParticipation === 'did_not_practice' ? 18 : 0) -
+    (input.stability.activeProjection === 'risky' ? 16 : 0) -
+    (input.stability.activeProjection === 'expected_inactive' ? 32 : 0) -
+    input.stability.roleVolatility * 38 +
+    input.stability.featureCoverage * 12 -
+    clamp(input.supportFlags.length * 2, 0, 8);
 
   return [
     {
@@ -142,10 +194,21 @@ function evaluateInput(request: FootballEvaluateRequest): EvaluateResponse {
   const input = adaptForgeWeeklyPlayerInput(request.input);
   const components = buildComponents(input);
   const overall = round(components.reduce((sum, component) => sum + component.score * component.weight, 0));
+  const practiceConfidencePenalty =
+    input.stability.practiceParticipation === 'did_not_practice' ? 0.09 : input.stability.practiceParticipation === 'limited' ? 0.04 : 0;
+  const projectionConfidencePenalty =
+    input.stability.activeProjection === 'expected_inactive' ? 0.16 : input.stability.activeProjection === 'risky' ? 0.06 : 0;
   const confidenceScore = round(
     clamp(
-      0.2 + input.stability.featureCoverage * 0.34 + input.stability.dataConfidenceHint * 0.26 - input.supportFlags.length * 0.05 - injuryPenalty(input.injuryStatus) / 110,
-      0.05,
+      0.18 +
+        input.stability.featureCoverage * 0.3 +
+        input.stability.dataConfidenceHint * 0.24 -
+        input.supportFlags.length * 0.06 -
+        injuryPenalty(input.injuryStatus) / 100 -
+        input.stability.roleVolatility * 0.14 -
+        practiceConfidencePenalty -
+        projectionConfidencePenalty,
+      0.03,
       0.99
     )
   );

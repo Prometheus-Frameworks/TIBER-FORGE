@@ -74,6 +74,10 @@ TIBER-FORGE now includes a **small football-specific deterministic lane** that a
 - Existing bootstrap demo endpoints and behavior remain intact
 - No DB, no live ingestion pipeline, and no full parity claim in this step
 
+### Football lane v1 initial calibration pass
+
+An initial in-repo calibration pass has been applied to the football lane scoring math (`opportunity`, `efficiency`, `environment`, `stability`) after canonical upstream-shaped artifact ingestion was established. This remains deterministic and contract-stable, but is still explicitly not full legacy parity. See `docs/architecture/FOOTBALL_LANE_V1_CALIBRATION_NOTES.md` for scoped audit details and deferrals.
+
 ### Contract-boundary correction (post-PR6)
 
 PR6 introduced the football lane. A follow-up boundary correction now keeps that lane intact while aligning the public football input contract more closely to canonical `TIBER-Data` `ForgeWeeklyPlayerInput/v1` semantics (including optional `opponent`, descriptive `dataConfidenceHint`, and adapter-side normalization of `activeProjection`).
