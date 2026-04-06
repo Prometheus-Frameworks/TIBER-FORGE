@@ -31,3 +31,29 @@ This is the first calibration pass after canonical `ForgeWeeklyPlayerInput/v1` a
 - New upstream fields or live ingestion expansion.
 - Team-state integration and broader modeling architecture changes.
 - Any API contract changes to evaluate/rankings endpoints.
+
+## Small follow-up environment calibration (this PR)
+
+### Weakness observed
+
+Environment was still somewhat compressed because implied team total did most of the lifting while defense/script/spread context had limited room to differentiate similar projections.
+
+### What changed (still using the same four environment inputs)
+
+- Kept environment inputs unchanged: `impliedTeamTotal`, `opponentDefenseTier`, `expectedGameScript`, `spread`.
+- Modestly rebalanced environment scoring so implied total remains primary but less dominant (`2.1x` -> `1.85x`).
+- Slightly strengthened defense-tier deltas (especially weak vs elite separation).
+- Made spread adjustment position-sensitive with conservative caps (RB > QB > WR/TE sensitivity).
+- Slightly widened script split across positions (RB positive/negative and pass-catcher negative-script behavior).
+
+### Why this is intentionally modest
+
+- Environment remains one weighted component (no contract changes, no feature additions, no live ingestion changes).
+- Coefficient changes are narrow and interpretable; the lane remains deterministic and bounded.
+- Existing weekly-factory derived skill (2024 W1-W6) behavior remains sanity-checked rather than broadly re-tuned.
+
+### Explicitly deferred
+
+- Any richer team/game context beyond the current four environment fields.
+- New upstream contracts or `TIBER-Data` schema additions.
+- Full-model recalibration or production-parity claims.
