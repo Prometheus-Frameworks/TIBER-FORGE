@@ -89,9 +89,22 @@ TIBER-FORGE can now ingest canonical `ForgeWeeklyPlayerInput` artifacts from dis
 - Sample lane default path: `../TIBER-Data/data/gold/forge/forge_weekly_player_input_2025_w12.sample.json` (override with `FORGE_WEEKLY_INPUT_ARTIFACT_PATH`, request `artifactKind: "sample"`).
 - Narrow QB-derived lane default path: `../TIBER-Data/data/gold/forge/forge_weekly_player_input_2024_w01.qb_offline_fixture.derived.json` (override with `FORGE_WEEKLY_DERIVED_QB_ARTIFACT_PATH`, request `artifactKind: "derived_qb"`).
 - Broader skill-derived lane default path: `../TIBER-Data/data/gold/forge/forge_weekly_player_input_2024_w01.skill_positions_offline_fixture.derived.json` (override with `FORGE_WEEKLY_DERIVED_SKILL_ARTIFACT_PATH`, request `artifactKind: "derived_skill"`).
-- Optional weekly-factory template for broader skill-derived lane: set `FORGE_WEEKLY_DERIVED_SKILL_ARTIFACT_PATH_TEMPLATE` (supports `{season}` and `{week}` placeholders) and request `artifactKind: "derived_skill"` with `artifactWeek` (for example weeks `1`, `2`, `3` for the first 2024 factory set).
+- Optional weekly-factory template for broader skill-derived lane: set `FORGE_WEEKLY_DERIVED_SKILL_ARTIFACT_PATH_TEMPLATE` (supports `{season}` and `{week}` placeholders) and request `artifactKind: "derived_skill"` with `artifactWeek` (for example weeks `1` through `6` for the current 2024 factory season segment).
 
 This is an operator/development ingestion path only: no live network pull from TIBER-Data, no DB, and no full production parity claim. The direct football request path and bootstrap lane remain available. Derived lanes are explicitly split so operator semantics are unambiguous between the narrow QB fixture and the first broader skill-position slice.
+
+
+### Quick operator inspection for real graded outputs
+
+Use the lightweight script below to print top ranked real artifact grades (overall/component/confidence/tier) for quick human sanity checks:
+
+```bash
+npm run build
+FORGE_WEEKLY_DERIVED_SKILL_ARTIFACT_PATH_TEMPLATE=tests/fixtures/artifacts/forge_weekly_player_input_{season}_w{week}.skill_positions_offline_fixture.derived.json \
+node scripts/inspect-football-artifact-grades.js --artifact-kind derived_skill --season 2024 --week 6 --limit 4
+```
+
+This is a debugging/operator utility only; it does not change API contracts or add live ingestion behavior.
 
 
 ## Non-goals

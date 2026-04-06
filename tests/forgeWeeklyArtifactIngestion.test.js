@@ -10,6 +10,9 @@ const derivedQbSlicePath = path.resolve(process.cwd(), 'tests/fixtures/artifacts
 const derivedSkillSlicePath = path.resolve(process.cwd(), 'tests/fixtures/artifacts/forge_weekly_player_input_2024_w01.skill_positions_offline_fixture.derived.json');
 const derivedSkillWeek2Path = path.resolve(process.cwd(), 'tests/fixtures/artifacts/forge_weekly_player_input_2024_w02.skill_positions_offline_fixture.derived.json');
 const derivedSkillWeek3Path = path.resolve(process.cwd(), 'tests/fixtures/artifacts/forge_weekly_player_input_2024_w03.skill_positions_offline_fixture.derived.json');
+const derivedSkillWeek4Path = path.resolve(process.cwd(), 'tests/fixtures/artifacts/forge_weekly_player_input_2024_w04.skill_positions_offline_fixture.derived.json');
+const derivedSkillWeek5Path = path.resolve(process.cwd(), 'tests/fixtures/artifacts/forge_weekly_player_input_2024_w05.skill_positions_offline_fixture.derived.json');
+const derivedSkillWeek6Path = path.resolve(process.cwd(), 'tests/fixtures/artifacts/forge_weekly_player_input_2024_w06.skill_positions_offline_fixture.derived.json');
 
 test('ingestForgeWeeklyArtifact reads and validates upstream-compatible mirror artifact', async () => {
   const records = await ingestForgeWeeklyArtifact(upstreamCompatMirrorPath);
@@ -40,15 +43,23 @@ test('ingestForgeWeeklyArtifact reads and validates broader skill-position deriv
 });
 
 
-test('ingestForgeWeeklyArtifact reads and validates weekly-factory derived skill artifacts for weeks 2 and 3', async () => {
-  const [week2Records, week3Records] = await Promise.all([ingestForgeWeeklyArtifact(derivedSkillWeek2Path), ingestForgeWeeklyArtifact(derivedSkillWeek3Path)]);
+test('ingestForgeWeeklyArtifact reads and validates weekly-factory derived skill artifacts for weeks 2 through 6', async () => {
+  const [week2Records, week3Records, week4Records, week5Records, week6Records] = await Promise.all([
+    ingestForgeWeeklyArtifact(derivedSkillWeek2Path),
+    ingestForgeWeeklyArtifact(derivedSkillWeek3Path),
+    ingestForgeWeeklyArtifact(derivedSkillWeek4Path),
+    ingestForgeWeeklyArtifact(derivedSkillWeek5Path),
+    ingestForgeWeeklyArtifact(derivedSkillWeek6Path)
+  ]);
 
-  assert.equal(week2Records.length, 4);
-  assert.equal(week3Records.length, 4);
-  assert.ok(week2Records.every((record) => record.week === 2));
-  assert.ok(week3Records.every((record) => record.week === 3));
-  assert.deepEqual(Array.from(new Set(week2Records.map((record) => record.position))).sort(), ['QB', 'RB', 'TE', 'WR']);
-  assert.deepEqual(Array.from(new Set(week3Records.map((record) => record.position))).sort(), ['QB', 'RB', 'TE', 'WR']);
+  const weeklyRecords = [week2Records, week3Records, week4Records, week5Records, week6Records];
+  for (const [index, records] of weeklyRecords.entries()) {
+    const expectedWeek = index + 2;
+    assert.equal(records.length, 4);
+    assert.ok(records.every((record) => record.week === expectedWeek));
+    assert.deepEqual(Array.from(new Set(records.map((record) => record.position))).sort(), ['QB', 'RB', 'TE', 'WR']);
+    assert.ok(records.every((record) => record.sourceSetId === `td-weekly-2024-w0${expectedWeek}-skill-offline-derived-v1`));
+  }
 });
 
 test('ingestForgeWeeklyArtifact fails closed for malformed JSON', async () => {
