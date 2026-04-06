@@ -399,9 +399,9 @@ test('POST /api/forge/rankings-football/from-artifact supports deterministic der
   });
 });
 
-test('POST /api/forge/rankings-football/from-artifact supports deterministic derived_skill weekly-factory artifacts for 2024 weeks 1-3', async () => {
+test('POST /api/forge/rankings-football/from-artifact supports deterministic derived_skill weekly-factory artifacts for 2024 weeks 1-6', async () => {
   await withServer(async (baseUrl) => {
-    for (const week of [1, 2, 3]) {
+    for (const week of [1, 2, 3, 4, 5, 6]) {
       const payload = JSON.stringify({
         requestId: `football-artifact-derived-skill-rankings-w${week}`,
         artifactKind: 'derived_skill',
@@ -435,8 +435,11 @@ test('POST /api/forge/rankings-football/from-artifact supports deterministic der
       assert.ok(firstBody.rankings.every((entry) => entry.score.overall >= 0 && entry.score.overall <= 100));
       assert.ok(firstBody.rankings.every((entry) => Number.isFinite(entry.score.overall)));
       assert.ok(firstBody.rankings.every((entry) => Number.isFinite(entry.confidence.score) && entry.confidence.score >= 0 && entry.confidence.score <= 1));
+      assert.ok(firstBody.rankings.every((entry) => entry.score.components.length === 4));
+      assert.ok(firstBody.rankings.every((entry) => ['high', 'medium', 'low'].includes(entry.confidence.label)));
+      assert.ok(firstBody.rankings.length > 0);
       assert.ok(firstBody.warnings.some((warning) => warning.includes(`Artifact lane: derived_skill (week ${week})`)));
-      assert.ok(firstBody.warnings.some((warning) => warning.includes(`forge_weekly_player_input_2024_w0${week}.skill_positions_offline_fixture.derived.json`)));
+      assert.ok(firstBody.warnings.some((warning) => warning.includes(`forge_weekly_player_input_2024_w${String(week).padStart(2, '0')}.skill_positions_offline_fixture.derived.json`)));
       assert.ok(firstBody.rankings[0].score.overall >= firstBody.rankings[1].score.overall);
       assert.ok(firstBody.rankings[1].score.overall >= firstBody.rankings[2].score.overall);
       assert.ok(firstBody.rankings[2].score.overall >= firstBody.rankings[3].score.overall);
