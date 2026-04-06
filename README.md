@@ -87,9 +87,10 @@ PR6 introduced the football lane. A follow-up boundary correction now keeps that
 TIBER-FORGE can now ingest canonical `ForgeWeeklyPlayerInput` artifacts from disk and run the existing deterministic football rankings lane through `POST /api/forge/rankings-football/from-artifact`.
 
 - Sample lane default path: `../TIBER-Data/data/gold/forge/forge_weekly_player_input_2025_w12.sample.json` (override with `FORGE_WEEKLY_INPUT_ARTIFACT_PATH`, request `artifactKind: "sample"`).
-- First derived lane default path: `../TIBER-Data/data/gold/forge/forge_weekly_player_input_2024_w01.qb_offline_fixture.derived.json` (override with `FORGE_WEEKLY_DERIVED_ARTIFACT_PATH`, request `artifactKind: "derived"`).
+- Narrow QB-derived lane default path: `../TIBER-Data/data/gold/forge/forge_weekly_player_input_2024_w01.qb_offline_fixture.derived.json` (override with `FORGE_WEEKLY_DERIVED_QB_ARTIFACT_PATH`, request `artifactKind: "derived_qb"`).
+- Broader skill-derived lane default path: `../TIBER-Data/data/gold/forge/forge_weekly_player_input_2024_w01.skill_positions_offline_fixture.derived.json` (override with `FORGE_WEEKLY_DERIVED_SKILL_ARTIFACT_PATH`, request `artifactKind: "derived_skill"`).
 
-This is an operator/development ingestion path only: no live network pull from TIBER-Data, no DB, and no full production parity claim. The direct football request path and bootstrap lane remain available. The first derived slice is intentionally narrow (QB-only, small cohort) and is used for early engine sanity checks rather than broad parity claims.
+This is an operator/development ingestion path only: no live network pull from TIBER-Data, no DB, and no full production parity claim. The direct football request path and bootstrap lane remain available. Derived lanes are explicitly split so operator semantics are unambiguous between the narrow QB fixture and the first broader skill-position slice.
 
 
 ## Non-goals
@@ -123,6 +124,9 @@ Optional:
 
 - `PORT=3000`
 - `LOG_LEVEL=info`
+- `FORGE_WEEKLY_INPUT_ARTIFACT_PATH=../TIBER-Data/data/gold/forge/forge_weekly_player_input_2025_w12.sample.json`
+- `FORGE_WEEKLY_DERIVED_QB_ARTIFACT_PATH=../TIBER-Data/data/gold/forge/forge_weekly_player_input_2024_w01.qb_offline_fixture.derived.json`
+- `FORGE_WEEKLY_DERIVED_SKILL_ARTIFACT_PATH=../TIBER-Data/data/gold/forge/forge_weekly_player_input_2024_w01.skill_positions_offline_fixture.derived.json`
 
 If `FORGE_SERVICE_MODE` is missing or invalid, startup fails immediately.
 

@@ -332,7 +332,10 @@ export function validateFootballArtifactRankingsRequest(value: unknown): Footbal
   }
 
   const requestId = value.requestId === undefined ? undefined : ensureString(value.requestId, 'requestId', errors);
-  const artifactKind = value.artifactKind === undefined ? 'sample' : ensureEnum(value.artifactKind, ['sample', 'derived'] as const, 'artifactKind', errors);
+  const artifactKind =
+    value.artifactKind === undefined
+      ? 'sample'
+      : ensureEnum(value.artifactKind, ['sample', 'derived_qb', 'derived_skill'] as const, 'artifactKind', errors);
   const artifactPath = value.artifactPath === undefined ? undefined : ensureString(value.artifactPath, 'artifactPath', errors);
   const context = value.context === undefined ? undefined : validateContext(value.context, 'context', errors);
   const includeExplanations = value.includeExplanations === undefined ? true : ensureBoolean(value.includeExplanations, 'includeExplanations', errors);

@@ -3,7 +3,8 @@ export interface AppConfig {
   PORT: number;
   LOG_LEVEL: 'debug' | 'info' | 'warn' | 'error';
   FORGE_WEEKLY_INPUT_ARTIFACT_PATH: string;
-  FORGE_WEEKLY_DERIVED_ARTIFACT_PATH: string;
+  FORGE_WEEKLY_DERIVED_QB_ARTIFACT_PATH: string;
+  FORGE_WEEKLY_DERIVED_SKILL_ARTIFACT_PATH: string;
 }
 
 function parsePort(rawPort: string | undefined): number {
@@ -33,10 +34,18 @@ function parseArtifactPath(rawPath: string | undefined): string {
   return artifactPath;
 }
 
-function parseDerivedArtifactPath(rawPath: string | undefined): string {
+function parseDerivedQbArtifactPath(rawPath: string | undefined): string {
   const artifactPath = rawPath ?? '../TIBER-Data/data/gold/forge/forge_weekly_player_input_2024_w01.qb_offline_fixture.derived.json';
   if (artifactPath.trim().length === 0) {
-    throw new Error('Invalid FORGE_WEEKLY_DERIVED_ARTIFACT_PATH. Expected a non-empty local file path.');
+    throw new Error('Invalid FORGE_WEEKLY_DERIVED_QB_ARTIFACT_PATH. Expected a non-empty local file path.');
+  }
+  return artifactPath;
+}
+
+function parseDerivedSkillArtifactPath(rawPath: string | undefined): string {
+  const artifactPath = rawPath ?? '../TIBER-Data/data/gold/forge/forge_weekly_player_input_2024_w01.skill_positions_offline_fixture.derived.json';
+  if (artifactPath.trim().length === 0) {
+    throw new Error('Invalid FORGE_WEEKLY_DERIVED_SKILL_ARTIFACT_PATH. Expected a non-empty local file path.');
   }
   return artifactPath;
 }
@@ -51,6 +60,7 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): AppConfig {
     PORT: parsePort(env.PORT),
     LOG_LEVEL: parseLogLevel(env.LOG_LEVEL),
     FORGE_WEEKLY_INPUT_ARTIFACT_PATH: parseArtifactPath(env.FORGE_WEEKLY_INPUT_ARTIFACT_PATH),
-    FORGE_WEEKLY_DERIVED_ARTIFACT_PATH: parseDerivedArtifactPath(env.FORGE_WEEKLY_DERIVED_ARTIFACT_PATH)
+    FORGE_WEEKLY_DERIVED_QB_ARTIFACT_PATH: parseDerivedQbArtifactPath(env.FORGE_WEEKLY_DERIVED_QB_ARTIFACT_PATH),
+    FORGE_WEEKLY_DERIVED_SKILL_ARTIFACT_PATH: parseDerivedSkillArtifactPath(env.FORGE_WEEKLY_DERIVED_SKILL_ARTIFACT_PATH)
   };
 }

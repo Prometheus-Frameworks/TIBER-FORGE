@@ -61,18 +61,35 @@ function errorEnvelope(statusCode: number, category: ErrorCategory, code: string
 
 
 
-function artifactPathForRequest(options: { samplePath: string; derivedPath: string; artifactKind: 'sample' | 'derived'; overridePath?: string }): string {
-  const configuredPath = options.artifactKind === 'derived' ? options.derivedPath : options.samplePath;
+function artifactPathForRequest(options: {
+  samplePath: string;
+  derivedQbPath: string;
+  derivedSkillPath: string;
+  artifactKind: 'sample' | 'derived_qb' | 'derived_skill';
+  overridePath?: string;
+}): string {
+  const configuredPath =
+    options.artifactKind === 'derived_qb'
+      ? options.derivedQbPath
+      : options.artifactKind === 'derived_skill'
+        ? options.derivedSkillPath
+        : options.samplePath;
   return resolve(process.cwd(), options.overridePath ?? configuredPath);
 }
 
-function defaultArtifactContext(records: Array<{ season: number; week: number; asOf: string }>, artifactKind: 'sample' | 'derived') {
+function defaultArtifactContext(records: Array<{ season: number; week: number; asOf: string }>, artifactKind: 'sample' | 'derived_qb' | 'derived_skill') {
   const first = records[0];
+  const site =
+    artifactKind === 'derived_qb'
+      ? 'artifact-derived-qb'
+      : artifactKind === 'derived_skill'
+        ? 'artifact-derived-skill'
+        : 'artifact-sample';
   return {
     slateId: `nfl-${first.season}-w${first.week}-artifact`,
     slateDate: first.asOf,
     sport: 'nfl',
-    site: artifactKind === 'derived' ? 'artifact-derived' : 'artifact-sample',
+    site,
     contestType: 'simulation' as const,
     mode: 'bootstrap-demo' as const
   };
@@ -131,7 +148,8 @@ export async function handleRequest(request: IncomingMessage, state: AppState): 
     const artifactRequest = validateFootballArtifactRankingsRequest(payload);
     const artifactPath = artifactPathForRequest({
       samplePath: state.config.FORGE_WEEKLY_INPUT_ARTIFACT_PATH,
-      derivedPath: state.config.FORGE_WEEKLY_DERIVED_ARTIFACT_PATH,
+      derivedQbPath: state.config.FORGE_WEEKLY_DERIVED_QB_ARTIFACT_PATH,
+      derivedSkillPath: state.config.FORGE_WEEKLY_DERIVED_SKILL_ARTIFACT_PATH,
       artifactKind: artifactRequest.artifactKind ?? 'sample',
       overridePath: artifactRequest.artifactPath
     });

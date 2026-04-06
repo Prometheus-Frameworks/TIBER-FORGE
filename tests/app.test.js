@@ -37,9 +37,13 @@ const parityFixturePlayers = forgeParityPlayers;
 async function withServer(fn) {
   process.env.FORGE_SERVICE_MODE = 'bootstrap-demo';
   process.env.FORGE_WEEKLY_INPUT_ARTIFACT_PATH = path.resolve(process.cwd(), 'tests/fixtures/artifacts/forge_weekly_player_input_2025_w12.upstream_compat.mirror.json');
-  process.env.FORGE_WEEKLY_DERIVED_ARTIFACT_PATH = path.resolve(
+  process.env.FORGE_WEEKLY_DERIVED_QB_ARTIFACT_PATH = path.resolve(
     process.cwd(),
     'tests/fixtures/artifacts/forge_weekly_player_input_2024_w01.qb_offline_fixture.derived.json'
+  );
+  process.env.FORGE_WEEKLY_DERIVED_SKILL_ARTIFACT_PATH = path.resolve(
+    process.cwd(),
+    'tests/fixtures/artifacts/forge_weekly_player_input_2024_w01.skill_positions_offline_fixture.derived.json'
   );
   delete process.env.PORT;
   const config = loadConfig(process.env);
@@ -354,11 +358,11 @@ test('POST /api/forge/rankings-football/from-artifact returns deterministic FORG
   });
 });
 
-test('POST /api/forge/rankings-football/from-artifact supports deterministic derived artifact lane (QB-only narrow cohort)', async () => {
+test('POST /api/forge/rankings-football/from-artifact supports deterministic derived_qb artifact lane (QB-only narrow cohort)', async () => {
   await withServer(async (baseUrl) => {
     const payload = JSON.stringify({
       requestId: 'football-artifact-derived-rankings-1',
-      artifactKind: 'derived',
+      artifactKind: 'derived_qb',
       includeExplanations: true
     });
 
@@ -386,8 +390,48 @@ test('POST /api/forge/rankings-football/from-artifact supports deterministic der
     assert.deepEqual(firstBody.rankings.map((entry) => entry.player.playerId), ['qb-dual-1', 'qb-pocket-1']);
     assert.deepEqual(firstBody.rankings.map((entry) => entry.player.position), ['QB', 'QB']);
     assert.ok(firstBody.rankings.every((entry) => entry.score.overall >= 0 && entry.score.overall <= 100));
-    assert.ok(firstBody.warnings.some((warning) => warning.includes('Artifact lane: derived')));
+    assert.ok(firstBody.warnings.some((warning) => warning.includes('Artifact lane: derived_qb')));
     assert.ok(firstBody.warnings.some((warning) => warning.includes('forge_weekly_player_input_2024_w01.qb_offline_fixture.derived.json')));
+  });
+});
+
+test('POST /api/forge/rankings-football/from-artifact supports deterministic derived_skill artifact lane (multi-position cohort)', async () => {
+  await withServer(async (baseUrl) => {
+    const payload = JSON.stringify({
+      requestId: 'football-artifact-derived-skill-rankings-1',
+      artifactKind: 'derived_skill',
+      includeExplanations: true
+    });
+
+    const [firstResponse, secondResponse] = await Promise.all([
+      fetch(`${baseUrl}/api/forge/rankings-football/from-artifact`, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: payload
+      }),
+      fetch(`${baseUrl}/api/forge/rankings-football/from-artifact`, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: payload
+      })
+    ]);
+
+    const firstBody = await firstResponse.json();
+    const secondBody = await secondResponse.json();
+
+    assert.equal(firstResponse.status, 200);
+    assert.equal(secondResponse.status, 200);
+    assert.deepEqual(firstBody, secondBody);
+    assert.equal(firstBody.metadata.totalCandidates, 4);
+    assert.equal(firstBody.metadata.returnedCount, 4);
+    assert.deepEqual(firstBody.rankings.map((entry) => entry.player.playerId), ['wr-featured-1', 'rb-volume-1', 'te-chain-1', 'qb-dual-1']);
+    assert.deepEqual(firstBody.rankings.map((entry) => entry.player.position), ['WR', 'RB', 'TE', 'QB']);
+    assert.ok(firstBody.rankings.every((entry) => entry.score.overall >= 0 && entry.score.overall <= 100));
+    assert.ok(firstBody.warnings.some((warning) => warning.includes('Artifact lane: derived_skill')));
+    assert.ok(firstBody.warnings.some((warning) => warning.includes('forge_weekly_player_input_2024_w01.skill_positions_offline_fixture.derived.json')));
+    assert.ok(firstBody.rankings[0].score.overall >= firstBody.rankings[1].score.overall);
+    assert.ok(firstBody.rankings[1].score.overall >= firstBody.rankings[2].score.overall);
+    assert.ok(firstBody.rankings[2].score.overall >= firstBody.rankings[3].score.overall);
   });
 });
 

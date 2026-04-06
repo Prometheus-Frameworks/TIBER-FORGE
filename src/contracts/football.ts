@@ -63,7 +63,7 @@ export interface FootballRankingsRequest {
 
 export interface FootballArtifactRankingsRequest {
   requestId?: string;
-  artifactKind?: 'sample' | 'derived';
+  artifactKind?: 'sample' | 'derived_qb' | 'derived_skill';
   artifactPath?: string;
   context?: EvaluationContext;
   limit?: number;
