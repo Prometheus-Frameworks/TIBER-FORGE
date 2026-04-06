@@ -41,24 +41,34 @@ function tierForScore(score: number): EvaluateResponse['score']['tier'] {
 function defenseAdjustment(tier: NormalizedFootballScoringInput['environment']['opponentDefenseTier']): number {
   switch (tier) {
     case 'weak':
-      return 8;
+      return 10;
     case 'neutral':
       return 2;
     case 'strong':
-      return -5;
+      return -6;
     case 'elite':
-      return -10;
+      return -12;
   }
 }
 
 function gameScriptAdjustment(script: NormalizedFootballScoringInput['environment']['expectedGameScript'], position: NormalizedFootballScoringInput['position']): number {
   if (position === 'RB') {
-    return script === 'positive' ? 5 : script === 'negative' ? -3 : 1;
+    return script === 'positive' ? 6 : script === 'negative' ? -4 : 1;
   }
   if (position === 'QB') {
-    return script === 'negative' ? 3 : script === 'positive' ? 1 : 2;
+    return script === 'negative' ? 4 : script === 'positive' ? 0 : 2;
   }
-  return script === 'negative' ? 3 : script === 'positive' ? -1 : 2;
+  return script === 'negative' ? 4 : script === 'positive' ? -2 : 1;
+}
+
+function spreadAdjustment(spread: number, position: NormalizedFootballScoringInput['position']): number {
+  if (position === 'RB') {
+    return clamp(-spread * 0.8, -10, 10);
+  }
+  if (position === 'QB') {
+    return clamp(-spread * 0.6, -8, 8);
+  }
+  return clamp(-spread * 0.5, -7, 7);
 }
 
 function injuryPenalty(status: NormalizedFootballScoringInput['injuryStatus']): number {
@@ -142,10 +152,10 @@ function buildComponents(input: NormalizedFootballScoringInput): ScoreComponent[
   const efficiencyRaw = efficiencyScore(input);
 
   const environmentRaw =
-    input.environment.impliedTeamTotal * 2.1 +
+    input.environment.impliedTeamTotal * 1.85 +
     defenseAdjustment(input.environment.opponentDefenseTier) +
     gameScriptAdjustment(input.environment.expectedGameScript, input.position) +
-    clamp(-input.environment.spread * 0.6, -8, 8);
+    spreadAdjustment(input.environment.spread, input.position);
 
   const stabilityRaw =
     80 -
