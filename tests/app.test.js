@@ -45,6 +45,10 @@ async function withServer(fn) {
     process.cwd(),
     'tests/fixtures/artifacts/forge_weekly_player_input_2024_w01.skill_positions_offline_fixture.derived.json'
   );
+  process.env.FORGE_WEEKLY_DERIVED_SKILL_ARTIFACT_PATH_TEMPLATE = path.resolve(
+    process.cwd(),
+    'tests/fixtures/artifacts/forge_weekly_player_input_{season}_w{week}.skill_positions_offline_fixture.derived.json'
+  );
   delete process.env.PORT;
   const config = loadConfig(process.env);
   const server = createServer(createRequestListener(config));
@@ -395,43 +399,48 @@ test('POST /api/forge/rankings-football/from-artifact supports deterministic der
   });
 });
 
-test('POST /api/forge/rankings-football/from-artifact supports deterministic derived_skill artifact lane (multi-position cohort)', async () => {
+test('POST /api/forge/rankings-football/from-artifact supports deterministic derived_skill weekly-factory artifacts for 2024 weeks 1-3', async () => {
   await withServer(async (baseUrl) => {
-    const payload = JSON.stringify({
-      requestId: 'football-artifact-derived-skill-rankings-1',
-      artifactKind: 'derived_skill',
-      includeExplanations: true
-    });
+    for (const week of [1, 2, 3]) {
+      const payload = JSON.stringify({
+        requestId: `football-artifact-derived-skill-rankings-w${week}`,
+        artifactKind: 'derived_skill',
+        artifactWeek: week,
+        includeExplanations: true
+      });
 
-    const [firstResponse, secondResponse] = await Promise.all([
-      fetch(`${baseUrl}/api/forge/rankings-football/from-artifact`, {
-        method: 'POST',
-        headers: { 'content-type': 'application/json' },
-        body: payload
-      }),
-      fetch(`${baseUrl}/api/forge/rankings-football/from-artifact`, {
-        method: 'POST',
-        headers: { 'content-type': 'application/json' },
-        body: payload
-      })
-    ]);
+      const [firstResponse, secondResponse] = await Promise.all([
+        fetch(`${baseUrl}/api/forge/rankings-football/from-artifact`, {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: payload
+        }),
+        fetch(`${baseUrl}/api/forge/rankings-football/from-artifact`, {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: payload
+        })
+      ]);
 
-    const firstBody = await firstResponse.json();
-    const secondBody = await secondResponse.json();
+      const firstBody = await firstResponse.json();
+      const secondBody = await secondResponse.json();
 
-    assert.equal(firstResponse.status, 200);
-    assert.equal(secondResponse.status, 200);
-    assert.deepEqual(firstBody, secondBody);
-    assert.equal(firstBody.metadata.totalCandidates, 4);
-    assert.equal(firstBody.metadata.returnedCount, 4);
-    assert.deepEqual(firstBody.rankings.map((entry) => entry.player.playerId), ['wr-featured-1', 'rb-volume-1', 'te-chain-1', 'qb-dual-1']);
-    assert.deepEqual(firstBody.rankings.map((entry) => entry.player.position), ['WR', 'RB', 'TE', 'QB']);
-    assert.ok(firstBody.rankings.every((entry) => entry.score.overall >= 0 && entry.score.overall <= 100));
-    assert.ok(firstBody.warnings.some((warning) => warning.includes('Artifact lane: derived_skill')));
-    assert.ok(firstBody.warnings.some((warning) => warning.includes('forge_weekly_player_input_2024_w01.skill_positions_offline_fixture.derived.json')));
-    assert.ok(firstBody.rankings[0].score.overall >= firstBody.rankings[1].score.overall);
-    assert.ok(firstBody.rankings[1].score.overall >= firstBody.rankings[2].score.overall);
-    assert.ok(firstBody.rankings[2].score.overall >= firstBody.rankings[3].score.overall);
+      assert.equal(firstResponse.status, 200);
+      assert.equal(secondResponse.status, 200);
+      assert.deepEqual(firstBody, secondBody);
+      assert.equal(firstBody.metadata.totalCandidates, 4);
+      assert.equal(firstBody.metadata.returnedCount, 4);
+      assert.deepEqual(firstBody.rankings.map((entry) => entry.player.playerId).sort(), ['qb-dual-1', 'rb-volume-1', 'te-chain-1', 'wr-featured-1']);
+      assert.deepEqual(Array.from(new Set(firstBody.rankings.map((entry) => entry.player.position))).sort(), ['QB', 'RB', 'TE', 'WR']);
+      assert.ok(firstBody.rankings.every((entry) => entry.score.overall >= 0 && entry.score.overall <= 100));
+      assert.ok(firstBody.rankings.every((entry) => Number.isFinite(entry.score.overall)));
+      assert.ok(firstBody.rankings.every((entry) => Number.isFinite(entry.confidence.score) && entry.confidence.score >= 0 && entry.confidence.score <= 1));
+      assert.ok(firstBody.warnings.some((warning) => warning.includes(`Artifact lane: derived_skill (week ${week})`)));
+      assert.ok(firstBody.warnings.some((warning) => warning.includes(`forge_weekly_player_input_2024_w0${week}.skill_positions_offline_fixture.derived.json`)));
+      assert.ok(firstBody.rankings[0].score.overall >= firstBody.rankings[1].score.overall);
+      assert.ok(firstBody.rankings[1].score.overall >= firstBody.rankings[2].score.overall);
+      assert.ok(firstBody.rankings[2].score.overall >= firstBody.rankings[3].score.overall);
+    }
   });
 });
 

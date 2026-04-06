@@ -337,6 +337,7 @@ export function validateFootballArtifactRankingsRequest(value: unknown): Footbal
       ? 'sample'
       : ensureEnum(value.artifactKind, ['sample', 'derived_qb', 'derived_skill'] as const, 'artifactKind', errors);
   const artifactPath = value.artifactPath === undefined ? undefined : ensureString(value.artifactPath, 'artifactPath', errors);
+  const artifactWeek = value.artifactWeek === undefined ? undefined : ensureNumber(value.artifactWeek, 'artifactWeek', errors, { min: 1, max: 25, integer: true });
   const context = value.context === undefined ? undefined : validateContext(value.context, 'context', errors);
   const includeExplanations = value.includeExplanations === undefined ? true : ensureBoolean(value.includeExplanations, 'includeExplanations', errors);
   const limit = value.limit === undefined ? undefined : ensureNumber(value.limit, 'limit', errors, { min: 1, max: 1000, integer: true });
@@ -345,7 +346,7 @@ export function validateFootballArtifactRankingsRequest(value: unknown): Footbal
     throw new ValidationError('INVALID_REQUEST_BODY', errors);
   }
 
-  return { requestId, artifactKind, artifactPath, context, limit, includeExplanations };
+  return { requestId, artifactKind, artifactPath, artifactWeek, context, limit, includeExplanations };
 }
 
 export function validateFootballRankingsRequest(value: unknown): FootballRankingsRequest {
