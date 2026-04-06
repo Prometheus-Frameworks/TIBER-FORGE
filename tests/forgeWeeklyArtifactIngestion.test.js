@@ -6,6 +6,7 @@ const path = require('node:path');
 const { ingestForgeWeeklyArtifact } = require('../dist/src/ingestion/forgeWeeklyArtifact.js');
 
 const upstreamCompatMirrorPath = path.resolve(process.cwd(), 'tests/fixtures/artifacts/forge_weekly_player_input_2025_w12.upstream_compat.mirror.json');
+const derivedQbSlicePath = path.resolve(process.cwd(), 'tests/fixtures/artifacts/forge_weekly_player_input_2024_w01.qb_offline_fixture.derived.json');
 
 test('ingestForgeWeeklyArtifact reads and validates upstream-compatible mirror artifact', async () => {
   const records = await ingestForgeWeeklyArtifact(upstreamCompatMirrorPath);
@@ -13,6 +14,16 @@ test('ingestForgeWeeklyArtifact reads and validates upstream-compatible mirror a
   assert.equal(records.length, 3);
   assert.equal(records[0].playerId, 'wr-featured-1');
   assert.equal(records[0].sourceSetId, 'td-weekly-2025-w12-sample-v1');
+});
+
+test('ingestForgeWeeklyArtifact reads and validates first narrow derived QB slice artifact', async () => {
+  const records = await ingestForgeWeeklyArtifact(derivedQbSlicePath);
+
+  assert.equal(records.length, 2);
+  assert.deepEqual(records.map((record) => record.position), ['QB', 'QB']);
+  assert.equal(records[0].season, 2024);
+  assert.equal(records[0].week, 1);
+  assert.equal(records[0].sourceSetId, 'td-weekly-2024-w01-qb-offline-derived-v1');
 });
 
 test('ingestForgeWeeklyArtifact fails closed for malformed JSON', async () => {

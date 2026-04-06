@@ -37,6 +37,10 @@ const parityFixturePlayers = forgeParityPlayers;
 async function withServer(fn) {
   process.env.FORGE_SERVICE_MODE = 'bootstrap-demo';
   process.env.FORGE_WEEKLY_INPUT_ARTIFACT_PATH = path.resolve(process.cwd(), 'tests/fixtures/artifacts/forge_weekly_player_input_2025_w12.upstream_compat.mirror.json');
+  process.env.FORGE_WEEKLY_DERIVED_ARTIFACT_PATH = path.resolve(
+    process.cwd(),
+    'tests/fixtures/artifacts/forge_weekly_player_input_2024_w01.qb_offline_fixture.derived.json'
+  );
   delete process.env.PORT;
   const config = loadConfig(process.env);
   const server = createServer(createRequestListener(config));
@@ -338,8 +342,52 @@ test('POST /api/forge/rankings-football/from-artifact returns deterministic FORG
     assert.deepEqual(firstBody, secondBody);
     assert.deepEqual(firstBody.rankings.map((entry) => entry.player.playerId), ['wr-featured-1', 'qb-dual-1', 'fragile-wr-1']);
     assert.equal(firstBody.source.provider, 'tiber-forge-football-lane');
+    assert.equal(firstBody.rankings[0].player.position, 'WR');
+    assert.equal(firstBody.rankings[1].player.position, 'QB');
+    assert.equal(firstBody.rankings[2].player.position, 'WR');
+    assert.equal(firstBody.metadata.totalCandidates, 3);
+    assert.equal(firstBody.metadata.returnedCount, 3);
+    assert.equal(firstBody.metadata.limitApplied, null);
+    assert.ok(firstBody.warnings.some((warning) => warning.includes('Artifact lane: sample')));
     assert.ok(firstBody.warnings.some((warning) => warning.includes('Artifact ingestion path')));
     assert.ok(firstBody.warnings.some((warning) => warning.includes('not live TIBER-Data pull parity')));
+  });
+});
+
+test('POST /api/forge/rankings-football/from-artifact supports deterministic derived artifact lane (QB-only narrow cohort)', async () => {
+  await withServer(async (baseUrl) => {
+    const payload = JSON.stringify({
+      requestId: 'football-artifact-derived-rankings-1',
+      artifactKind: 'derived',
+      includeExplanations: true
+    });
+
+    const [firstResponse, secondResponse] = await Promise.all([
+      fetch(`${baseUrl}/api/forge/rankings-football/from-artifact`, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: payload
+      }),
+      fetch(`${baseUrl}/api/forge/rankings-football/from-artifact`, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: payload
+      })
+    ]);
+
+    const firstBody = await firstResponse.json();
+    const secondBody = await secondResponse.json();
+
+    assert.equal(firstResponse.status, 200);
+    assert.equal(secondResponse.status, 200);
+    assert.deepEqual(firstBody, secondBody);
+    assert.equal(firstBody.metadata.totalCandidates, 2);
+    assert.equal(firstBody.metadata.returnedCount, 2);
+    assert.deepEqual(firstBody.rankings.map((entry) => entry.player.playerId), ['qb-dual-1', 'qb-pocket-1']);
+    assert.deepEqual(firstBody.rankings.map((entry) => entry.player.position), ['QB', 'QB']);
+    assert.ok(firstBody.rankings.every((entry) => entry.score.overall >= 0 && entry.score.overall <= 100));
+    assert.ok(firstBody.warnings.some((warning) => warning.includes('Artifact lane: derived')));
+    assert.ok(firstBody.warnings.some((warning) => warning.includes('forge_weekly_player_input_2024_w01.qb_offline_fixture.derived.json')));
   });
 });
 

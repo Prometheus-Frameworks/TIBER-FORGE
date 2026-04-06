@@ -84,9 +84,12 @@ PR6 introduced the football lane. A follow-up boundary correction now keeps that
 
 ### Artifact-driven football operator path (first upstream fuel line)
 
-TIBER-FORGE can now ingest a canonical sample `ForgeWeeklyPlayerInput` artifact file from disk (defaulting to the upstream handoff path `../TIBER-Data/data/gold/forge/forge_weekly_player_input_2025_w12.sample.json`, override via `FORGE_WEEKLY_INPUT_ARTIFACT_PATH`) and run the existing deterministic football rankings lane through `POST /api/forge/rankings-football/from-artifact`.
+TIBER-FORGE can now ingest canonical `ForgeWeeklyPlayerInput` artifacts from disk and run the existing deterministic football rankings lane through `POST /api/forge/rankings-football/from-artifact`.
 
-This is an operator/development ingestion path only: no live network pull from TIBER-Data, no DB, and no full production parity claim. The direct football request path and bootstrap lane remain available. Local fallback artifacts used in this repo are test fixtures, not canonical upstream sources; compatibility tests target an upstream-semantic mirror fixture (including numeric `activeProjection` and descriptive `dataConfidenceHint` semantics).
+- Sample lane default path: `../TIBER-Data/data/gold/forge/forge_weekly_player_input_2025_w12.sample.json` (override with `FORGE_WEEKLY_INPUT_ARTIFACT_PATH`, request `artifactKind: "sample"`).
+- First derived lane default path: `../TIBER-Data/data/gold/forge/forge_weekly_player_input_2024_w01.qb_offline_fixture.derived.json` (override with `FORGE_WEEKLY_DERIVED_ARTIFACT_PATH`, request `artifactKind: "derived"`).
+
+This is an operator/development ingestion path only: no live network pull from TIBER-Data, no DB, and no full production parity claim. The direct football request path and bootstrap lane remain available. The first derived slice is intentionally narrow (QB-only, small cohort) and is used for early engine sanity checks rather than broad parity claims.
 
 
 ## Non-goals
