@@ -54,7 +54,7 @@ npm test
 
 Use `scripts/inspect-football-artifact-grades.js` for quick human inspection of ranked outputs (overall, components, confidence, tier).
 
-Preferred real-player sanity check (uses local `../TIBER-Data` season-segment artifacts, no live ingestion):
+Preferred real-player sanity check for the `derived_skill` lane (uses local `../TIBER-Data` season-segment artifacts, no live ingestion):
 
 ```bash
 npm run build

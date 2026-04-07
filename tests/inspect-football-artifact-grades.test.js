@@ -44,24 +44,31 @@ test('artifactPathForRequest keeps explicit --artifact-path override highest pri
 
 test('artifactPathForRequest resolves real TIBER-Data template for derived_skill week requests', () => {
   const previousTemplate = process.env.FORGE_WEEKLY_DERIVED_SKILL_ARTIFACT_PATH_TEMPLATE;
-  process.env.FORGE_WEEKLY_DERIVED_SKILL_ARTIFACT_PATH_TEMPLATE = 'tests/fixtures/artifacts/forge_weekly_player_input_{season}_w{week}.skill_positions_offline_fixture.derived.json';
+  try {
+    process.env.FORGE_WEEKLY_DERIVED_SKILL_ARTIFACT_PATH_TEMPLATE =
+      'tests/fixtures/artifacts/forge_weekly_player_input_{season}_w{week}.skill_positions_offline_fixture.derived.json';
 
-  const resolved = artifactPathForRequest({
-    artifactKind: 'derived_skill',
-    season: 2024,
-    week: 6,
-    artifactPath: undefined,
-    artifactTemplate: undefined,
-    useRealTiberData: true
-  });
+    const resolved = artifactPathForRequest({
+      artifactKind: 'derived_skill',
+      season: 2024,
+      week: 6,
+      artifactPath: undefined,
+      artifactTemplate: undefined,
+      useRealTiberData: true
+    });
 
-  assert.equal(
-    resolved,
-    path.resolve(
-      process.cwd(),
-      '../TIBER-Data/data/gold/forge/forge_weekly_player_input_2024_w06.skill_positions_season_segment.derived.json'
-    )
-  );
-
-  process.env.FORGE_WEEKLY_DERIVED_SKILL_ARTIFACT_PATH_TEMPLATE = previousTemplate;
+    assert.equal(
+      resolved,
+      path.resolve(
+        process.cwd(),
+        '../TIBER-Data/data/gold/forge/forge_weekly_player_input_2024_w06.skill_positions_season_segment.derived.json'
+      )
+    );
+  } finally {
+    if (previousTemplate === undefined) {
+      delete process.env.FORGE_WEEKLY_DERIVED_SKILL_ARTIFACT_PATH_TEMPLATE;
+    } else {
+      process.env.FORGE_WEEKLY_DERIVED_SKILL_ARTIFACT_PATH_TEMPLATE = previousTemplate;
+    }
+  }
 });

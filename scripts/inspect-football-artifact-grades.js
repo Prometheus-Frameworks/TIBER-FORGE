@@ -65,8 +65,6 @@ function artifactPathForRequest(options) {
     return path.resolve(process.cwd(), options.artifactPath);
   }
 
-  const realSamplePath = '../TIBER-Data/data/gold/forge/forge_weekly_player_input_2025_w12.sample.json';
-  const realDerivedQbPath = '../TIBER-Data/data/gold/forge/forge_weekly_player_input_2024_w01.qb_offline_fixture.derived.json';
   const realDerivedSkillTemplate =
     '../TIBER-Data/data/gold/forge/forge_weekly_player_input_{season}_w{week}.skill_positions_season_segment.derived.json';
 
@@ -96,15 +94,9 @@ function artifactPathForRequest(options) {
   }
 
   if (options.artifactKind === 'sample') {
-    if (options.useRealTiberData) {
-      return path.resolve(process.cwd(), realSamplePath);
-    }
     return path.resolve(process.cwd(), samplePath);
   }
   if (options.artifactKind === 'derived_qb') {
-    if (options.useRealTiberData) {
-      return path.resolve(process.cwd(), realDerivedQbPath);
-    }
     return path.resolve(process.cwd(), derivedQbPath);
   }
   return path.resolve(process.cwd(), derivedSkillPath);
