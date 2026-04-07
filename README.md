@@ -54,13 +54,29 @@ npm test
 
 Use `scripts/inspect-football-artifact-grades.js` for quick human inspection of ranked outputs (overall, components, confidence, tier).
 
-Example using `derived_skill` weekly-factory style inputs (2024 W6):
+Preferred real-player sanity check (uses local `../TIBER-Data` season-segment artifacts, no live ingestion):
+
+```bash
+npm run build
+node scripts/inspect-football-artifact-grades.js \
+  --artifact-kind derived_skill \
+  --season 2024 \
+  --week 6 \
+  --limit 8 \
+  --use-real-tiber-data
+```
+
+This is the easiest path for inspecting real player names from existing `TIBER-Data` W1–W6 season-segment artifacts and cross-checking outputs against references such as Sleeper gamelogs.
+
+Fixture-based inspection is still supported for controlled/local mirrors:
 
 ```bash
 npm run build
 FORGE_WEEKLY_DERIVED_SKILL_ARTIFACT_PATH_TEMPLATE=tests/fixtures/artifacts/forge_weekly_player_input_{season}_w{week}.skill_positions_offline_fixture.derived.json \
 node scripts/inspect-football-artifact-grades.js --artifact-kind derived_skill --season 2024 --week 6 --limit 4
 ```
+
+You can also provide an explicit one-off path (`--artifact-path`) or template (`--artifact-template`) without editing the script source.
 
 This utility is for operator/developer sanity checks only. It does not change contracts, model logic, or ingestion boundaries.
 
