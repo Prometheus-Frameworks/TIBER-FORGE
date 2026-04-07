@@ -1,6 +1,8 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
+const path = require('node:path');
 const { evaluateFootballPlayer, rankFootballPlayers } = require('../dist/src/services/footballForgeService.js');
+const { ingestForgeWeeklyArtifact } = require('../dist/src/ingestion/forgeWeeklyArtifact.js');
 const { forgeFootballEvaluateFixture, forgeFootballInputs, footballFixtureContext } = require('../dist/tests/fixtures/forgeFootballFixtures.js');
 
 function environmentScore(response) {
@@ -55,6 +57,70 @@ test('environment remains bounded and deterministic for weekly fixture cohort', 
   assert.deepEqual(second, first);
   assert.ok(first.rankings.every((entry) => Number.isFinite(environmentScore(entry))));
   assert.ok(first.rankings.every((entry) => environmentScore(entry) >= 0 && environmentScore(entry) <= 100));
+  assert.ok(first.rankings.every((entry) => Number.isFinite(entry.confidence.score) && entry.confidence.score >= 0 && entry.confidence.score <= 1));
+});
+
+test('confidence separates materially different support profiles while staying deterministic', () => {
+  const highSupport = evaluateFootballPlayer(forgeFootballEvaluateFixture);
+  const lowSupport = evaluateFootballPlayer({
+    ...forgeFootballEvaluateFixture,
+    requestId: 'football-eval-fragile-support',
+    input: {
+      ...forgeFootballEvaluateFixture.input,
+      featureCoverage: 0.58,
+      dataConfidenceHint: 'low confidence sample',
+      qualityFlags: ['thin_sample', 'role_uncertainty', 'injury_noise'],
+      roleVolatility: 0.7,
+      injuryStatus: 'questionable',
+      practiceParticipation: 'did_not_practice',
+      activeProjection: 0.41
+    }
+  });
+
+  assert.equal(highSupport.confidence.score, evaluateFootballPlayer(forgeFootballEvaluateFixture).confidence.score);
+  assert.ok(highSupport.confidence.score - lowSupport.confidence.score >= 0.2);
+  assert.equal(highSupport.confidence.label, 'high');
+  assert.equal(lowSupport.confidence.label, 'low');
+});
+
+test('artifact-driven week-6 real-player cohort confidence no longer collapses into an overly tight low band', async () => {
+  const artifactPath = path.resolve(process.cwd(), 'tests/fixtures/artifacts/forge_weekly_player_input_2024_w06.real_players_variance_fixture.derived.json');
+  const inputs = await ingestForgeWeeklyArtifact(artifactPath);
+
+  const first = rankFootballPlayers({
+    requestId: 'week6-real-players-confidence-1',
+    inputs,
+    context: {
+      slateId: 'nfl-2024-w6-real-players',
+      slateDate: '2024-10-13T17:00:00Z',
+      sport: 'nfl',
+      site: 'artifact-derived-skill',
+      contestType: 'simulation',
+      mode: 'bootstrap-demo'
+    },
+    includeExplanations: true
+  });
+  const second = rankFootballPlayers({
+    requestId: 'week6-real-players-confidence-1',
+    inputs,
+    context: {
+      slateId: 'nfl-2024-w6-real-players',
+      slateDate: '2024-10-13T17:00:00Z',
+      sport: 'nfl',
+      site: 'artifact-derived-skill',
+      contestType: 'simulation',
+      mode: 'bootstrap-demo'
+    },
+    includeExplanations: true
+  });
+
+  const scores = first.rankings.map((entry) => entry.confidence.score);
+  const spread = Math.max(...scores) - Math.min(...scores);
+  const mediumCount = first.rankings.filter((entry) => entry.confidence.label === 'medium').length;
+
+  assert.deepEqual(second, first);
+  assert.ok(spread >= 0.12);
+  assert.ok(mediumCount >= 3);
 });
 
 test('environment differentiates opponent-defense tiers a bit more clearly', () => {
