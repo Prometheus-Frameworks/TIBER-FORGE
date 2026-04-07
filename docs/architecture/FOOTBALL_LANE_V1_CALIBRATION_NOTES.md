@@ -57,3 +57,23 @@ Environment was still somewhat compressed because implied team total did most of
 - Any richer team/game context beyond the current four environment fields.
 - New upstream contracts or `TIBER-Data` schema additions.
 - Full-model recalibration or production-parity claims.
+
+## Narrow confidence/stability interpretation follow-up (post upstream variance fix)
+
+### What still looked off after `TIBER-Data` row-level variance improved
+
+- Real-player rows started varying correctly on `featureCoverage`, `roleVolatility`, and quality flags, but football-lane confidence still clustered too tightly in a low band.
+- Labels remained too pessimistic for healthier rows with meaningfully better support.
+
+### What this calibration changed (and only this)
+
+- Modestly reweighted football confidence to use the current inputs more effectively (`featureCoverage`, `dataConfidenceHint`, support-flag count, volatility, practice, active projection, injury status).
+- Reduced excessive compression by softening some penalties and adding a small expected-active confidence adjustment while keeping deterministic bounds.
+- Nudged confidence labels slightly (`high >= 0.72`, `medium >= 0.38`) so improved-support rows are not auto-labeled low.
+- Minor stability interpretation tweak: include a small bounded data-confidence contribution and slightly soften quality-flag/volatility drag.
+
+### Still deferred
+
+- No API or contract changes.
+- No `TIBER-Data` or artifact-path logic changes.
+- No opportunity/efficiency/environment rewrite.

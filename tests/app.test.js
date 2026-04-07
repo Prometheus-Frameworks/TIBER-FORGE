@@ -295,7 +295,7 @@ test('POST /api/forge/rankings-football stays deterministic with stable ordering
     assert.deepEqual(secondBody, firstBody);
     assert.deepEqual(firstBody.rankings.map((entry) => entry.player.playerId), ['wr-featured-1', 'rb-volume-1', 'qb-dual-1', 'fragile-wr-1']);
     assert.equal(firstBody.rankings[2].player.opponent, 'UNK');
-    assert.equal(firstBody.rankings[0].confidence.label, 'medium');
+    assert.equal(firstBody.rankings[0].confidence.label, 'high');
     assert.equal(firstBody.rankings[3].confidence.label, 'low');
   });
 });

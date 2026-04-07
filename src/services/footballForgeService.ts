@@ -16,10 +16,10 @@ function clamp(value: number, min: number, max: number): number {
 }
 
 function confidenceLabel(score: number): EvaluateResponse['confidence']['label'] {
-  if (score >= 0.75) {
+  if (score >= 0.72) {
     return 'high';
   }
-  if (score >= 0.45) {
+  if (score >= 0.38) {
     return 'medium';
   }
   return 'low';
@@ -164,9 +164,10 @@ function buildComponents(input: NormalizedFootballScoringInput): ScoreComponent[
     (input.stability.practiceParticipation === 'did_not_practice' ? 18 : 0) -
     (input.stability.activeProjection === 'risky' ? 16 : 0) -
     (input.stability.activeProjection === 'expected_inactive' ? 32 : 0) -
-    input.stability.roleVolatility * 38 +
+    input.stability.roleVolatility * 36 +
     input.stability.featureCoverage * 12 -
-    clamp(input.supportFlags.length * 2, 0, 8);
+    clamp(input.supportFlags.length * 1.5, 0, 6) +
+    input.stability.dataConfidenceHint * 6;
 
   return [
     {
@@ -205,20 +206,23 @@ function evaluateInput(request: FootballEvaluateRequest): EvaluateResponse {
   const components = buildComponents(input);
   const overall = round(components.reduce((sum, component) => sum + component.score * component.weight, 0));
   const practiceConfidencePenalty =
-    input.stability.practiceParticipation === 'did_not_practice' ? 0.09 : input.stability.practiceParticipation === 'limited' ? 0.04 : 0;
+    input.stability.practiceParticipation === 'did_not_practice' ? 0.07 : input.stability.practiceParticipation === 'limited' ? 0.03 : 0;
   const projectionConfidencePenalty =
-    input.stability.activeProjection === 'expected_inactive' ? 0.16 : input.stability.activeProjection === 'risky' ? 0.06 : 0;
+    input.stability.activeProjection === 'expected_inactive' ? 0.12 : input.stability.activeProjection === 'risky' ? 0.05 : 0;
+  const activeProjectionConfidenceAdjustment =
+    input.stability.activeProjection === 'expected_active' ? 0.05 : input.stability.activeProjection === 'risky' ? -0.02 : -0.08;
   const confidenceScore = round(
     clamp(
-      0.18 +
-        input.stability.featureCoverage * 0.3 +
-        input.stability.dataConfidenceHint * 0.24 -
-        input.supportFlags.length * 0.06 -
-        injuryPenalty(input.injuryStatus) / 100 -
-        input.stability.roleVolatility * 0.14 -
+      0.2 +
+        input.stability.featureCoverage * 0.36 +
+        input.stability.dataConfidenceHint * 0.28 +
+        activeProjectionConfidenceAdjustment -
+        clamp(input.supportFlags.length * 0.035, 0, 0.14) -
+        injuryPenalty(input.injuryStatus) / 130 -
+        input.stability.roleVolatility * 0.18 -
         practiceConfidencePenalty -
         projectionConfidencePenalty,
-      0.03,
+      0.05,
       0.99
     )
   );
