@@ -147,6 +147,12 @@ If `FORGE_SERVICE_MODE` is missing or invalid, startup fails immediately.
 
 ## Local development
 
+Install dependencies first in a fresh clone:
+
+```bash
+npm install
+```
+
 ### Build
 
 ```bash
