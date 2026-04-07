@@ -10,6 +10,8 @@ function parseArgs(argv) {
     season: 2024,
     limit: 5,
     artifactPath: undefined,
+    artifactTemplate: undefined,
+    useRealTiberData: false,
     includeExplanations: true
   };
 
@@ -41,6 +43,15 @@ function parseArgs(argv) {
       i += 1;
       continue;
     }
+    if (arg === '--artifact-template' && next) {
+      options.artifactTemplate = next;
+      i += 1;
+      continue;
+    }
+    if (arg === '--use-real-tiber-data') {
+      options.useRealTiberData = true;
+      continue;
+    }
     if (arg === '--compact') {
       options.includeExplanations = false;
     }
@@ -54,16 +65,31 @@ function artifactPathForRequest(options) {
     return path.resolve(process.cwd(), options.artifactPath);
   }
 
+  const realDerivedSkillTemplate =
+    '../TIBER-Data/data/gold/forge/forge_weekly_player_input_{season}_w{week}.skill_offline_fixture.derived.json';
+
   const samplePath = process.env.FORGE_WEEKLY_INPUT_ARTIFACT_PATH ?? '../TIBER-Data/data/gold/forge/forge_weekly_player_input_2025_w12.sample.json';
   const derivedQbPath =
     process.env.FORGE_WEEKLY_DERIVED_QB_ARTIFACT_PATH ?? '../TIBER-Data/data/gold/forge/forge_weekly_player_input_2024_w01.qb_offline_fixture.derived.json';
   const derivedSkillPath =
     process.env.FORGE_WEEKLY_DERIVED_SKILL_ARTIFACT_PATH ?? '../TIBER-Data/data/gold/forge/forge_weekly_player_input_2024_w01.skill_positions_offline_fixture.derived.json';
-  const derivedSkillTemplate = process.env.FORGE_WEEKLY_DERIVED_SKILL_ARTIFACT_PATH_TEMPLATE;
+  const envDerivedSkillTemplate = process.env.FORGE_WEEKLY_DERIVED_SKILL_ARTIFACT_PATH_TEMPLATE;
 
-  if (options.artifactKind === 'derived_skill' && derivedSkillTemplate) {
+  if (options.artifactKind === 'derived_skill' && options.artifactTemplate) {
     const week = String(options.week).padStart(2, '0');
-    const templatedPath = derivedSkillTemplate.replaceAll('{week}', week).replaceAll('{season}', String(options.season));
+    const templatedPath = options.artifactTemplate.replaceAll('{week}', week).replaceAll('{season}', String(options.season));
+    return path.resolve(process.cwd(), templatedPath);
+  }
+
+  if (options.artifactKind === 'derived_skill' && options.useRealTiberData) {
+    const week = String(options.week).padStart(2, '0');
+    const templatedPath = realDerivedSkillTemplate.replaceAll('{week}', week).replaceAll('{season}', String(options.season));
+    return path.resolve(process.cwd(), templatedPath);
+  }
+
+  if (options.artifactKind === 'derived_skill' && envDerivedSkillTemplate && !options.useRealTiberData) {
+    const week = String(options.week).padStart(2, '0');
+    const templatedPath = envDerivedSkillTemplate.replaceAll('{week}', week).replaceAll('{season}', String(options.season));
     return path.resolve(process.cwd(), templatedPath);
   }
 
@@ -121,7 +147,14 @@ async function main() {
   console.log(JSON.stringify({ artifactPath, totalCandidates: inputs.length, returned: preview.length, preview }, null, 2));
 }
 
-main().catch((error) => {
-  console.error(error instanceof Error ? error.message : String(error));
-  process.exitCode = 1;
-});
+if (require.main === module) {
+  main().catch((error) => {
+    console.error(error instanceof Error ? error.message : String(error));
+    process.exitCode = 1;
+  });
+}
+
+module.exports = {
+  parseArgs,
+  artifactPathForRequest
+};
