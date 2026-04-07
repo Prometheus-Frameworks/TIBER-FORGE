@@ -66,7 +66,7 @@ node scripts/inspect-football-artifact-grades.js \
   --use-real-tiber-data
 ```
 
-This is the easiest path for inspecting real player names from existing `TIBER-Data` W1–W6 season-segment artifacts and cross-checking outputs against references such as Sleeper gamelogs.
+This is the easiest path for inspecting real player names from existing `TIBER-Data` W1–W6 season-segment artifacts (for example `forge_weekly_player_input_2024_w06.skill_offline_fixture.derived.json`) and cross-checking outputs against references such as Sleeper gamelogs.
 
 Fixture-based inspection is still supported for controlled/local mirrors:
 

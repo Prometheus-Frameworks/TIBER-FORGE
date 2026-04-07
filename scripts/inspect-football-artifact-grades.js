@@ -66,7 +66,7 @@ function artifactPathForRequest(options) {
   }
 
   const realDerivedSkillTemplate =
-    '../TIBER-Data/data/gold/forge/forge_weekly_player_input_{season}_w{week}.skill_positions_season_segment.derived.json';
+    '../TIBER-Data/data/gold/forge/forge_weekly_player_input_{season}_w{week}.skill_offline_fixture.derived.json';
 
   const samplePath = process.env.FORGE_WEEKLY_INPUT_ARTIFACT_PATH ?? '../TIBER-Data/data/gold/forge/forge_weekly_player_input_2025_w12.sample.json';
   const derivedQbPath =
@@ -147,7 +147,14 @@ async function main() {
   console.log(JSON.stringify({ artifactPath, totalCandidates: inputs.length, returned: preview.length, preview }, null, 2));
 }
 
-main().catch((error) => {
-  console.error(error instanceof Error ? error.message : String(error));
-  process.exitCode = 1;
-});
+if (require.main === module) {
+  main().catch((error) => {
+    console.error(error instanceof Error ? error.message : String(error));
+    process.exitCode = 1;
+  });
+}
+
+module.exports = {
+  parseArgs,
+  artifactPathForRequest
+};
