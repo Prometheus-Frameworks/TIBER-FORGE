@@ -17,6 +17,12 @@ It is intentionally early and constrained: useful for local development, artifac
 - Not final production-grade model truth.
 - Not the `TIBER-Fantasy` product UI or product-facing integration surface.
 
+## Agent operating files
+
+- [`AGENTS.md`](AGENTS.md)
+- [`TRUTH_SOURCES.md`](TRUTH_SOURCES.md)
+- [`HANDOFF.md`](HANDOFF.md)
+
 ## Current artifact lanes (football artifact rankings)
 
 `POST /api/forge/rankings-football/from-artifact` supports these explicit lanes:
