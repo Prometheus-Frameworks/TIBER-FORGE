@@ -493,3 +493,59 @@ test('loadConfig fails fast when required config is missing', () => {
   delete process.env.FORGE_SERVICE_MODE;
   assert.throws(() => loadConfig(process.env), /FORGE_SERVICE_MODE/);
 });
+
+test('GET /season/2025/fixture-rankings returns ranked real-player fixture grades', async () => {
+  await withServer(async (baseUrl) => {
+    const response = await fetch(`${baseUrl}/season/2025/fixture-rankings`);
+    const body = await response.json();
+
+    assert.equal(response.status, 200);
+    assert.equal(body.season, 2025);
+    assert.equal(body.sourceSetId, 'forge-season-2025-real-player-local-sample-v1');
+    assert.equal(body.count, 14);
+    assert.equal(body.warning, 'Fixture-backed calibration data only. Not live TIBER-Data. Retrospective grades only.');
+    assert.deepEqual(
+      body.rankings.map((entry) => entry.player.playerId),
+      [...body.rankings].sort((left, right) => right.score - left.score || left.player.playerId.localeCompare(right.player.playerId)).map((entry) => entry.player.playerId)
+    );
+    assert.ok(body.rankings[0].components.some((component) => component.key === 'realized_ppr'));
+    assert.ok(body.rankings[0].components.some((component) => component.key === 'volume'));
+    assert.ok(body.rankings[0].components.some((component) => component.key === 'efficiency'));
+    assert.ok(body.rankings[0].components.some((component) => component.key === 'availability'));
+    assert.ok(body.rankings[0].components.some((component) => component.key === 'fragility'));
+    assert.ok(body.rankings[0].qualityFlags.includes('real_player_fixture_sample'));
+    assert.equal(body.rankings[0].sourceSetId, body.sourceSetId);
+    assert.doesNotMatch(JSON.stringify(body), /projection/i);
+  });
+});
+
+test('GET /season/2025/fixture-rankings filters by position and tier', async () => {
+  await withServer(async (baseUrl) => {
+    const response = await fetch(`${baseUrl}/season/2025/fixture-rankings?position=WR&tier=elite`);
+    const body = await response.json();
+
+    assert.equal(response.status, 200);
+    assert.equal(body.filters.position, 'WR');
+    assert.equal(body.filters.tier, 'elite');
+    assert.ok(body.count > 0);
+    assert.ok(body.rankings.every((entry) => entry.player.position === 'WR'));
+    assert.ok(body.rankings.every((entry) => entry.tier === 'elite'));
+  });
+});
+
+test('GET /season/2025/fixture-inspector renders fixture warning and table without projection language', async () => {
+  await withServer(async (baseUrl) => {
+    const response = await fetch(`${baseUrl}/season/2025/fixture-inspector`);
+    const body = await response.text();
+
+    assert.equal(response.status, 200);
+    assert.match(response.headers.get('content-type'), /text\/html/);
+    assert.match(body, /<h1>FORGE Season Grade Inspector<\/h1>/);
+    assert.match(body, /Fixture-backed calibration data only\. Not live TIBER-Data\. Retrospective grades only\./);
+    assert.match(body, /recognizable calibration profiles/i);
+    assert.match(body, /not source-truth rows or verified 2025 stats/i);
+    assert.match(body, /realized_ppr/);
+    assert.match(body, /sourceSetId/);
+    assert.doesNotMatch(body, /projection/i);
+  });
+});
