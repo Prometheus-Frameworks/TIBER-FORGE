@@ -608,3 +608,101 @@ export function validateErrorEnvelope(value: unknown): ErrorEnvelope {
 
   return value as unknown as ErrorEnvelope;
 }
+
+const seasonPositions = ['QB', 'RB', 'WR', 'TE'] as const;
+const seasonFixtureSemantics = ['sample-only-retrospective-fixture'] as const;
+
+function validateForgeSeasonPlayerInput(value: unknown, path: string, errors: string[]): import('./football').ForgeSeasonPlayerInputV1 | undefined {
+  if (!isObject(value)) {
+    errors.push(`${path} must be an object.`);
+    return undefined;
+  }
+
+  const contract = ensureEnum(value.contract, ['ForgeSeasonPlayerInput/v1'] as const, `${path}.contract`, errors);
+  const fixtureSemantics = ensureEnum(value.fixtureSemantics, seasonFixtureSemantics, `${path}.fixtureSemantics`, errors);
+  const playerId = ensureString(value.playerId, `${path}.playerId`, errors);
+  const playerName = ensureString(value.playerName, `${path}.playerName`, errors);
+  const position = ensureEnum(value.position, seasonPositions, `${path}.position`, errors);
+  const team = ensureString(value.team, `${path}.team`, errors);
+  const season = ensureNumber(value.season, `${path}.season`, errors, { min: 2025, max: 2025, integer: true });
+  const games = ensureNumber(value.games, `${path}.games`, errors, { min: 0, max: 17, integer: true });
+  const pprPoints = ensureNumber(value.pprPoints, `${path}.pprPoints`, errors, { min: 0, max: 600 });
+  const fantasyPointsPerGame = ensureNumber(value.fantasyPointsPerGame, `${path}.fantasyPointsPerGame`, errors, { min: 0, max: 50 });
+  const totalTd = ensureNumber(value.totalTd, `${path}.totalTd`, errors, { min: 0, max: 70, integer: true });
+  const sourceSetId = ensureString(value.sourceSetId, `${path}.sourceSetId`, errors);
+  const sourceUpdatedAt = ensureIsoDate(value.sourceUpdatedAt, `${path}.sourceUpdatedAt`, errors);
+  const asOf = ensureIsoDate(value.asOf, `${path}.asOf`, errors);
+  const featureCoverage = ensureNumber(value.featureCoverage, `${path}.featureCoverage`, errors, { min: 0, max: 1 });
+  const qualityFlags = value.qualityFlags === undefined ? undefined : ensureArrayOfStrings(value.qualityFlags, `${path}.qualityFlags`, errors);
+  const sampleNote = value.sampleNote === undefined ? undefined : ensureString(value.sampleNote, `${path}.sampleNote`, errors);
+  const opt = (name: string, max: number, integer = true) =>
+    value[name] === undefined ? undefined : ensureNumber(value[name], `${path}.${name}`, errors, { min: 0, max, integer });
+
+  if (
+    !contract ||
+    !fixtureSemantics ||
+    !playerId ||
+    !playerName ||
+    !position ||
+    !team ||
+    season === undefined ||
+    games === undefined ||
+    pprPoints === undefined ||
+    fantasyPointsPerGame === undefined ||
+    totalTd === undefined ||
+    !sourceSetId ||
+    !sourceUpdatedAt ||
+    !asOf ||
+    featureCoverage === undefined
+  ) {
+    return undefined;
+  }
+
+  return {
+    contract,
+    fixtureSemantics,
+    playerId,
+    playerName,
+    position,
+    team,
+    season: season as 2025,
+    games,
+    pprPoints,
+    fantasyPointsPerGame,
+    passingAttempts: opt('passingAttempts', 800),
+    passingYards: opt('passingYards', 6000),
+    passingTd: opt('passingTd', 70),
+    interceptions: opt('interceptions', 40),
+    carries: opt('carries', 450),
+    targets: opt('targets', 250),
+    receptions: opt('receptions', 200),
+    rushingYards: opt('rushingYards', 2500),
+    rushingTd: opt('rushingTd', 35),
+    receivingYards: opt('receivingYards', 2500),
+    receivingTd: opt('receivingTd', 35),
+    totalTd,
+    sourceSetId,
+    sourceUpdatedAt,
+    asOf,
+    featureCoverage,
+    qualityFlags,
+    sampleNote
+  };
+}
+
+export function validateForgeSeasonPlayerInputArray(value: unknown, path = 'seasonArtifact'): import('./football').ForgeSeasonPlayerInputV1[] {
+  const errors: string[] = [];
+  if (!Array.isArray(value) || value.length === 0 || value.length > 100) {
+    errors.push(`${path} must be an array containing between 1 and 100 ForgeSeasonPlayerInput/v1 records.`);
+  }
+
+  const inputs = Array.isArray(value)
+    ? value.map((input, index) => validateForgeSeasonPlayerInput(input, `${path}[${index}]`, errors)).filter((input): input is import('./football').ForgeSeasonPlayerInputV1 => Boolean(input))
+    : [];
+
+  if (errors.length > 0) {
+    throw new ValidationError('INVALID_SEASON_ARTIFACT_INPUT', errors, 'Season artifact input validation failed.');
+  }
+
+  return inputs;
+}
