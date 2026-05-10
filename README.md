@@ -55,6 +55,7 @@ FORGE should expect upstream artifacts or contracts to provide these fields only
 - [`AGENTS.md`](AGENTS.md)
 - [`TRUTH_SOURCES.md`](TRUTH_SOURCES.md)
 - [`HANDOFF.md`](HANDOFF.md)
+- [`docs/forge-standalone-readiness.md`](docs/forge-standalone-readiness.md)
 
 ## Current artifact lanes (football artifact rankings)
 
