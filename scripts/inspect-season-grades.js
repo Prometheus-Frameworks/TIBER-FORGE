@@ -3,9 +3,12 @@ const path = require('node:path');
 const { ingestForgeSeasonArtifact } = require('../dist/src/ingestion/forgeSeasonArtifact.js');
 const { rankSeasonPlayers } = require('../dist/src/services/seasonForgeService.js');
 
+const DEFAULT_ARTIFACT_PATH = 'tests/fixtures/artifacts/forge_season_player_input_2025.sample.json';
+const REAL_PLAYERS_ARTIFACT_PATH = 'tests/fixtures/artifacts/forge_season_player_input_2025.real_players_sample.json';
+
 function parseArgs(argv) {
   const options = {
-    artifactPath: 'tests/fixtures/artifacts/forge_season_player_input_2025.sample.json',
+    artifactPath: DEFAULT_ARTIFACT_PATH,
     json: false
   };
 
@@ -13,6 +16,8 @@ function parseArgs(argv) {
     const arg = argv[index];
     if (arg === '--artifact-path') {
       options.artifactPath = argv[++index];
+    } else if (arg === '--real-players') {
+      options.artifactPath = REAL_PLAYERS_ARTIFACT_PATH;
     } else if (arg === '--json') {
       options.json = true;
     } else if (arg === '--help' || arg === '-h') {
@@ -26,7 +31,7 @@ function parseArgs(argv) {
 }
 
 function printHelp() {
-  console.log(`Usage: node scripts/inspect-season-grades.js [--artifact-path <path>] [--json]\n\nLocal-only 2025 season grading prototype. Reads fixture-backed ForgeSeasonPlayerInput/v1 artifacts only; no live TIBER-Data or projection semantics.`);
+  console.log(`Usage: node scripts/inspect-season-grades.js [--artifact-path <path>] [--real-players] [--json]\n\nLocal-only 2025 season grading prototype. Reads fixture-backed ForgeSeasonPlayerInput/v1 artifacts only; no live TIBER-Data or projection semantics. Use --real-players to load the curated real-player calibration fixture.`);
 }
 
 function printable(rankingsResult, artifactPath) {
@@ -75,4 +80,4 @@ if (require.main === module) {
   });
 }
 
-module.exports = { parseArgs, printable };
+module.exports = { DEFAULT_ARTIFACT_PATH, REAL_PLAYERS_ARTIFACT_PATH, parseArgs, printable };
