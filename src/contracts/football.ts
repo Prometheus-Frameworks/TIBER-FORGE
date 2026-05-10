@@ -116,3 +116,76 @@ export interface NormalizedFootballScoringInput {
     week: number;
   };
 }
+
+export type ForgeSeasonPosition = 'QB' | 'RB' | 'WR' | 'TE';
+export type ForgeSeasonFixtureSemantics = 'sample-only-retrospective-fixture';
+export type ForgeSeasonGradeTier = 'elite' | 'high' | 'solid' | 'volatile' | 'low';
+export type ForgeSeasonConfidenceLabel = 'high' | 'medium' | 'low';
+export type ForgeSeasonComponentKey = 'realized_ppr' | 'volume' | 'efficiency' | 'availability' | 'fragility';
+
+export interface ForgeSeasonPlayerInputV1 {
+  contract: 'ForgeSeasonPlayerInput/v1';
+  fixtureSemantics: ForgeSeasonFixtureSemantics;
+  playerId: string;
+  playerName: string;
+  position: ForgeSeasonPosition;
+  team: string;
+  season: 2025;
+  games: number;
+  pprPoints: number;
+  fantasyPointsPerGame: number;
+  passingAttempts?: number;
+  passingYards?: number;
+  passingTd?: number;
+  interceptions?: number;
+  carries?: number;
+  targets?: number;
+  receptions?: number;
+  rushingYards?: number;
+  rushingTd?: number;
+  receivingYards?: number;
+  receivingTd?: number;
+  totalTd: number;
+  sourceSetId: string;
+  sourceUpdatedAt: string;
+  asOf: string;
+  featureCoverage: number;
+  qualityFlags?: string[];
+  sampleNote?: string;
+}
+
+export interface ForgeSeasonComponentGrade {
+  key: ForgeSeasonComponentKey;
+  label: string;
+  weight: number;
+  score: number;
+  reason: string;
+}
+
+export interface ForgeSeasonPlayerGrade {
+  rank?: number;
+  player: {
+    playerId: string;
+    playerName: string;
+    position: ForgeSeasonPosition;
+    team: string;
+  };
+  score: number;
+  tier: ForgeSeasonGradeTier;
+  components: ForgeSeasonComponentGrade[];
+  confidence: {
+    score: number;
+    label: ForgeSeasonConfidenceLabel;
+    deterministic: true;
+    reason: string;
+  };
+  warnings: string[];
+}
+
+export interface ForgeSeasonRankingsResult {
+  season: 2025;
+  sourceSetId: string;
+  count: number;
+  rankings: ForgeSeasonPlayerGrade[];
+  warnings: string[];
+}
