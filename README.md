@@ -1,21 +1,54 @@
 # TIBER-FORGE
 
-`TIBER-FORGE` is a standalone, contract-driven FORGE service bootstrap focused on a deterministic football lane.
+`TIBER-FORGE` is a standalone, contract-driven fantasy signal grading layer focused on a deterministic football lane.
 
-It is intentionally early and constrained: useful for local development, artifact-based evaluation, and sanity-checking score outputs, but **not** a production-complete system.
+It is intentionally early and constrained: useful for local development, artifact-based evaluation, and sanity-checking score outputs, but **not** a production-complete system. FORGE sits downstream of governed source truth from `TIBER-Data`, team-environment interpretation from `TIBER-Teamstate`, and player-role interpretation from `Role-and-opportunity`; it grades fantasy relevance from those inputs rather than owning raw source truth or product presentation.
 
 ## What this repo is
 
 - A deterministic FORGE service surface with typed contracts and runtime validation.
-- A football lane that can score and rank canonical `ForgeWeeklyPlayerInput/v1` records.
+- A fantasy signal grading layer for football that can score and rank canonical `ForgeWeeklyPlayerInput/v1` records.
 - An artifact-driven operator path that can read local weekly artifacts and produce inspectable grades.
+- A downstream evaluator of governed source truth and interpreted football context.
 
 ## What this repo is not
 
 - Not full legacy FORGE parity.
 - Not live-ingestion backed (no live pull from `TIBER-Data`).
 - Not final production-grade model truth.
-- Not the `TIBER-Fantasy` product UI or product-facing integration surface.
+- Not the owner of source-backed usage/PPR evidence, roster identity, GOBLIN research candidates, play-caller PROE scaffold/input validation, or Receiving Role Integrity proxy scaffolds.
+- Not a place to fabricate missing usage, route, PPR, identity, source, team-environment, or player-role context.
+- Not GOBLIN candidate discovery.
+- Not the `TIBER-Fantasy` cockpit, product UI, or product-facing integration surface.
+
+## System boundary after the May TIBER-Data milestone
+
+- `TIBER-Data` proves what happened: governed source/provenance truth, source-backed usage and PPR outcomes, roster identity, source metadata, GOBLIN research candidates, play-caller PROE scaffold/input validation, and Receiving Role Integrity / route participation proxy scaffold.
+- `TIBER-Teamstate` explains the team environment: game/team context, team tendencies, and team-environment interpretation consumed by downstream rankers.
+- `Role-and-opportunity` explains player role: role and opportunity context used to interpret a player's football situation.
+- `GOBLIN` finds ugly-output legitimate-signal candidates: candidates are inspection/research context, not default scoring inputs for FORGE.
+- `TIBER-FORGE` grades fantasy signal: it consumes governed source truth and interpreted football context, then produces deterministic fantasy relevance grades, components, tiers, confidence labels, and explanations.
+- `TIBER-Fantasy` becomes the cockpit: it presents, filters, compares, and explains FORGE outputs to users without owning the ranking math.
+
+## Future input expectations
+
+FORGE should expect upstream artifacts or contracts to provide these fields only when they are governed by the owning layer:
+
+- source-backed usage evidence and PPR outcomes from `TIBER-Data`;
+- roster identity and cross-id mapping from `TIBER-Data`;
+- team-environment context from `TIBER-Teamstate`;
+- player-role context from `Role-and-opportunity`;
+- Receiving Role Integrity proxy outputs only when source-backed and clearly labeled as proxy participation;
+- GOBLIN candidates as read-only inspection context unless a future scoring contract explicitly promotes them to scoring inputs.
+
+## Guardrails
+
+- Do not fabricate usage, routes, PPR outcomes, player identity, or source metadata.
+- Do not make proprietary route claims or imply unavailable route data is true route participation.
+- Do not mutate `TIBER-Data` artifacts; FORGE reads governed inputs and emits separate grades.
+- Do not treat GOBLIN candidates as direct scoring inputs by default.
+- Do not call proxy participation true route participation; label proxy participation explicitly.
+- Do not change scoring/ranking semantics in docs-only alignment work.
 
 ## Agent operating files
 

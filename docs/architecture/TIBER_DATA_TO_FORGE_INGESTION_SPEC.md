@@ -1,10 +1,13 @@
 # TIBER-Data → TIBER-FORGE Weekly Ingestion Spec (Phase 1)
 
+> May alignment note: after the May TIBER-Data milestone, this spec should be read as a FORGE-side ingestion/grading boundary. `TIBER-Data` owns governed source/provenance truth; `TIBER-Teamstate` owns team-environment interpretation; `Role-and-opportunity` owns player-role interpretation; FORGE consumes those artifacts/contracts and grades fantasy signal without mutating upstream artifacts or fabricating missing context.
+
 ## A) Decision summary
 
-- **TIBER-FORGE must evolve from bootstrap scaffold into the scoring brain for football rankings.**
-- **TIBER-Data should be the canonical stat/feature source for FORGE inputs.**
-- **TIBER-Fantasy should consume FORGE outputs and should not own long-term ranking math.**
+- **TIBER-FORGE must evolve from bootstrap scaffold into the fantasy signal grading layer for football rankings.**
+- **TIBER-Data should be the canonical governed source/provenance truth for source-backed usage/PPR evidence, roster identity, source metadata, GOBLIN research candidates, play-caller PROE scaffold/input validation, and Receiving Role Integrity proxy scaffolds.**
+- **TIBER-Teamstate should supply interpreted team-environment context, and Role-and-opportunity should supply interpreted player-role context.**
+- **TIBER-Fantasy should consume FORGE outputs as the cockpit and should not own long-term ranking math.**
 - **This PR is spec-first only**: no live ingestion implementation, no runtime scoring replacement, no product rewiring.
 
 ## B) Current state (as of this PR)
@@ -18,44 +21,65 @@ TIBER-FORGE is currently a service bootstrap with deterministic scaffold behavio
 - scoring/reasons/confidence are deterministic placeholder heuristics
 - no canonical upstream TIBER-Data ingestion path exists yet
 
-### Ecosystem split reality (transition still incomplete)
+### Ecosystem split reality after May alignment
 
-Based on current ecosystem documentation context and migration notes, the split is only partially realized:
+The intended ownership split is now explicit, even while runtime integration remains incremental:
 
-- TIBER-Fantasy still documents transition-era coexistence between legacy/in-repo FORGE behavior and external FORGE migration path.
-- TIBER-Data documents canonical contracts/governance direction, but does not yet define a concrete weekly FORGE player-feature contract that can be consumed as-is by TIBER-FORGE.
-- TIBER-FORGE still documents bootstrap scaffolding and transition contract alignment, not a production football ingestion + scoring pipeline.
+- TIBER-Data proves what happened by governing source/provenance truth, source-backed usage and PPR evidence, roster identity, GOBLIN research candidates, play-caller PROE scaffold/input validation, and Receiving Role Integrity / route participation proxy scaffold.
+- TIBER-Teamstate explains the team environment and supplies interpreted team context.
+- Role-and-opportunity explains player role and supplies interpreted player-role context.
+- GOBLIN finds ugly-output legitimate-signal candidates for inspection/research context.
+- TIBER-FORGE grades fantasy signal from governed inputs and interpreted context.
+- TIBER-Fantasy becomes the cockpit for presentation, filtering, comparison, and product-facing explanation.
 
-**Conclusion:** the next architecture step is to define a canonical weekly input contract from TIBER-Data into TIBER-FORGE before deeper ranking math implementation.
+**Conclusion:** the next architecture step is to keep the weekly input contract explicit about source truth, interpreted context, proxy labels, and read-only research context before deeper ranking math implementation.
 
 ## C) Target architecture
 
 ```text
-TIBER-Data  --->  TIBER-FORGE  --->  TIBER-Fantasy
-(canonical)      (scoring brain)    (product consumer)
+TIBER-Data + TIBER-Teamstate + Role-and-opportunity  --->  TIBER-FORGE  --->  TIBER-Fantasy
+(governed truth + interpreted football context)             (fantasy signal grading) (cockpit)
 ```
 
 ### Responsibility boundaries
 
 #### TIBER-Data responsibilities
 
-Own and publish deterministic upstream data/features/contracts for ranking builds, including:
+Own governed source/provenance truth, including:
 
-- canonical player identity mappings
-- weekly stat inputs and aggregated usage/efficiency/context features
-- stable scope keys (season/week/asOf)
-- provenance/freshness semantics and confidence-support metadata
-- versioned contract definitions usable by downstream FORGE builds
+- source adapters, source freshness, and source metadata
+- source-backed usage evidence and PPR outcomes
+- roster identity and cross-id mapping
+- weekly stats normalization
+- injury/status normalization if sourced upstream
+- GOBLIN research candidates as governed candidate artifacts
+- play-caller PROE scaffold/input validation
+- Receiving Role Integrity / route participation proxy scaffold, clearly labeled as proxy participation rather than proprietary route truth
+- export/contract versioning for downstream consumers
 
 #### TIBER-FORGE responsibilities
 
-Own ranking computation semantics, including:
+Own fantasy signal grading intelligence, including:
 
-- scoring formulas and weighting policies
+- scoring formulas and weighting policies over supplied inputs
 - penalties/boosts and tier derivation
+- deterministic fallback behavior that exposes missing upstream features without fabricating them
 - confidence scoring logic
 - explanation primitives and reason generation
 - evaluation/rankings outputs and deterministic execution behavior
+- read-only inspection of GOBLIN candidates only when a contract explicitly provides them as context
+
+#### TIBER-Teamstate responsibilities
+
+Own team-environment interpretation, including game/team context, team tendencies, and interpreted environmental signals that can be consumed by FORGE when contract-backed.
+
+#### Role-and-opportunity responsibilities
+
+Own player-role interpretation, including role and opportunity context that can be consumed by FORGE when contract-backed.
+
+#### GOBLIN responsibilities
+
+Own candidate discovery for ugly-output legitimate-signal research. GOBLIN candidates are not direct FORGE scoring inputs by default.
 
 #### TIBER-Fantasy responsibilities
 
@@ -136,7 +160,7 @@ interface ForgeWeeklyPlayerInput {
 ### Contract notes
 
 - This contract is intentionally **input-only**. It does not include FORGE outputs (score/tier/reasons/confidence).
-- Missing values are allowed for some fields in phase 1; TIBER-FORGE must apply deterministic fallback rules.
+- Missing values are allowed for some fields in phase 1; TIBER-FORGE must apply deterministic fallback rules without fabricating usage, routes, PPR outcomes, identity, source metadata, team-environment context, or player-role context.
 - Phase 1 should keep the schema narrow and avoid full feature-store overdesign.
 
 ## E) Ownership rules: what Data supplies vs what FORGE computes
@@ -145,17 +169,30 @@ interface ForgeWeeklyPlayerInput {
 
 - player identity + cross-id mapping
 - weekly raw stats and derived upstream feature columns
-- reusable context baselines and schedule/opponent context inputs
+- source-backed usage and PPR outcome fields
+- roster identity and cross-id mapping
 - upstream freshness/provenance and quality indicators
+- Receiving Role Integrity proxy outputs only when source-backed and explicitly labeled as proxy participation
 - contract version metadata
 
-### Computed by TIBER-FORGE (ranking intelligence)
+### Computed by TIBER-FORGE (fantasy signal grading intelligence)
 
 - score components, weighted totals, alpha/final score
 - tier labels and ranking order
 - penalties/boosts and fallback math
 - confidence score and confidence label
 - explanation primitives / machine-readable reason payloads
+
+### Supplied by TIBER-Teamstate and Role-and-opportunity (interpreted context)
+
+- team-environment context from TIBER-Teamstate
+- player-role context from Role-and-opportunity
+- no proprietary route claims unless an upstream contract explicitly proves and labels the field
+
+### Read-only GOBLIN context
+
+- GOBLIN candidates may be consumed for inspection only unless a future scoring contract explicitly promotes them to scoring inputs.
+- Candidate discovery must not silently alter FORGE ranking weights, tiers, confidence, or reason generation.
 
 ### Surfaced by TIBER-Fantasy (consumer layer)
 
@@ -205,11 +242,18 @@ Start with **exported weekly artifacts + versioned contract package** as the ini
 
 This enables real math work to begin in FORGE using canonical upstream inputs without premature ecosystem rewiring.
 
-## H) Explicit deferrals (out of scope for this PR/spec)
+## H) Guardrails and explicit deferrals (out of scope for this PR/spec)
+
+- no fabricated usage, routes, PPR outcomes, player identity, source metadata, team context, or player-role context
+- no proprietary route claims
+- no mutation of TIBER-Data artifacts
+- no treating GOBLIN candidates as direct scoring inputs by default
+- no calling proxy participation true route participation
+- no scoring/ranking changes from this docs-only alignment
 
 - claiming full legacy parity
 - completing all modes (dynasty/ROS/best-ball) immediately
-- Team State weighting rollout
+- runtime Teamstate weighting rollout
 - frontend rewiring in TIBER-Fantasy
 - broad multi-repo runtime implementation
 - perfect feature-store architecture
