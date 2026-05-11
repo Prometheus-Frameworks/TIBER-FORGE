@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 const path = require('node:path');
 const { ingestForgeSeasonArtifact } = require('../dist/src/ingestion/forgeSeasonArtifact.js');
+const { ingestSourceBackedCohortArtifact } = require('../dist/src/ingestion/sourceBackedCohortArtifact.js');
 const { rankSeasonPlayers } = require('../dist/src/services/seasonForgeService.js');
 
 const DEFAULT_ARTIFACT_PATH = 'tests/fixtures/artifacts/forge_season_player_input_2025.sample.json';
@@ -16,6 +17,8 @@ function parseArgs(argv) {
     const arg = argv[index];
     if (arg === '--artifact-path') {
       options.artifactPath = argv[++index];
+    } else if (arg === '--source-backed-cohort') {
+      options.sourceBackedCohortPath = argv[++index];
     } else if (arg === '--real-players') {
       options.artifactPath = REAL_PLAYERS_ARTIFACT_PATH;
     } else if (arg === '--json') {
@@ -31,7 +34,7 @@ function parseArgs(argv) {
 }
 
 function printHelp() {
-  console.log(`Usage: node scripts/inspect-season-grades.js [--artifact-path <path>] [--real-players] [--json]\n\nLocal-only 2025 season grading prototype. Reads fixture-backed ForgeSeasonPlayerInput/v1 artifacts only; no live TIBER-Data or projection semantics. Use --real-players to load the curated real-player calibration fixture.`);
+  console.log(`Usage: node scripts/inspect-season-grades.js [--artifact-path <path>] [--real-players] [--source-backed-cohort <path>] [--json]\n\nRetrospective 2025 season grading inspector. Fixture calibration artifacts remain supported by --artifact-path and --real-players. Use --source-backed-cohort to ingest a validated TIBER-Data forge_player_weekly_ppr_2025.cohort.v1.json artifact. No projection semantics are applied.`);
 }
 
 function printable(rankingsResult, artifactPath) {
@@ -56,16 +59,24 @@ async function main() {
     return;
   }
 
-  const artifactPath = path.resolve(process.cwd(), options.artifactPath);
-  const inputs = await ingestForgeSeasonArtifact(artifactPath);
-  const result = rankSeasonPlayers(inputs);
+  const sourceBacked = Boolean(options.sourceBackedCohortPath);
+  const artifactPath = path.resolve(process.cwd(), sourceBacked ? options.sourceBackedCohortPath : options.artifactPath);
+  const ingestion = sourceBacked ? await ingestSourceBackedCohortArtifact(artifactPath) : { inputs: await ingestForgeSeasonArtifact(artifactPath), metadata: undefined };
+  const result = rankSeasonPlayers(ingestion.inputs, sourceBacked ? { artifactPath, cohortMetadata: ingestion.metadata } : {});
 
   if (options.json) {
-    console.log(JSON.stringify({ artifactPath, ...result }, null, 2));
+    console.log(JSON.stringify({ inspectionMode: sourceBacked ? 'source-backed-cohort' : 'fixture', artifactPath, ...result }, null, 2));
     return;
   }
 
-  console.log('FORGE local-only 2025 retrospective season grades');
+  console.log(sourceBacked ? 'FORGE source-backed TIBER-Data retrospective season grades' : 'FORGE local-only 2025 retrospective season grades');
+  if (sourceBacked) {
+    console.log(`Cohort artifact path: ${artifactPath}`);
+    console.log(`Cohort buildId: ${ingestion.metadata.buildId}`);
+    console.log(`Source provider: ${ingestion.metadata.sourceProvider}`);
+    console.log(`Player count: ${result.count}`);
+    console.log(`Season: ${result.season}`);
+  }
   console.log('Warnings:');
   for (const warning of result.warnings) {
     console.log(`- ${warning}`);
