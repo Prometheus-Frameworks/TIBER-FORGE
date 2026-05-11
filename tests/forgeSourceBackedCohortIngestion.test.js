@@ -43,7 +43,7 @@ test('valid source-backed cohort artifact loads successfully', async () => {
 
 test('malformed source-backed cohort artifact fails clearly', async () => {
   const malformedPath = await writeMutatedArtifact((artifact) => {
-    artifact.weeklyRows[0].position = 'K';
+    artifact.players[0].position = 'K';
   });
 
   await rejectsClearly(malformedPath, /position must be one of: QB, RB, WR, TE/);
@@ -51,7 +51,7 @@ test('malformed source-backed cohort artifact fails clearly', async () => {
 
 test('source-backed cohort season total mismatch fails validation', async () => {
   const mismatchPath = await writeMutatedArtifact((artifact) => {
-    artifact.seasonTotals[0].pprPoints = 45;
+    artifact.players[0].seasonTotal.pprPoints = 45;
   });
 
   await rejectsClearly(mismatchPath, /pprPoints \(45\) must equal weeklyRows sum \(46\)/);
@@ -59,15 +59,15 @@ test('source-backed cohort season total mismatch fails validation', async () => 
 
 test('source-backed cohort missing metadata fails validation', async () => {
   const missingMetadataPath = await writeMutatedArtifact((artifact) => {
-    delete artifact.metadata.buildId;
+    delete artifact.buildId;
   });
 
-  await rejectsClearly(missingMetadataPath, /metadata\.buildId must be a non-empty string/);
+  await rejectsClearly(missingMetadataPath, /buildId must be a non-empty string/);
 });
 
 test('source-backed cohort rejects fixture, sample, offline, and projection semantics', async () => {
   const forbiddenPath = await writeMutatedArtifact((artifact) => {
-    artifact.metadata.source.provider = 'offline-projection-fixture';
+    artifact.source.provider = 'offline-projection-fixture';
   });
 
   await rejectsClearly(forbiddenPath, /must not contain offline semantics|must not contain projection semantics|must not contain fixture semantics/);

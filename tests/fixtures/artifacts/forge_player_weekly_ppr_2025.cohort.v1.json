@@ -1,127 +1,103 @@
 {
-  "contract": "forge_player_weekly_ppr_2025.cohort.v1",
-  "metadata": {
-    "contract": "forge_player_weekly_ppr_2025.cohort.v1",
-    "season": 2025,
-    "buildId": "td-2025-cohort-build-001",
-    "generatedAt": "2026-01-08T00:00:00.000Z",
-    "sourceProvider": "TIBER-Data",
-    "source": {
-      "provider": "TIBER-Data",
-      "buildId": "td-2025-cohort-build-001",
-      "generatedAt": "2026-01-08T00:00:00.000Z"
-    }
+  "artifactId": "forge_player_weekly_ppr_2025.cohort.v1",
+  "schemaVersion": "1.0.0",
+  "artifactType": "forge_player_weekly_ppr_2025_cohort",
+  "source": {
+    "provider": "TIBER-Data",
+    "seasonType": "REG"
   },
-  "weeklyRows": [
+  "asOf": "2026-01-08T00:00:00.000Z",
+  "sourceUpdatedAt": "2026-01-08T00:00:00.000Z",
+  "buildId": "td-2025-cohort-build-001",
+  "season": 2025,
+  "players": [
     {
       "playerId": "cohort-wr-1",
       "playerName": "Cohort Wide Receiver",
       "position": "WR",
       "team": "CIN",
-      "season": 2025,
-      "week": 1,
-      "source": { "provider": "TIBER-Data", "generatedAt": "2026-01-08T00:00:00.000Z" },
-      "games": 1,
-      "pprPoints": 25.5,
-      "targets": 12,
-      "receptions": 9,
-      "receivingYards": 105,
-      "receivingTd": 1,
-      "totalTd": 1
-    },
-    {
-      "playerId": "cohort-wr-1",
-      "playerName": "Cohort Wide Receiver",
-      "position": "WR",
-      "team": "CIN",
-      "season": 2025,
-      "week": 2,
-      "source": { "provider": "TIBER-Data", "generatedAt": "2026-01-08T00:00:00.000Z" },
-      "games": 1,
-      "pprPoints": 20.5,
-      "targets": 10,
-      "receptions": 7,
-      "receivingYards": 75,
-      "receivingTd": 1,
-      "totalTd": 1,
-      "qualityFlags": ["late_stat_correction"]
+      "seasonTotal": {
+        "games": 2,
+        "pprPoints": 46,
+        "fantasyPointsPerGame": 23,
+        "targets": 22,
+        "receptions": 16,
+        "receivingYards": 180,
+        "receivingTd": 2,
+        "totalTd": 2,
+        "featureCoverage": 1,
+        "qualityFlags": ["late_stat_correction"]
+      },
+      "weeklyRows": [
+        {
+          "week": 1,
+          "games": 1,
+          "pprPoints": 25.5,
+          "targets": 12,
+          "receptions": 9,
+          "receivingYards": 105,
+          "receivingTd": 1,
+          "totalTd": 1
+        },
+        {
+          "week": 2,
+          "games": 1,
+          "pprPoints": 20.5,
+          "targets": 10,
+          "receptions": 7,
+          "receivingYards": 75,
+          "receivingTd": 1,
+          "totalTd": 1,
+          "qualityFlags": ["late_stat_correction"]
+        }
+      ]
     },
     {
       "playerId": "cohort-rb-1",
       "playerName": "Cohort Running Back",
       "position": "RB",
       "team": "ATL",
-      "season": 2025,
-      "week": 1,
-      "source": { "provider": "TIBER-Data", "generatedAt": "2026-01-08T00:00:00.000Z" },
-      "games": 1,
-      "pprPoints": 18,
-      "carries": 16,
-      "targets": 4,
-      "receptions": 3,
-      "rushingYards": 90,
-      "rushingTd": 1,
-      "receivingYards": 20,
-      "totalTd": 1
-    },
-    {
-      "playerId": "cohort-rb-1",
-      "playerName": "Cohort Running Back",
-      "position": "RB",
-      "team": "ATL",
-      "season": 2025,
-      "week": 2,
-      "source": { "provider": "TIBER-Data", "generatedAt": "2026-01-08T00:00:00.000Z" },
-      "games": 1,
-      "pprPoints": 22,
-      "carries": 20,
-      "targets": 5,
-      "receptions": 4,
-      "rushingYards": 100,
-      "rushingTd": 1,
-      "receivingYards": 30,
-      "receivingTd": 1,
-      "totalTd": 2
-    }
-  ],
-  "seasonTotals": [
-    {
-      "playerId": "cohort-wr-1",
-      "playerName": "Cohort Wide Receiver",
-      "position": "WR",
-      "team": "CIN",
-      "season": 2025,
-      "source": { "provider": "TIBER-Data", "generatedAt": "2026-01-08T00:00:00.000Z" },
-      "games": 2,
-      "pprPoints": 46,
-      "fantasyPointsPerGame": 23,
-      "targets": 22,
-      "receptions": 16,
-      "receivingYards": 180,
-      "receivingTd": 2,
-      "totalTd": 2,
-      "featureCoverage": 1,
-      "qualityFlags": ["late_stat_correction"]
-    },
-    {
-      "playerId": "cohort-rb-1",
-      "playerName": "Cohort Running Back",
-      "position": "RB",
-      "team": "ATL",
-      "season": 2025,
-      "source": { "provider": "TIBER-Data", "generatedAt": "2026-01-08T00:00:00.000Z" },
-      "games": 2,
-      "pprPoints": 40,
-      "fantasyPointsPerGame": 20,
-      "carries": 36,
-      "targets": 9,
-      "receptions": 7,
-      "rushingYards": 190,
-      "rushingTd": 2,
-      "receivingYards": 50,
-      "receivingTd": 1,
-      "totalTd": 3,
-      "featureCoverage": 1
+      "seasonTotal": {
+        "games": 2,
+        "pprPoints": 40,
+        "fantasyPointsPerGame": 20,
+        "carries": 36,
+        "targets": 9,
+        "receptions": 7,
+        "rushingYards": 190,
+        "rushingTd": 2,
+        "receivingYards": 50,
+        "receivingTd": 1,
+        "totalTd": 3,
+        "featureCoverage": 1
+      },
+      "weeklyRows": [
+        {
+          "week": 1,
+          "games": 1,
+          "pprPoints": 18,
+          "carries": 16,
+          "targets": 4,
+          "receptions": 3,
+          "rushingYards": 90,
+          "rushingTd": 1,
+          "receivingYards": 20,
+          "totalTd": 1
+        },
+        {
+          "week": 2,
+          "games": 1,
+          "pprPoints": 22,
+          "carries": 20,
+          "targets": 5,
+          "receptions": 4,
+          "rushingYards": 100,
+          "rushingTd": 1,
+          "receivingYards": 30,
+          "receivingTd": 1,
+          "totalTd": 2
+        }
+      ]
     }
   ]
 }

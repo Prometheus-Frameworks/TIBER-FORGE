@@ -14,16 +14,17 @@ function mergeQualityFlags(flags: Array<string[] | undefined>): string[] | undef
 }
 
 export function toForgeSeasonInputsFromSourceBackedCohort(cohort: ReturnType<typeof validateForgePlayerWeeklyPprCohortV1>): ForgeSeasonPlayerInputV1[] {
-  return cohort.seasonTotals.map((total) => {
+  return cohort.players.map((player) => {
+    const total = player.seasonTotal;
     const totalTd = total.totalTd ?? (total.passingTd ?? 0) + (total.rushingTd ?? 0) + (total.receivingTd ?? 0);
     const fantasyPointsPerGame = total.fantasyPointsPerGame ?? (total.games > 0 ? round(total.pprPoints / total.games) : 0);
-    const weeklyRows = cohort.weeklyRows.filter((row) => row.playerId === total.playerId);
+    const weeklyRows = player.weeklyRows;
 
     return {
       contract: 'ForgeSeasonPlayerInput/v1',
       inputMode: 'source-backed-cohort',
       sourceBackedCohort: {
-        artifactContract: cohort.contract,
+        artifactContract: cohort.artifactContract,
         buildId: cohort.metadata.buildId,
         sourceProvider: cohort.metadata.sourceProvider
       },
@@ -48,10 +49,10 @@ export function toForgeSeasonInputsFromSourceBackedCohort(cohort: ReturnType<typ
       receivingTd: total.receivingTd,
       totalTd,
       sourceSetId: cohort.metadata.buildId,
-      sourceUpdatedAt: cohort.metadata.generatedAt ?? total.source.generatedAt ?? new Date(0).toISOString(),
-      asOf: cohort.metadata.generatedAt ?? total.source.generatedAt ?? new Date(0).toISOString(),
+      sourceUpdatedAt: cohort.metadata.sourceUpdatedAt,
+      asOf: cohort.metadata.asOf,
       featureCoverage: total.featureCoverage ?? 1,
-      qualityFlags: mergeQualityFlags([total.qualityFlags, ...weeklyRows.map((row) => row.qualityFlags)])
+      qualityFlags: mergeQualityFlags([player.qualityFlags, total.qualityFlags, ...weeklyRows.map((row) => row.qualityFlags)])
     };
   });
 }
