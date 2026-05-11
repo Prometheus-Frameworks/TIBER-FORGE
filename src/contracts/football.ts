@@ -119,13 +119,20 @@ export interface NormalizedFootballScoringInput {
 
 export type ForgeSeasonPosition = 'QB' | 'RB' | 'WR' | 'TE';
 export type ForgeSeasonFixtureSemantics = 'sample-only-retrospective-fixture';
+export type ForgeSeasonInputMode = 'fixture' | 'source-backed-cohort';
 export type ForgeSeasonGradeTier = 'elite' | 'high' | 'solid' | 'volatile' | 'low';
 export type ForgeSeasonConfidenceLabel = 'high' | 'medium' | 'low';
 export type ForgeSeasonComponentKey = 'realized_ppr' | 'volume' | 'efficiency' | 'availability' | 'fragility';
 
 export interface ForgeSeasonPlayerInputV1 {
   contract: 'ForgeSeasonPlayerInput/v1';
-  fixtureSemantics: ForgeSeasonFixtureSemantics;
+  fixtureSemantics?: ForgeSeasonFixtureSemantics;
+  inputMode?: ForgeSeasonInputMode;
+  sourceBackedCohort?: {
+    artifactContract: 'forge_player_weekly_ppr_2025.cohort.v1';
+    buildId: string;
+    sourceProvider: string;
+  };
   playerId: string;
   playerName: string;
   position: ForgeSeasonPosition;
@@ -185,6 +192,14 @@ export interface ForgeSeasonPlayerGrade {
 export interface ForgeSeasonRankingsResult {
   season: 2025;
   sourceSetId: string;
+  inputMode?: ForgeSeasonInputMode;
+  cohortMetadata?: {
+    artifactPath?: string;
+    buildId: string;
+    sourceProvider: string;
+    playerCount: number;
+    season: 2025;
+  };
   count: number;
   rankings: ForgeSeasonPlayerGrade[];
   warnings: string[];

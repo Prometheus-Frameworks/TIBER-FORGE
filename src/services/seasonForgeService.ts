@@ -1,10 +1,19 @@
 import { ForgeSeasonComponentGrade, ForgeSeasonPlayerGrade, ForgeSeasonPlayerInputV1, ForgeSeasonRankingsResult } from '../contracts/football';
 
-const SEASON_WARNINGS = [
+const FIXTURE_SEASON_WARNINGS = [
   'Fixture-backed local 2025 season prototype: inspect-only sample semantics.',
   'Not live TIBER-Data; this service reads only the artifact supplied by the operator.',
   'Retrospective realized-season grading only; no projection semantics are implied.'
 ];
+
+const SOURCE_BACKED_SEASON_WARNINGS = [
+  'Source-backed TIBER-Data cohort mode: grading reflects the supplied cohort artifact only.',
+  'Retrospective realized-season grading only; no projection semantics are implied.'
+];
+
+function seasonWarnings(inputMode?: ForgeSeasonPlayerInputV1['inputMode']): string[] {
+  return inputMode === 'source-backed-cohort' ? SOURCE_BACKED_SEASON_WARNINGS : FIXTURE_SEASON_WARNINGS;
+}
 
 function round(value: number): number {
   return Math.round(value * 100) / 100;
@@ -60,15 +69,15 @@ function confidenceLabel(score: number): ForgeSeasonPlayerGrade['confidence']['l
 }
 
 function buildWarnings(input: ForgeSeasonPlayerInputV1, fragilityScore: number, opportunities: number): string[] {
-  const warnings = [...SEASON_WARNINGS];
+  const warnings = [...seasonWarnings(input.inputMode)];
   if (fragilityScore < 60) {
     warnings.push('Fragility penalty: touchdown concentration is high relative to volume and realized PPR.');
   }
   if (opportunities < volumeBenchmark(input) * 0.45) {
-    warnings.push('Low-volume sample: efficiency is not allowed to outrank elite realized volume by itself.');
+    warnings.push(`${input.inputMode === 'source-backed-cohort' ? 'Low-volume cohort row' : 'Low-volume sample'}: efficiency is not allowed to outrank elite realized volume by itself.`);
   }
   for (const flag of input.qualityFlags ?? []) {
-    warnings.push(`Fixture quality flag: ${flag}.`);
+    warnings.push(`${input.inputMode === 'source-backed-cohort' ? 'Source quality flag' : 'Fixture quality flag'}: ${flag}.`);
   }
   return warnings;
 }
@@ -89,7 +98,7 @@ function buildComponents(input: ForgeSeasonPlayerInputV1): ForgeSeasonComponentG
       label: 'Realized PPR',
       weight: 0.35,
       score: round(clamp((input.pprPoints / realizedPprBenchmark(input)) * 100, 0, 100)),
-      reason: `Uses actual fixture PPR (${input.pprPoints}) against a simple ${input.position} season benchmark (${realizedPprBenchmark(input)}).`
+      reason: `Uses actual ${input.inputMode === 'source-backed-cohort' ? 'source-backed cohort' : 'fixture'} PPR (${input.pprPoints}) against a simple ${input.position} season benchmark (${realizedPprBenchmark(input)}).`
     },
     {
       key: 'volume',
@@ -143,25 +152,41 @@ export function gradeSeasonPlayer(input: ForgeSeasonPlayerInputV1): ForgeSeasonP
       score: confidenceScore,
       label: confidenceLabel(confidenceScore),
       deterministic: true,
-      reason: 'Confidence is deterministic from fixture feature coverage, games played, and explicit quality flags.'
+      reason: `Confidence is deterministic from ${input.inputMode === 'source-backed-cohort' ? 'source-backed cohort' : 'fixture'} feature coverage, games played, and explicit quality flags.`
     },
     warnings: buildWarnings(input, fragilityScore, opportunities)
   };
 }
 
-export function rankSeasonPlayers(inputs: ForgeSeasonPlayerInputV1[]): ForgeSeasonRankingsResult {
+export function rankSeasonPlayers(
+  inputs: ForgeSeasonPlayerInputV1[],
+  options: { artifactPath?: string; cohortMetadata?: { buildId: string; sourceProvider: string; season: 2025 } } = {}
+): ForgeSeasonRankingsResult {
   const rankings = inputs
     .map(gradeSeasonPlayer)
     .sort((left, right) => right.score - left.score || left.player.playerId.localeCompare(right.player.playerId))
     .map((grade, index) => ({ ...grade, rank: index + 1 }));
 
+  const inputMode = inputs[0]?.inputMode ?? 'fixture';
+
   return {
     season: 2025,
     sourceSetId: inputs[0]?.sourceSetId ?? 'unknown-season-fixture',
+    inputMode,
+    cohortMetadata: options.cohortMetadata
+      ? {
+          artifactPath: options.artifactPath,
+          buildId: options.cohortMetadata.buildId,
+          sourceProvider: options.cohortMetadata.sourceProvider,
+          playerCount: rankings.length,
+          season: options.cohortMetadata.season
+        }
+      : undefined,
     count: rankings.length,
     rankings,
-    warnings: SEASON_WARNINGS
+    warnings: seasonWarnings(inputMode)
   };
 }
 
-export const seasonPrototypeWarnings = SEASON_WARNINGS;
+export const seasonPrototypeWarnings = FIXTURE_SEASON_WARNINGS;
+export const sourceBackedSeasonWarnings = SOURCE_BACKED_SEASON_WARNINGS;
