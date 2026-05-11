@@ -12,6 +12,13 @@ COPY tsconfig.json ./
 COPY src/ ./src/
 RUN npm run build
 
+# Verify the compilation produced output — fail fast if dist/ is empty
+RUN if [ -z "$(ls -A dist 2>/dev/null)" ]; then \
+      echo "ERROR: dist/ is empty after build — TypeScript compilation produced no output" >&2; \
+      exit 1; \
+    fi && \
+    echo "dist/ contents:" && ls -lR dist
+
 # ── Runtime stage ─────────────────────────────────────────────────────────────
 FROM node:22-alpine AS runtime
 
