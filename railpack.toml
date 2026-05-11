@@ -1,0 +1,9 @@
+[build]
+cmd = "npm run build"
+
+[deploy]
+cmd = "npm run start"
+
+[[deploy.copyToRuntime]]
+src = "dist"
+dest = "dist"
