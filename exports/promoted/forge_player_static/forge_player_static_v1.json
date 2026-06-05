@@ -1,0 +1,180 @@
+{
+  "schema_version": "forge_player_static_v1",
+  "artifact_type": "FORGE_PLAYER_STATIC_V1",
+  "generated_at": "2026-01-08T00:00:00.000Z",
+  "model_version": "forge-player-static-v1.0.0",
+  "row_count": 2,
+  "score_source_policy": {
+    "player_specific": "The row is compiled from source-backed player identity and player-specific statistical evidence supplied to FORGE.",
+    "fallback_default": "The row is an explicit fallback/default and must not be interpreted as player-specific FORGE evidence.",
+    "generated_baseline": "The row is generated from fixture/sample/baseline semantics and must not be interpreted as player-specific FORGE evidence."
+  },
+  "source_artifacts": [
+    "tests/fixtures/artifacts/forge_player_weekly_ppr_2025.cohort.v1.json"
+  ],
+  "rows": [
+    {
+      "schema_version": "forge_player_static_v1",
+      "player_id": "cohort-wr-1",
+      "player_name": "Cohort Wide Receiver",
+      "position": "WR",
+      "team": "CIN",
+      "forge_alpha": 32.02,
+      "forge_tier": "low",
+      "confidence": {
+        "score": 0.66,
+        "label": "medium",
+        "deterministic": true,
+        "reason": "Confidence is deterministic from source-backed cohort feature coverage, games played, and explicit quality flags."
+      },
+      "components": {
+        "age_curve": {
+          "score": null,
+          "evidence_status": "unsupported_by_input",
+          "evidence": "No age or date-of-birth field is present in the current FORGE-owned season input contract.",
+          "source_component_keys": []
+        },
+        "production_profile": {
+          "score": 56.57,
+          "evidence_status": "player_specific",
+          "evidence": "Compiled from player-specific realized PPR (46) and FORGE efficiency scoring for the supplied 2025 season artifact row.",
+          "source_component_keys": [
+            "realized_ppr",
+            "efficiency"
+          ]
+        },
+        "role_security": {
+          "score": 33.49,
+          "evidence_status": "player_specific",
+          "evidence": "Compiled from player-specific volume, games played (2), and fragility guards for the supplied 2025 season artifact row.",
+          "source_component_keys": [
+            "volume",
+            "availability",
+            "fragility"
+          ]
+        },
+        "market_strength": {
+          "score": null,
+          "evidence_status": "unsupported_by_input",
+          "evidence": "No ADP, trade market, salary, or roster market field is present in the current FORGE-owned season input contract.",
+          "source_component_keys": []
+        },
+        "positional_leverage": {
+          "score": null,
+          "evidence_status": "unsupported_by_input",
+          "evidence": "Static v1 avoids generic position baselines; no player-specific positional leverage evidence is present in the current input contract.",
+          "source_component_keys": []
+        }
+      },
+      "provenance": {
+        "generated_at": "2026-01-08T00:00:00.000Z",
+        "model_version": "forge-player-static-v1.0.0",
+        "source_artifacts": [
+          "tests/fixtures/artifacts/forge_player_weekly_ppr_2025.cohort.v1.json"
+        ],
+        "source_set_id": "td-2025-cohort-build-001",
+        "source_provider": "TIBER-Data",
+        "source_updated_at": "2026-01-08T00:00:00.000Z",
+        "score_source": "player_specific",
+        "input_mode": "source-backed-cohort"
+      },
+      "evidence_summary": [
+        "FORGE alpha 32.02 / low is compiled from player-specific retrospective season scoring components where score_source=player_specific.",
+        "Unsupported static components remain null rather than being filled with generic baselines.",
+        "Confidence is medium (0.66) from the existing deterministic FORGE season confidence model."
+      ],
+      "warnings": [
+        "Source-backed TIBER-Data cohort mode: grading reflects the supplied cohort artifact only.",
+        "Retrospective realized-season grading only; no projection semantics are implied.",
+        "Low-volume cohort row: efficiency is not allowed to outrank elite realized volume by itself.",
+        "Source quality flag: late_stat_correction.",
+        "Static v1 does not score age_curve or market_strength because the current FORGE-owned input does not contain age or market evidence.",
+        "Static v1 does not make Team Direction, ROP, or Point Prediction claims."
+      ]
+    },
+    {
+      "schema_version": "forge_player_static_v1",
+      "player_id": "cohort-rb-1",
+      "player_name": "Cohort Running Back",
+      "position": "RB",
+      "team": "ATL",
+      "forge_alpha": 25.03,
+      "forge_tier": "low",
+      "confidence": {
+        "score": 0.7,
+        "label": "medium",
+        "deterministic": true,
+        "reason": "Confidence is deterministic from source-backed cohort feature coverage, games played, and explicit quality flags."
+      },
+      "components": {
+        "age_curve": {
+          "score": null,
+          "evidence_status": "unsupported_by_input",
+          "evidence": "No age or date-of-birth field is present in the current FORGE-owned season input contract.",
+          "source_component_keys": []
+        },
+        "production_profile": {
+          "score": 47.87,
+          "evidence_status": "player_specific",
+          "evidence": "Compiled from player-specific realized PPR (40) and FORGE efficiency scoring for the supplied 2025 season artifact row.",
+          "source_component_keys": [
+            "realized_ppr",
+            "efficiency"
+          ]
+        },
+        "role_security": {
+          "score": 20.43,
+          "evidence_status": "player_specific",
+          "evidence": "Compiled from player-specific volume, games played (2), and fragility guards for the supplied 2025 season artifact row.",
+          "source_component_keys": [
+            "volume",
+            "availability",
+            "fragility"
+          ]
+        },
+        "market_strength": {
+          "score": null,
+          "evidence_status": "unsupported_by_input",
+          "evidence": "No ADP, trade market, salary, or roster market field is present in the current FORGE-owned season input contract.",
+          "source_component_keys": []
+        },
+        "positional_leverage": {
+          "score": null,
+          "evidence_status": "unsupported_by_input",
+          "evidence": "Static v1 avoids generic position baselines; no player-specific positional leverage evidence is present in the current input contract.",
+          "source_component_keys": []
+        }
+      },
+      "provenance": {
+        "generated_at": "2026-01-08T00:00:00.000Z",
+        "model_version": "forge-player-static-v1.0.0",
+        "source_artifacts": [
+          "tests/fixtures/artifacts/forge_player_weekly_ppr_2025.cohort.v1.json"
+        ],
+        "source_set_id": "td-2025-cohort-build-001",
+        "source_provider": "TIBER-Data",
+        "source_updated_at": "2026-01-08T00:00:00.000Z",
+        "score_source": "player_specific",
+        "input_mode": "source-backed-cohort"
+      },
+      "evidence_summary": [
+        "FORGE alpha 25.03 / low is compiled from player-specific retrospective season scoring components where score_source=player_specific.",
+        "Unsupported static components remain null rather than being filled with generic baselines.",
+        "Confidence is medium (0.7) from the existing deterministic FORGE season confidence model."
+      ],
+      "warnings": [
+        "Source-backed TIBER-Data cohort mode: grading reflects the supplied cohort artifact only.",
+        "Retrospective realized-season grading only; no projection semantics are implied.",
+        "Fragility penalty: touchdown concentration is high relative to volume and realized PPR.",
+        "Low-volume cohort row: efficiency is not allowed to outrank elite realized volume by itself.",
+        "Static v1 does not score age_curve or market_strength because the current FORGE-owned input does not contain age or market evidence.",
+        "Static v1 does not make Team Direction, ROP, or Point Prediction claims."
+      ]
+    }
+  ],
+  "warnings": [
+    "FORGE_PLAYER_STATIC_V1 is an evidence compiler artifact, not a projection artifact.",
+    "Missing artifacts should be treated by downstream consumers as unavailable FORGE evidence, not as zero-valued player evidence.",
+    "Rows with provenance.score_source other than player_specific are explicit fallback/default/baseline rows."
+  ]
+}

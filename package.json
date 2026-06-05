@@ -11,7 +11,8 @@
     "build": "tsc -p tsconfig.json",
     "dev": "node --experimental-strip-types src/server.ts",
     "start": "node dist/server.js",
-    "test": "npm run build && node --test tests/*.test.js"
+    "test": "npm run build && node --test tests/*.test.js",
+    "build:player-static": "npm run build && node scripts/build-player-static-artifact.js"
   },
   "devDependencies": {
     "@types/node": "^22.15.3",
