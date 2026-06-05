@@ -73,7 +73,14 @@ function average(values: Array<number | null>): number | null {
 }
 
 function inputByPlayerId(inputs: ForgeSeasonPlayerInputV1[]): Map<string, ForgeSeasonPlayerInputV1> {
-  return new Map(inputs.map((input) => [input.playerId, input]));
+  const byPlayerId = new Map<string, ForgeSeasonPlayerInputV1>();
+  for (const input of inputs) {
+    if (byPlayerId.has(input.playerId)) {
+      throw new Error(`Duplicate canonical player_id supplied to FORGE_PLAYER_STATIC_V1 builder: ${input.playerId}.`);
+    }
+    byPlayerId.set(input.playerId, input);
+  }
+  return byPlayerId;
 }
 
 function scoreSourceForInput(input: ForgeSeasonPlayerInputV1): ForgePlayerStaticScoreSource {
@@ -86,6 +93,20 @@ function scoreSourceForInput(input: ForgeSeasonPlayerInputV1): ForgePlayerStatic
 function evidenceStatusForInput(input: ForgeSeasonPlayerInputV1): ForgePlayerStaticEvidenceStatus {
   const scoreSource = scoreSourceForInput(input);
   return scoreSource === 'player_specific' ? 'player_specific' : scoreSource;
+}
+
+function sourceProviderForInput(input: ForgeSeasonPlayerInputV1, fallbackSourceProvider?: string): string {
+  if (input.inputMode === 'source-backed-cohort') {
+    return input.sourceBackedCohort?.sourceProvider ?? fallbackSourceProvider ?? 'TIBER-Data';
+  }
+  if (scoreSourceForInput(input) === 'generated_baseline') {
+    return 'FORGE generated baseline fixture';
+  }
+  return fallbackSourceProvider ?? 'fallback/default';
+}
+
+function evidenceSubjectForInput(input: ForgeSeasonPlayerInputV1): string {
+  return scoreSourceForInput(input) === 'player_specific' ? 'player-specific' : `${scoreSourceForInput(input).replace('_', ' ')} non-player-specific`;
 }
 
 function unsupportedComponent(evidence: string): ForgePlayerStaticComponent {
@@ -101,7 +122,7 @@ function productionProfileComponent(grade: ForgeSeasonPlayerGrade, input: ForgeS
   return {
     score: average([seasonComponent(grade, 'realized_ppr'), seasonComponent(grade, 'efficiency')]),
     evidence_status: evidenceStatusForInput(input),
-    evidence: `Compiled from player-specific realized PPR (${input.pprPoints}) and FORGE efficiency scoring for the supplied ${input.season} season artifact row.`,
+    evidence: `Compiled from ${evidenceSubjectForInput(input)} realized PPR (${input.pprPoints}) and FORGE efficiency scoring for the supplied ${input.season} season artifact row.`,
     source_component_keys: ['realized_ppr', 'efficiency']
   };
 }
@@ -110,7 +131,7 @@ function roleSecurityComponent(grade: ForgeSeasonPlayerGrade, input: ForgeSeason
   return {
     score: average([seasonComponent(grade, 'volume'), seasonComponent(grade, 'availability'), seasonComponent(grade, 'fragility')]),
     evidence_status: evidenceStatusForInput(input),
-    evidence: `Compiled from player-specific volume, games played (${input.games}), and fragility guards for the supplied ${input.season} season artifact row.`,
+    evidence: `Compiled from ${evidenceSubjectForInput(input)} volume, games played (${input.games}), and fragility guards for the supplied ${input.season} season artifact row.`,
     source_component_keys: ['volume', 'availability', 'fragility']
   };
 }
@@ -133,7 +154,7 @@ export function buildForgePlayerStaticArtifact(
   const inputsByPlayerId = inputByPlayerId(inputs);
   const generatedAt = options.generatedAt ?? inputs[0]?.asOf ?? new Date(0).toISOString();
   const sourceArtifacts = options.sourceArtifacts ?? [];
-  const sourceProvider = options.sourceProvider ?? inputs[0]?.sourceBackedCohort?.sourceProvider ?? (inputs[0]?.inputMode === 'source-backed-cohort' ? 'TIBER-Data' : 'fixture');
+  const sourceProvider = options.sourceProvider;
 
   const rows = rankings.rankings.map((grade) => {
     const input = inputsByPlayerId.get(grade.player.playerId);
@@ -162,13 +183,15 @@ export function buildForgePlayerStaticArtifact(
         model_version: FORGE_PLAYER_STATIC_MODEL_VERSION,
         source_artifacts: sourceArtifacts,
         source_set_id: input.sourceSetId,
-        source_provider: sourceProvider,
+        source_provider: sourceProviderForInput(input, sourceProvider),
         source_updated_at: input.sourceUpdatedAt,
         score_source: scoreSourceForInput(input),
         input_mode: input.inputMode ?? 'fixture'
       },
       evidence_summary: [
-        `FORGE alpha ${grade.score} / ${grade.tier} is compiled from player-specific retrospective season scoring components where score_source=player_specific.`,
+        scoreSourceForInput(input) === 'player_specific'
+          ? `FORGE alpha ${grade.score} / ${grade.tier} is compiled from player-specific retrospective season scoring components where score_source=player_specific.`
+          : `FORGE alpha ${grade.score} / ${grade.tier} is compiled from explicit ${scoreSourceForInput(input)} retrospective season scoring inputs and must not be treated as player-specific evidence.`,
         'Unsupported static components remain null rather than being filled with generic baselines.',
         `Confidence is ${grade.confidence.label} (${grade.confidence.score}) from the existing deterministic FORGE season confidence model.`
       ],
