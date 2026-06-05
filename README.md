@@ -9,6 +9,7 @@ It is intentionally early and constrained: useful for local development, artifac
 - A deterministic FORGE service surface with typed contracts and runtime validation.
 - A fantasy signal grading layer for football that can score and rank canonical `ForgeWeeklyPlayerInput/v1` records.
 - An artifact-driven operator path that can read local weekly artifacts and produce inspectable grades.
+- A static evidence compiler that can emit promoted player-specific FORGE evidence artifacts while explicitly marking unsupported or baseline/default semantics.
 - A downstream evaluator of governed source truth and interpreted football context.
 
 ## What this repo is not
@@ -49,6 +50,7 @@ FORGE should expect upstream artifacts or contracts to provide these fields only
 - Do not treat GOBLIN candidates as direct scoring inputs by default.
 - Do not call proxy participation true route participation; label proxy participation explicitly.
 - Do not change scoring/ranking semantics in docs-only alignment work.
+- Do not emit generic position baselines as player-specific FORGE evidence; mark fallback/default/baseline rows explicitly.
 
 ## Agent operating files
 
@@ -56,6 +58,19 @@ FORGE should expect upstream artifacts or contracts to provide these fields only
 - [`TRUTH_SOURCES.md`](TRUTH_SOURCES.md)
 - [`HANDOFF.md`](HANDOFF.md)
 - [`docs/forge-standalone-readiness.md`](docs/forge-standalone-readiness.md)
+
+
+## Promoted static player evidence artifact
+
+FORGE now has a promoted static evidence artifact contract for downstream consumers that need player-specific dynasty evidence without mistaking generated/default baselines for real FORGE evidence:
+
+```text
+exports/promoted/forge_player_static/forge_player_static_v1.json
+```
+
+`FORGE_PLAYER_STATIC_V1` makes FORGE an evidence compiler, not only a score/ranking generator. Rows carry canonical player identity, `forge_alpha`, `forge_tier`, confidence, component evidence, and provenance. Downstream consumers should gate on `row.provenance.score_source`: only `player_specific` rows are true player-specific FORGE evidence; `fallback_default` and `generated_baseline` rows must remain explicit non-evidence states. Missing artifacts should be treated as unavailable FORGE evidence rather than zero-valued player scores.
+
+See [`docs/forge-player-static-v1.md`](docs/forge-player-static-v1.md) for the contract and rebuild command.
 
 ## Current artifact lanes (football artifact rankings)
 
