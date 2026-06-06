@@ -24,19 +24,19 @@ node scripts/build-player-static-artifact.js \
 
 ## Current promoted coverage
 
-The promoted repository artifact now contains a broader deterministic player universe than the original two-row source-backed proof:
+The promoted repository artifact now contains a broader deterministic player universe and materially more true source-backed rows than the original two-row source-backed proof:
 
-- 2 `player_specific` rows from `tests/fixtures/artifacts/forge_player_weekly_ppr_2025.cohort.v1.json`.
+- 8 `player_specific` rows from the governed TIBER-Data source-backed cohort at `tests/fixtures/artifacts/forge_player_weekly_ppr_2025.cohort.v1.json`.
 - 14 `generated_baseline` rows from `tests/fixtures/artifacts/forge_season_player_input_2025.real_players_sample.json`.
-- 16 total rows ordered deterministically by FORGE score descending, then canonical `player_id` ascending for score ties.
+- 22 total rows ordered deterministically by FORGE score descending, then canonical `player_id` ascending for score ties.
 
-The generated-baseline rows expand roster-evaluation lookup coverage, but they are not live source-backed evidence. Consumers must continue to gate on `row.provenance.score_source` and may only treat `player_specific` rows as true player-specific FORGE evidence.
+The source-backed cohort is the only lane that currently counts as true player-specific FORGE evidence. The generated-baseline rows expand roster-evaluation lookup visibility, but they are not live source-backed evidence. Consumers must continue to gate on `row.provenance.score_source` and may only treat `player_specific` rows as true player-specific FORGE evidence.
 
-To rebuild only the source-backed proof cohort, pass `--no-generated-baselines` to the builder. To add another explicit baseline universe, pass one or more `--generated-baseline-season <path>` arguments; those rows remain `generated_baseline` when their season inputs carry `fixtureSemantics: sample-only-retrospective-fixture`.
+To rebuild only the governed source-backed cohort, pass `--no-generated-baselines` to the builder. To add another explicit baseline universe, pass one or more `--generated-baseline-season <path>` arguments; those rows remain `generated_baseline` when their season inputs carry `fixtureSemantics: sample-only-retrospective-fixture`.
 
-## Next expansion stage
+## Current coverage limits and next expansion stage
 
-The next coverage stage belongs at the input/source boundary: replace or supplement the generated-baseline season universe with a larger governed TIBER-Data source-backed player cohort keyed by canonical identity. FORGE should then compile those supplied rows as `player_specific`; it should not upgrade generated/default rows to player-specific without true player-specific upstream evidence.
+This pass expands the governed source-backed input cohort to eight canonical player IDs and keeps every generated/default row in the `generated_baseline` lane. It does not add TeamState, Role-and-opportunity, Point Prediction, Team Direction, age, market, or route evidence. The next coverage stage still belongs at the input/source boundary: supplement the source-backed cohort with more governed TIBER-Data player rows keyed by canonical identity. FORGE should then compile those supplied rows as `player_specific`; it should not upgrade generated/default rows to player-specific without true player-specific upstream evidence.
 
 ## Contract summary
 

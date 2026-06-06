@@ -34,13 +34,13 @@ test('FORGE_PLAYER_STATIC_V1 builder emits player-specific evidence rows with ex
 
   assert.equal(artifact.schema_version, 'forge_player_static_v1');
   assert.equal(artifact.artifact_type, 'FORGE_PLAYER_STATIC_V1');
-  assert.equal(artifact.row_count, 16);
+  assert.equal(artifact.row_count, 22);
 
   const sourceCounts = artifact.rows.reduce((counts, row) => {
     counts[row.provenance.score_source] = (counts[row.provenance.score_source] ?? 0) + 1;
     return counts;
   }, {});
-  assert.deepEqual(sourceCounts, { player_specific: 2, generated_baseline: 14 });
+  assert.deepEqual(sourceCounts, { player_specific: 8, generated_baseline: 14 });
   assert.ok(artifact.warnings.some((warning) => /evidence compiler artifact/i.test(warning)));
 
   for (const row of artifact.rows.filter((candidate) => candidate.provenance.score_source === 'player_specific')) {
@@ -85,6 +85,24 @@ test('FORGE_PLAYER_STATIC_V1 builder explicitly labels generated baseline rows a
   }
 });
 
+
+test('FORGE_PLAYER_STATIC_V1 player-specific coverage expands without duplicate canonical player ids', async () => {
+  const artifact = await buildFixtureStaticArtifact();
+  const playerSpecificRows = artifact.rows.filter((row) => row.provenance.score_source === 'player_specific');
+  const canonicalIds = artifact.rows.map((row) => row.player_id);
+
+  assert.equal(playerSpecificRows.length, 8);
+  assert.ok(playerSpecificRows.length > 2);
+  assert.equal(new Set(canonicalIds).size, canonicalIds.length);
+});
+
+test('FORGE_PLAYER_STATIC_V1 builder output is stable across repeated builds', async () => {
+  const first = await buildFixtureStaticArtifact();
+  const second = await buildFixtureStaticArtifact();
+
+  assert.deepEqual(second, first);
+});
+
 test('FORGE_PLAYER_STATIC_V1 builder keeps deterministic rank ordering by score then canonical player_id', async () => {
   const artifact = await buildFixtureStaticArtifact();
   const orderKeys = artifact.rows.map((row) => [row.forge_alpha, row.player_id]);
@@ -100,9 +118,9 @@ test('player static artifact script can write a deterministic promoted artifact 
   const { stdout } = await execFileAsync(process.execPath, ['scripts/build-player-static-artifact.js', '--output', outputPath], { cwd: process.cwd() });
   const written = JSON.parse(await readFile(outputPath, 'utf8'));
 
-  assert.match(stdout, /Wrote FORGE_PLAYER_STATIC_V1 \(16 rows\)/);
+  assert.match(stdout, /Wrote FORGE_PLAYER_STATIC_V1 \(22 rows\)/);
   assert.equal(written.artifact_type, 'FORGE_PLAYER_STATIC_V1');
-  assert.equal(written.rows.filter((row) => row.provenance.score_source === 'player_specific').length, 2);
+  assert.equal(written.rows.filter((row) => row.provenance.score_source === 'player_specific').length, 8);
   assert.equal(written.rows.filter((row) => row.provenance.score_source === 'generated_baseline').length, 14);
 });
 
