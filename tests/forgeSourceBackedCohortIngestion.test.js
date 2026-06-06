@@ -36,7 +36,7 @@ test('valid source-backed cohort artifact loads successfully', async () => {
 
   assert.equal(ingestion.metadata.buildId, 'td-2025-cohort-build-001');
   assert.equal(ingestion.metadata.sourceProvider, 'TIBER-Data');
-  assert.equal(ingestion.inputs.length, 2);
+  assert.equal(ingestion.inputs.length, 8);
   assert.ok(ingestion.inputs.every((input) => input.inputMode === 'source-backed-cohort'));
   assert.ok(ingestion.inputs.every((input) => input.sourceBackedCohort?.artifactContract === 'forge_player_weekly_ppr_2025.cohort.v1'));
 });
@@ -81,9 +81,9 @@ test('FORGE grading works against the source-backed cohort artifact', async () =
   assert.equal(result.cohortMetadata.artifactPath, cohortFixturePath);
   assert.equal(result.cohortMetadata.buildId, 'td-2025-cohort-build-001');
   assert.equal(result.cohortMetadata.sourceProvider, 'TIBER-Data');
-  assert.equal(result.cohortMetadata.playerCount, 2);
+  assert.equal(result.cohortMetadata.playerCount, 8);
   assert.equal(result.cohortMetadata.season, 2025);
-  assert.equal(result.rankings.length, 2);
+  assert.equal(result.rankings.length, 8);
   assert.ok(result.warnings.some((warning) => /Source-backed TIBER-Data cohort mode/i.test(warning)));
   assert.ok(result.rankings.some((entry) => entry.warnings.some((warning) => /Source quality flag: late_stat_correction/i.test(warning))));
 });

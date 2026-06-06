@@ -26,7 +26,9 @@
         "receivingTd": 2,
         "totalTd": 2,
         "featureCoverage": 1,
-        "qualityFlags": ["late_stat_correction"]
+        "qualityFlags": [
+          "late_stat_correction"
+        ]
       },
       "weeklyRows": [
         {
@@ -48,7 +50,9 @@
           "receivingYards": 75,
           "receivingTd": 1,
           "totalTd": 1,
-          "qualityFlags": ["late_stat_correction"]
+          "qualityFlags": [
+            "late_stat_correction"
+          ]
         }
       ]
     },
@@ -96,6 +100,273 @@
           "receivingYards": 30,
           "receivingTd": 1,
           "totalTd": 2
+        }
+      ]
+    },
+    {
+      "playerId": "cohort-qb-1",
+      "playerName": "Governed Cohort Quarterback",
+      "position": "QB",
+      "team": "BUF",
+      "seasonTotal": {
+        "games": 2,
+        "pprPoints": 51.2,
+        "fantasyPointsPerGame": 25.6,
+        "passingAttempts": 72,
+        "passingYards": 610,
+        "passingTd": 5,
+        "interceptions": 1,
+        "carries": 10,
+        "rushingYards": 45,
+        "rushingTd": 1,
+        "totalTd": 6,
+        "featureCoverage": 1
+      },
+      "weeklyRows": [
+        {
+          "week": 1,
+          "games": 1,
+          "pprPoints": 26.4,
+          "passingAttempts": 36,
+          "passingYards": 310,
+          "passingTd": 3,
+          "interceptions": 0,
+          "carries": 5,
+          "rushingYards": 25,
+          "rushingTd": 0,
+          "totalTd": 3
+        },
+        {
+          "week": 2,
+          "games": 1,
+          "pprPoints": 24.8,
+          "passingAttempts": 36,
+          "passingYards": 300,
+          "passingTd": 2,
+          "interceptions": 1,
+          "carries": 5,
+          "rushingYards": 20,
+          "rushingTd": 1,
+          "totalTd": 3
+        }
+      ]
+    },
+    {
+      "playerId": "cohort-te-1",
+      "playerName": "Governed Cohort Tight End",
+      "position": "TE",
+      "team": "DET",
+      "seasonTotal": {
+        "games": 2,
+        "pprPoints": 29.5,
+        "fantasyPointsPerGame": 14.75,
+        "targets": 15,
+        "receptions": 11,
+        "receivingYards": 135,
+        "receivingTd": 2,
+        "totalTd": 2,
+        "featureCoverage": 1
+      },
+      "weeklyRows": [
+        {
+          "week": 1,
+          "games": 1,
+          "pprPoints": 14.2,
+          "targets": 7,
+          "receptions": 5,
+          "receivingYards": 62,
+          "receivingTd": 1,
+          "totalTd": 1
+        },
+        {
+          "week": 2,
+          "games": 1,
+          "pprPoints": 15.3,
+          "targets": 8,
+          "receptions": 6,
+          "receivingYards": 73,
+          "receivingTd": 1,
+          "totalTd": 1
+        }
+      ]
+    },
+    {
+      "playerId": "cohort-wr-2",
+      "playerName": "Governed Cohort Slot Receiver",
+      "position": "WR",
+      "team": "LAR",
+      "seasonTotal": {
+        "games": 2,
+        "pprPoints": 34.6,
+        "fantasyPointsPerGame": 17.3,
+        "targets": 18,
+        "receptions": 12,
+        "receivingYards": 160,
+        "receivingTd": 1,
+        "totalTd": 1,
+        "featureCoverage": 1
+      },
+      "weeklyRows": [
+        {
+          "week": 1,
+          "games": 1,
+          "pprPoints": 16.1,
+          "targets": 9,
+          "receptions": 6,
+          "receivingYards": 71,
+          "receivingTd": 0,
+          "totalTd": 0
+        },
+        {
+          "week": 2,
+          "games": 1,
+          "pprPoints": 18.5,
+          "targets": 9,
+          "receptions": 6,
+          "receivingYards": 89,
+          "receivingTd": 1,
+          "totalTd": 1
+        }
+      ]
+    },
+    {
+      "playerId": "cohort-rb-2",
+      "playerName": "Governed Cohort Passing Down Back",
+      "position": "RB",
+      "team": "MIA",
+      "seasonTotal": {
+        "games": 2,
+        "pprPoints": 31.2,
+        "fantasyPointsPerGame": 15.6,
+        "carries": 28,
+        "targets": 7,
+        "receptions": 5,
+        "rushingYards": 115,
+        "rushingTd": 1,
+        "receivingYards": 45,
+        "receivingTd": 0,
+        "totalTd": 1,
+        "featureCoverage": 1
+      },
+      "weeklyRows": [
+        {
+          "week": 1,
+          "games": 1,
+          "pprPoints": 14.8,
+          "carries": 13,
+          "targets": 3,
+          "receptions": 2,
+          "rushingYards": 52,
+          "rushingTd": 0,
+          "receivingYards": 18,
+          "receivingTd": 0,
+          "totalTd": 0
+        },
+        {
+          "week": 2,
+          "games": 1,
+          "pprPoints": 16.4,
+          "carries": 15,
+          "targets": 4,
+          "receptions": 3,
+          "rushingYards": 63,
+          "rushingTd": 1,
+          "receivingYards": 27,
+          "receivingTd": 0,
+          "totalTd": 1
+        }
+      ]
+    },
+    {
+      "playerId": "cohort-qb-2",
+      "playerName": "Governed Cohort Pocket Passer",
+      "position": "QB",
+      "team": "LAC",
+      "seasonTotal": {
+        "games": 2,
+        "pprPoints": 39.8,
+        "fantasyPointsPerGame": 19.9,
+        "passingAttempts": 65,
+        "passingYards": 490,
+        "passingTd": 3,
+        "interceptions": 2,
+        "carries": 8,
+        "rushingYards": 30,
+        "rushingTd": 0,
+        "totalTd": 3,
+        "featureCoverage": 1,
+        "qualityFlags": [
+          "stat_review_pending"
+        ]
+      },
+      "weeklyRows": [
+        {
+          "week": 1,
+          "games": 1,
+          "pprPoints": 21.6,
+          "passingAttempts": 33,
+          "passingYards": 260,
+          "passingTd": 2,
+          "interceptions": 1,
+          "carries": 4,
+          "rushingYards": 18,
+          "rushingTd": 0,
+          "totalTd": 2
+        },
+        {
+          "week": 2,
+          "games": 1,
+          "pprPoints": 18.2,
+          "passingAttempts": 32,
+          "passingYards": 230,
+          "passingTd": 1,
+          "interceptions": 1,
+          "carries": 4,
+          "rushingYards": 12,
+          "rushingTd": 0,
+          "totalTd": 1,
+          "qualityFlags": [
+            "stat_review_pending"
+          ]
+        }
+      ]
+    },
+    {
+      "playerId": "cohort-te-2",
+      "playerName": "Governed Cohort Inline Tight End",
+      "position": "TE",
+      "team": "KC",
+      "seasonTotal": {
+        "games": 2,
+        "pprPoints": 20.4,
+        "fantasyPointsPerGame": 10.2,
+        "targets": 12,
+        "receptions": 8,
+        "receivingYards": 84,
+        "receivingTd": 1,
+        "totalTd": 1,
+        "featureCoverage": 1
+      },
+      "weeklyRows": [
+        {
+          "week": 1,
+          "games": 1,
+          "pprPoints": 8.8,
+          "targets": 5,
+          "receptions": 3,
+          "receivingYards": 28,
+          "receivingTd": 0,
+          "totalTd": 0
+        },
+        {
+          "week": 2,
+          "games": 1,
+          "pprPoints": 11.6,
+          "targets": 7,
+          "receptions": 5,
+          "receivingYards": 56,
+          "receivingTd": 1,
+          "totalTd": 1
         }
       ]
     }
