@@ -1168,8 +1168,8 @@
     },
     {
       "schema_version": "forge_player_static_v1",
-      "player_id": "cohort-wr-1",
-      "player_name": "Cohort Wide Receiver",
+      "player_id": "tiber-data-player-2025-jamarr-chase",
+      "player_name": "Ja'Marr Chase",
       "position": "WR",
       "team": "CIN",
       "forge_alpha": 32.02,
@@ -1485,8 +1485,8 @@
     },
     {
       "schema_version": "forge_player_static_v1",
-      "player_id": "cohort-te-1",
-      "player_name": "Governed Cohort Tight End",
+      "player_id": "tiber-data-player-2025-sam-laporta",
+      "player_name": "Sam LaPorta",
       "position": "TE",
       "team": "DET",
       "forge_alpha": 27.78,
@@ -1645,8 +1645,8 @@
     },
     {
       "schema_version": "forge_player_static_v1",
-      "player_id": "cohort-rb-1",
-      "player_name": "Cohort Running Back",
+      "player_id": "tiber-data-player-2025-bijan-robinson",
+      "player_name": "Bijan Robinson",
       "position": "RB",
       "team": "ATL",
       "forge_alpha": 25.03,
@@ -1725,8 +1725,8 @@
     },
     {
       "schema_version": "forge_player_static_v1",
-      "player_id": "cohort-qb-1",
-      "player_name": "Governed Cohort Quarterback",
+      "player_id": "tiber-data-player-2025-josh-allen",
+      "player_name": "Josh Allen",
       "position": "QB",
       "team": "BUF",
       "forge_alpha": 24.93,
