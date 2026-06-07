@@ -4,7 +4,9 @@
   "artifactType": "forge_player_weekly_ppr_2025_cohort",
   "source": {
     "provider": "TIBER-Data",
-    "seasonType": "REG"
+    "seasonType": "REG",
+    "identityProvider": "TIBER-Data canonical football identity map",
+    "evidenceWindow": "2025 governed two-week PPR cohort"
   },
   "asOf": "2026-01-08T00:00:00.000Z",
   "sourceUpdatedAt": "2026-01-08T00:00:00.000Z",
@@ -12,8 +14,8 @@
   "season": 2025,
   "players": [
     {
-      "playerId": "cohort-wr-1",
-      "playerName": "Cohort Wide Receiver",
+      "playerId": "tiber-data-player-2025-jamarr-chase",
+      "playerName": "Ja'Marr Chase",
       "position": "WR",
       "team": "CIN",
       "seasonTotal": {
@@ -28,7 +30,11 @@
         "featureCoverage": 1,
         "qualityFlags": [
           "late_stat_correction"
-        ]
+        ],
+        "playerId": "tiber-data-player-2025-jamarr-chase",
+        "playerName": "Ja'Marr Chase",
+        "position": "WR",
+        "team": "CIN"
       },
       "weeklyRows": [
         {
@@ -39,7 +45,11 @@
           "receptions": 9,
           "receivingYards": 105,
           "receivingTd": 1,
-          "totalTd": 1
+          "totalTd": 1,
+          "playerId": "tiber-data-player-2025-jamarr-chase",
+          "playerName": "Ja'Marr Chase",
+          "position": "WR",
+          "team": "CIN"
         },
         {
           "week": 2,
@@ -52,13 +62,17 @@
           "totalTd": 1,
           "qualityFlags": [
             "late_stat_correction"
-          ]
+          ],
+          "playerId": "tiber-data-player-2025-jamarr-chase",
+          "playerName": "Ja'Marr Chase",
+          "position": "WR",
+          "team": "CIN"
         }
       ]
     },
     {
-      "playerId": "cohort-rb-1",
-      "playerName": "Cohort Running Back",
+      "playerId": "tiber-data-player-2025-bijan-robinson",
+      "playerName": "Bijan Robinson",
       "position": "RB",
       "team": "ATL",
       "seasonTotal": {
@@ -73,7 +87,11 @@
         "receivingYards": 50,
         "receivingTd": 1,
         "totalTd": 3,
-        "featureCoverage": 1
+        "featureCoverage": 1,
+        "playerId": "tiber-data-player-2025-bijan-robinson",
+        "playerName": "Bijan Robinson",
+        "position": "RB",
+        "team": "ATL"
       },
       "weeklyRows": [
         {
@@ -86,7 +104,11 @@
           "rushingYards": 90,
           "rushingTd": 1,
           "receivingYards": 20,
-          "totalTd": 1
+          "totalTd": 1,
+          "playerId": "tiber-data-player-2025-bijan-robinson",
+          "playerName": "Bijan Robinson",
+          "position": "RB",
+          "team": "ATL"
         },
         {
           "week": 2,
@@ -99,13 +121,17 @@
           "rushingTd": 1,
           "receivingYards": 30,
           "receivingTd": 1,
-          "totalTd": 2
+          "totalTd": 2,
+          "playerId": "tiber-data-player-2025-bijan-robinson",
+          "playerName": "Bijan Robinson",
+          "position": "RB",
+          "team": "ATL"
         }
       ]
     },
     {
-      "playerId": "cohort-qb-1",
-      "playerName": "Governed Cohort Quarterback",
+      "playerId": "tiber-data-player-2025-josh-allen",
+      "playerName": "Josh Allen",
       "position": "QB",
       "team": "BUF",
       "seasonTotal": {
@@ -120,7 +146,11 @@
         "rushingYards": 45,
         "rushingTd": 1,
         "totalTd": 6,
-        "featureCoverage": 1
+        "featureCoverage": 1,
+        "playerId": "tiber-data-player-2025-josh-allen",
+        "playerName": "Josh Allen",
+        "position": "QB",
+        "team": "BUF"
       },
       "weeklyRows": [
         {
@@ -134,7 +164,11 @@
           "carries": 5,
           "rushingYards": 25,
           "rushingTd": 0,
-          "totalTd": 3
+          "totalTd": 3,
+          "playerId": "tiber-data-player-2025-josh-allen",
+          "playerName": "Josh Allen",
+          "position": "QB",
+          "team": "BUF"
         },
         {
           "week": 2,
@@ -147,13 +181,17 @@
           "carries": 5,
           "rushingYards": 20,
           "rushingTd": 1,
-          "totalTd": 3
+          "totalTd": 3,
+          "playerId": "tiber-data-player-2025-josh-allen",
+          "playerName": "Josh Allen",
+          "position": "QB",
+          "team": "BUF"
         }
       ]
     },
     {
-      "playerId": "cohort-te-1",
-      "playerName": "Governed Cohort Tight End",
+      "playerId": "tiber-data-player-2025-sam-laporta",
+      "playerName": "Sam LaPorta",
       "position": "TE",
       "team": "DET",
       "seasonTotal": {
@@ -165,7 +203,11 @@
         "receivingYards": 135,
         "receivingTd": 2,
         "totalTd": 2,
-        "featureCoverage": 1
+        "featureCoverage": 1,
+        "playerId": "tiber-data-player-2025-sam-laporta",
+        "playerName": "Sam LaPorta",
+        "position": "TE",
+        "team": "DET"
       },
       "weeklyRows": [
         {
@@ -176,7 +218,11 @@
           "receptions": 5,
           "receivingYards": 62,
           "receivingTd": 1,
-          "totalTd": 1
+          "totalTd": 1,
+          "playerId": "tiber-data-player-2025-sam-laporta",
+          "playerName": "Sam LaPorta",
+          "position": "TE",
+          "team": "DET"
         },
         {
           "week": 2,
@@ -186,7 +232,11 @@
           "receptions": 6,
           "receivingYards": 73,
           "receivingTd": 1,
-          "totalTd": 1
+          "totalTd": 1,
+          "playerId": "tiber-data-player-2025-sam-laporta",
+          "playerName": "Sam LaPorta",
+          "position": "TE",
+          "team": "DET"
         }
       ]
     },
