@@ -50,6 +50,7 @@ Top-level artifact fields:
 - `model_version`: static compiler version.
 - `row_count`: number of emitted rows.
 - `score_source_policy`: downstream-readable definitions for `player_specific`, `fallback_default`, and `generated_baseline`.
+- `consumer_manifest`: machine-readable downstream consumption rules for the evidence gate, required row fields, recommended counters, and fail-closed behavior.
 - `source_artifacts`: source artifact paths used by the compiler.
 - `rows`: static player evidence rows.
 - `warnings`: artifact-level consumer guidance.
@@ -81,15 +82,68 @@ Static v1 exposes the requested dynasty component names, but each component is e
 
 Unsupported components are intentionally null, not zero. A null component means FORGE does not have contract-backed evidence for that component. It is not a poor player score.
 
-## Provenance and fallback rules
+## Downstream consumption contract
 
-Downstream consumers should use `row.provenance.score_source` as the primary gate:
+Consumers, including TIBER-Fantasy, should read `FORGE_PLAYER_STATIC_V1` as an optional evidence artifact keyed by canonical `row.player_id`. The artifact is safe to index for lookup visibility, but only a subset of rows count as true FORGE evidence.
 
-- `player_specific`: safe to treat as player-specific FORGE evidence.
-- `fallback_default`: explicit fallback/default row; do not treat as player-specific evidence.
-- `generated_baseline`: generated/sample/baseline row; do not treat as player-specific evidence.
+### Required consumer fields
 
-If the promoted artifact is missing, downstream consumers should display FORGE evidence as unavailable. They should not synthesize a zero score, position baseline, or Team Direction claim.
+A downstream consumer needs these top-level fields before using the artifact:
+
+- `schema_version` equal to `forge_player_static_v1`.
+- `artifact_type` equal to `FORGE_PLAYER_STATIC_V1`.
+- `generated_at`.
+- `model_version`.
+- `row_count` matching `rows.length`.
+- `score_source_policy`.
+- `consumer_manifest`.
+- `rows`.
+
+A downstream consumer needs these row fields before using a row:
+
+- `schema_version`.
+- `player_id` as the canonical lookup key.
+- `player_name`, `position`, and `team` for display/context only.
+- `forge_alpha` and `forge_tier`, but only after the evidence gate passes.
+- `confidence`, but only after the evidence gate passes.
+- `components`, with unsupported component scores treated as unavailable/null rather than zero.
+- `provenance.score_source`, `provenance.source_provider`, `provenance.source_set_id`, and `provenance.source_updated_at`.
+
+### Evidence gate
+
+The only true player-specific FORGE evidence gate is:
+
+```js
+row.provenance.score_source === "player_specific"
+```
+
+Only rows passing that exact gate may contribute to player-specific FORGE evidence, Team Direction inputs, FORGE coverage, confidence, roster strength, or player-specific alpha totals.
+
+Rows with `provenance.score_source = "generated_baseline"` are visibility scaffolding only. They may help a shell explain that FORGE has a non-player-specific baseline row for a lookup, but they must not contribute to Team Direction, FORGE coverage, confidence, roster strength, or player-specific alpha totals.
+
+Rows with `provenance.score_source = "fallback_default"` are also non-evidence. They should be displayed only as explicit fallback/default states if a consumer chooses to expose them.
+
+Rows with an unknown `provenance.score_source` must fail closed as non-evidence unless a future FORGE contract explicitly supports that value. Unknown values are not permission to infer a new evidence lane.
+
+### Recommended consumer counters
+
+Consumers should maintain separate counters rather than collapsing every lookup into one coverage number:
+
+- `player_specific_coverage`: count of requested canonical player IDs with a matching row where `provenance.score_source === "player_specific"`.
+- `generated_baseline_visibility`: count of requested canonical player IDs with a matching row where `provenance.score_source === "generated_baseline"`; this is lookup visibility, not evidence coverage.
+- `unresolved_identity_misses`: count of requested canonical player IDs that do not resolve to any artifact row.
+- `unsupported_missing_artifact_state`: count/flag for cases where the artifact is missing, unreadable, malformed, or otherwise unavailable.
+
+### Fail-closed behavior
+
+Consumers should fail closed before wiring this artifact into live Management:
+
+- Missing artifact: treat FORGE evidence as unavailable. Do not synthesize zero scores, baselines, Team Direction, confidence, roster strength, or alpha totals.
+- Malformed artifact: treat FORGE evidence as unavailable. A partially readable malformed file is not a degraded confidence signal.
+- Duplicate `player_id` values: treat the artifact as invalid because canonical lookup would be ambiguous.
+- Unknown `score_source`: keep the row out of evidence counters and player-specific totals unless a future contract explicitly lists the value as supported.
+
+The promoted artifact includes a lightweight `consumer_manifest` that repeats these rules in machine-readable form. FORGE also exposes `validateForgePlayerStaticConsumerContract(...)` for conformance checks; it verifies required top-level/row fields, duplicate IDs, safe source counters, and fail-closed missing/malformed states.
 
 ## Current limitations
 
