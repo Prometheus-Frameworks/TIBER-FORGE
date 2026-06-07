@@ -2,6 +2,7 @@ import { ForgeSeasonPlayerGrade, ForgeSeasonPlayerInputV1, ForgeSeasonRankingsRe
 
 export const FORGE_PLAYER_STATIC_SCHEMA_VERSION = 'forge_player_static_v1';
 export const FORGE_PLAYER_STATIC_MODEL_VERSION = 'forge-player-static-v1.0.0';
+export const FORGE_PLAYER_STATIC_PLAYER_EVIDENCE_SCORE_SOURCE = 'player_specific';
 
 export type ForgePlayerStaticScoreSource = 'player_specific' | 'fallback_default' | 'generated_baseline';
 export type ForgePlayerStaticEvidenceStatus = 'player_specific' | 'unsupported_by_input' | 'fallback_default' | 'generated_baseline';
@@ -43,6 +44,36 @@ export interface ForgePlayerStaticRowV1 {
   warnings: string[];
 }
 
+export interface ForgePlayerStaticConsumerManifestV1 {
+  contract_name: 'FORGE_PLAYER_STATIC_V1_DOWNSTREAM_CONSUMPTION';
+  evidence_gate: {
+    player_specific_forge_evidence: 'row.provenance.score_source === "player_specific"';
+    non_evidence_score_sources: Array<'fallback_default' | 'generated_baseline'>;
+    unknown_score_source_behavior: 'non_evidence_unless_explicitly_supported';
+  };
+  generated_baseline_policy: string;
+  required_row_fields: string[];
+  recommended_consumer_counters: string[];
+  fail_closed_behavior: {
+    missing_artifact: 'unavailable_forge_evidence';
+    malformed_artifact: 'unavailable_forge_evidence';
+    duplicate_player_ids: 'invalid_artifact';
+    unknown_score_source: 'non_evidence_unless_explicitly_supported';
+  };
+}
+
+export interface ForgePlayerStaticConsumerConformanceResult {
+  valid: boolean;
+  errors: string[];
+  warnings: string[];
+  counters: {
+    player_specific_coverage: number;
+    generated_baseline_visibility: number;
+    unresolved_identity_misses: number;
+    unsupported_missing_artifact_state: number;
+  };
+}
+
 export interface ForgePlayerStaticArtifactV1 {
   schema_version: typeof FORGE_PLAYER_STATIC_SCHEMA_VERSION;
   artifact_type: 'FORGE_PLAYER_STATIC_V1';
@@ -54,6 +85,7 @@ export interface ForgePlayerStaticArtifactV1 {
     fallback_default: string;
     generated_baseline: string;
   };
+  consumer_manifest: ForgePlayerStaticConsumerManifestV1;
   source_artifacts: string[];
   rows: ForgePlayerStaticRowV1[];
   warnings: string[];
@@ -136,6 +168,46 @@ function roleSecurityComponent(grade: ForgeSeasonPlayerGrade, input: ForgeSeason
   };
 }
 
+function consumerManifest(): ForgePlayerStaticConsumerManifestV1 {
+  return {
+    contract_name: 'FORGE_PLAYER_STATIC_V1_DOWNSTREAM_CONSUMPTION',
+    evidence_gate: {
+      player_specific_forge_evidence: 'row.provenance.score_source === "player_specific"',
+      non_evidence_score_sources: ['fallback_default', 'generated_baseline'],
+      unknown_score_source_behavior: 'non_evidence_unless_explicitly_supported'
+    },
+    generated_baseline_policy:
+      'generated_baseline rows are visibility scaffolding only and must not count toward Team Direction, FORGE coverage, confidence, roster strength, or player-specific alpha totals.',
+    required_row_fields: [
+      'schema_version',
+      'player_id',
+      'player_name',
+      'position',
+      'team',
+      'forge_alpha',
+      'forge_tier',
+      'confidence',
+      'components',
+      'provenance.score_source',
+      'provenance.source_provider',
+      'provenance.source_set_id',
+      'provenance.source_updated_at'
+    ],
+    recommended_consumer_counters: [
+      'player_specific_coverage',
+      'generated_baseline_visibility',
+      'unresolved_identity_misses',
+      'unsupported_missing_artifact_state'
+    ],
+    fail_closed_behavior: {
+      missing_artifact: 'unavailable_forge_evidence',
+      malformed_artifact: 'unavailable_forge_evidence',
+      duplicate_player_ids: 'invalid_artifact',
+      unknown_score_source: 'non_evidence_unless_explicitly_supported'
+    }
+  };
+}
+
 function rowWarnings(input: ForgeSeasonPlayerInputV1, grade: ForgeSeasonPlayerGrade): string[] {
   const warnings = [...grade.warnings];
   if (scoreSourceForInput(input) !== 'player_specific') {
@@ -206,16 +278,139 @@ export function buildForgePlayerStaticArtifact(
     model_version: FORGE_PLAYER_STATIC_MODEL_VERSION,
     row_count: rows.length,
     score_source_policy: {
-      player_specific: 'The row is compiled from source-backed player identity and player-specific statistical evidence supplied to FORGE.',
+      player_specific: 'The row is compiled from source-backed player identity and player-specific statistical evidence supplied to FORGE. This is the only score_source that counts as player-specific FORGE evidence.',
       fallback_default: 'The row is an explicit fallback/default and must not be interpreted as player-specific FORGE evidence.',
-      generated_baseline: 'The row is generated from fixture/sample/baseline semantics and must not be interpreted as player-specific FORGE evidence.'
+      generated_baseline: 'The row is generated from fixture/sample/baseline semantics and must not be interpreted as player-specific FORGE evidence, Team Direction input, FORGE coverage, confidence input, roster strength input, or player-specific alpha.'
     },
+    consumer_manifest: consumerManifest(),
     source_artifacts: sourceArtifacts,
     rows,
     warnings: [
       'FORGE_PLAYER_STATIC_V1 is an evidence compiler artifact, not a projection artifact.',
       'Missing artifacts should be treated by downstream consumers as unavailable FORGE evidence, not as zero-valued player evidence.',
-      'Rows with provenance.score_source other than player_specific are explicit fallback/default/baseline rows.'
+      'Rows with provenance.score_source other than player_specific are explicit fallback/default/baseline rows.',
+      'Unknown provenance.score_source values are non-evidence unless a future contract explicitly supports them.'
     ]
   };
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
+function hasNonEmptyString(value: unknown): value is string {
+  return typeof value === 'string' && value.trim().length > 0;
+}
+
+export function validateForgePlayerStaticConsumerContract(value: unknown): ForgePlayerStaticConsumerConformanceResult {
+  const result: ForgePlayerStaticConsumerConformanceResult = {
+    valid: true,
+    errors: [],
+    warnings: [],
+    counters: {
+      player_specific_coverage: 0,
+      generated_baseline_visibility: 0,
+      unresolved_identity_misses: 0,
+      unsupported_missing_artifact_state: 0
+    }
+  };
+
+  if (value === undefined || value === null) {
+    result.valid = false;
+    result.errors.push('FORGE_PLAYER_STATIC_V1 artifact is missing; FORGE evidence is unavailable.');
+    result.counters.unsupported_missing_artifact_state = 1;
+    return result;
+  }
+
+  if (!isRecord(value)) {
+    result.valid = false;
+    result.errors.push('FORGE_PLAYER_STATIC_V1 artifact must be a JSON object; FORGE evidence is unavailable.');
+    result.counters.unsupported_missing_artifact_state = 1;
+    return result;
+  }
+
+  if (value.schema_version !== FORGE_PLAYER_STATIC_SCHEMA_VERSION) {
+    result.errors.push('schema_version must be forge_player_static_v1.');
+  }
+  if (value.artifact_type !== 'FORGE_PLAYER_STATIC_V1') {
+    result.errors.push('artifact_type must be FORGE_PLAYER_STATIC_V1.');
+  }
+  if (!hasNonEmptyString(value.generated_at)) {
+    result.errors.push('generated_at must be a non-empty string.');
+  }
+  if (value.model_version !== FORGE_PLAYER_STATIC_MODEL_VERSION) {
+    result.errors.push(`model_version must be ${FORGE_PLAYER_STATIC_MODEL_VERSION}.`);
+  }
+  if (!Array.isArray(value.rows)) {
+    result.errors.push('rows must be an array.');
+  }
+  if (typeof value.row_count !== 'number' || (Array.isArray(value.rows) && value.row_count !== value.rows.length)) {
+    result.errors.push('row_count must equal rows.length.');
+  }
+  if (!isRecord(value.consumer_manifest)) {
+    result.errors.push('consumer_manifest is required for downstream consumption.');
+  }
+
+  const rows = Array.isArray(value.rows) ? value.rows : [];
+  const seenPlayerIds = new Set<string>();
+  for (const [index, row] of rows.entries()) {
+    const path = `rows[${index}]`;
+    if (!isRecord(row)) {
+      result.errors.push(`${path} must be an object.`);
+      continue;
+    }
+    if (row.schema_version !== FORGE_PLAYER_STATIC_SCHEMA_VERSION) {
+      result.errors.push(`${path}.schema_version must be forge_player_static_v1.`);
+    }
+    if (!hasNonEmptyString(row.player_id)) {
+      result.errors.push(`${path}.player_id must be a non-empty canonical player id.`);
+      result.counters.unresolved_identity_misses += 1;
+    } else if (seenPlayerIds.has(row.player_id)) {
+      result.errors.push(`Duplicate player_id in FORGE_PLAYER_STATIC_V1 artifact: ${row.player_id}.`);
+    } else {
+      seenPlayerIds.add(row.player_id);
+    }
+    for (const field of ['player_name', 'position', 'team']) {
+      if (!hasNonEmptyString(row[field])) {
+        result.errors.push(`${path}.${field} must be a non-empty string.`);
+      }
+    }
+    if (typeof row.forge_alpha !== 'number' || Number.isNaN(row.forge_alpha)) {
+      result.errors.push(`${path}.forge_alpha must be a valid number.`);
+    }
+    if (!hasNonEmptyString(row.forge_tier)) {
+      result.errors.push(`${path}.forge_tier must be a non-empty string.`);
+    }
+    if (!isRecord(row.confidence)) {
+      result.errors.push(`${path}.confidence must be an object.`);
+    }
+    if (!isRecord(row.components)) {
+      result.errors.push(`${path}.components must be an object.`);
+    }
+    if (!isRecord(row.provenance)) {
+      result.errors.push(`${path}.provenance must be an object.`);
+      continue;
+    }
+
+    const scoreSource = row.provenance.score_source;
+    if (scoreSource === FORGE_PLAYER_STATIC_PLAYER_EVIDENCE_SCORE_SOURCE) {
+      result.counters.player_specific_coverage += 1;
+    } else if (scoreSource === 'generated_baseline') {
+      result.counters.generated_baseline_visibility += 1;
+    } else if (scoreSource !== 'fallback_default') {
+      result.warnings.push(`${path}.provenance.score_source=${String(scoreSource)} is not explicitly supported and must be treated as non-evidence.`);
+    }
+
+    for (const field of ['source_provider', 'source_set_id', 'source_updated_at']) {
+      if (!hasNonEmptyString(row.provenance[field])) {
+        result.errors.push(`${path}.provenance.${field} must be a non-empty string.`);
+      }
+    }
+  }
+
+  result.valid = result.errors.length === 0;
+  if (!result.valid) {
+    result.counters.unsupported_missing_artifact_state = 1;
+  }
+  return result;
 }

@@ -11,7 +11,7 @@ const execFileAsync = promisify(execFile);
 const { ingestSourceBackedCohortArtifact } = require('../dist/src/ingestion/sourceBackedCohortArtifact.js');
 const { ingestForgeSeasonArtifact } = require('../dist/src/ingestion/forgeSeasonArtifact.js');
 const { rankSeasonPlayers } = require('../dist/src/services/seasonForgeService.js');
-const { buildForgePlayerStaticArtifact } = require('../dist/src/services/playerStaticArtifactService.js');
+const { buildForgePlayerStaticArtifact, validateForgePlayerStaticConsumerContract } = require('../dist/src/services/playerStaticArtifactService.js');
 const { DEFAULT_GENERATED_BASELINE_SEASON_PATHS, DEFAULT_OUTPUT_PATH, parseArgs } = require('../scripts/build-player-static-artifact.js');
 
 const cohortFixturePath = path.resolve(process.cwd(), 'tests/fixtures/artifacts/forge_player_weekly_ppr_2025.cohort.v1.json');
@@ -94,6 +94,73 @@ test('promoted static artifact matches deterministic builder output', async () =
   const promoted = JSON.parse(await readFile(promotedArtifactPath, 'utf8'));
 
   assert.deepEqual(promoted, expected);
+});
+
+test('FORGE_PLAYER_STATIC_V1 promoted artifact satisfies downstream consumer conformance contract', async () => {
+  const promoted = JSON.parse(await readFile(promotedArtifactPath, 'utf8'));
+  const conformance = validateForgePlayerStaticConsumerContract(promoted);
+
+  assert.equal(conformance.valid, true);
+  assert.deepEqual(conformance.errors, []);
+  assert.deepEqual(conformance.warnings, []);
+  assert.deepEqual(conformance.counters, {
+    player_specific_coverage: 24,
+    generated_baseline_visibility: 14,
+    unresolved_identity_misses: 0,
+    unsupported_missing_artifact_state: 0
+  });
+  assert.equal(promoted.consumer_manifest.evidence_gate.player_specific_forge_evidence, 'row.provenance.score_source === "player_specific"');
+  assert.deepEqual(promoted.consumer_manifest.evidence_gate.non_evidence_score_sources, ['fallback_default', 'generated_baseline']);
+  assert.equal(promoted.consumer_manifest.fail_closed_behavior.missing_artifact, 'unavailable_forge_evidence');
+  assert.equal(promoted.consumer_manifest.fail_closed_behavior.malformed_artifact, 'unavailable_forge_evidence');
+  assert.equal(promoted.consumer_manifest.fail_closed_behavior.duplicate_player_ids, 'invalid_artifact');
+  assert.equal(promoted.consumer_manifest.fail_closed_behavior.unknown_score_source, 'non_evidence_unless_explicitly_supported');
+});
+
+test('FORGE_PLAYER_STATIC_V1 consumer conformance fails closed for missing, malformed, and duplicate artifacts', async () => {
+  const promoted = JSON.parse(await readFile(promotedArtifactPath, 'utf8'));
+  const missing = validateForgePlayerStaticConsumerContract(undefined);
+  const malformed = validateForgePlayerStaticConsumerContract({ ...promoted, rows: 'not-rows' });
+  const duplicate = validateForgePlayerStaticConsumerContract({
+    ...promoted,
+    row_count: promoted.rows.length + 1,
+    rows: [...promoted.rows, { ...promoted.rows[0] }]
+  });
+
+  assert.equal(missing.valid, false);
+  assert.equal(missing.counters.unsupported_missing_artifact_state, 1);
+  assert.ok(missing.errors.some((error) => /artifact is missing/i.test(error)));
+
+  assert.equal(malformed.valid, false);
+  assert.equal(malformed.counters.unsupported_missing_artifact_state, 1);
+  assert.ok(malformed.errors.some((error) => /rows must be an array/i.test(error)));
+
+  assert.equal(duplicate.valid, false);
+  assert.equal(duplicate.counters.unsupported_missing_artifact_state, 1);
+  assert.ok(duplicate.errors.some((error) => /Duplicate player_id/i.test(error)));
+});
+
+test('FORGE_PLAYER_STATIC_V1 consumer conformance treats unknown score_source as non-evidence', async () => {
+  const promoted = JSON.parse(await readFile(promotedArtifactPath, 'utf8'));
+  const generatedBaselineIndex = promoted.rows.findIndex((row) => row.provenance.score_source === 'generated_baseline');
+  const rows = [...promoted.rows];
+  rows[generatedBaselineIndex] = {
+    ...rows[generatedBaselineIndex],
+    provenance: {
+      ...rows[generatedBaselineIndex].provenance,
+      score_source: 'future_unknown_source'
+    }
+  };
+  const unknownSourceArtifact = {
+    ...promoted,
+    rows
+  };
+  const conformance = validateForgePlayerStaticConsumerContract(unknownSourceArtifact);
+
+  assert.equal(conformance.valid, true);
+  assert.equal(conformance.counters.player_specific_coverage, 24);
+  assert.equal(conformance.counters.generated_baseline_visibility, 13);
+  assert.ok(conformance.warnings.some((warning) => /not explicitly supported and must be treated as non-evidence/i.test(warning)));
 });
 
 test('FORGE_PLAYER_STATIC_V1 builder explicitly labels generated baseline rows as non-player-specific', async () => {

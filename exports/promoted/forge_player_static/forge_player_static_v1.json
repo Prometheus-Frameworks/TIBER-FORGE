@@ -5,9 +5,48 @@
   "model_version": "forge-player-static-v1.0.0",
   "row_count": 38,
   "score_source_policy": {
-    "player_specific": "The row is compiled from source-backed player identity and player-specific statistical evidence supplied to FORGE.",
+    "player_specific": "The row is compiled from source-backed player identity and player-specific statistical evidence supplied to FORGE. This is the only score_source that counts as player-specific FORGE evidence.",
     "fallback_default": "The row is an explicit fallback/default and must not be interpreted as player-specific FORGE evidence.",
-    "generated_baseline": "The row is generated from fixture/sample/baseline semantics and must not be interpreted as player-specific FORGE evidence."
+    "generated_baseline": "The row is generated from fixture/sample/baseline semantics and must not be interpreted as player-specific FORGE evidence, Team Direction input, FORGE coverage, confidence input, roster strength input, or player-specific alpha."
+  },
+  "consumer_manifest": {
+    "contract_name": "FORGE_PLAYER_STATIC_V1_DOWNSTREAM_CONSUMPTION",
+    "evidence_gate": {
+      "player_specific_forge_evidence": "row.provenance.score_source === \"player_specific\"",
+      "non_evidence_score_sources": [
+        "fallback_default",
+        "generated_baseline"
+      ],
+      "unknown_score_source_behavior": "non_evidence_unless_explicitly_supported"
+    },
+    "generated_baseline_policy": "generated_baseline rows are visibility scaffolding only and must not count toward Team Direction, FORGE coverage, confidence, roster strength, or player-specific alpha totals.",
+    "required_row_fields": [
+      "schema_version",
+      "player_id",
+      "player_name",
+      "position",
+      "team",
+      "forge_alpha",
+      "forge_tier",
+      "confidence",
+      "components",
+      "provenance.score_source",
+      "provenance.source_provider",
+      "provenance.source_set_id",
+      "provenance.source_updated_at"
+    ],
+    "recommended_consumer_counters": [
+      "player_specific_coverage",
+      "generated_baseline_visibility",
+      "unresolved_identity_misses",
+      "unsupported_missing_artifact_state"
+    ],
+    "fail_closed_behavior": {
+      "missing_artifact": "unavailable_forge_evidence",
+      "malformed_artifact": "unavailable_forge_evidence",
+      "duplicate_player_ids": "invalid_artifact",
+      "unknown_score_source": "non_evidence_unless_explicitly_supported"
+    }
   },
   "source_artifacts": [
     "tests/fixtures/artifacts/forge_player_weekly_ppr_2025.cohort.v1.json",
@@ -3073,6 +3112,7 @@
   "warnings": [
     "FORGE_PLAYER_STATIC_V1 is an evidence compiler artifact, not a projection artifact.",
     "Missing artifacts should be treated by downstream consumers as unavailable FORGE evidence, not as zero-valued player evidence.",
-    "Rows with provenance.score_source other than player_specific are explicit fallback/default/baseline rows."
+    "Rows with provenance.score_source other than player_specific are explicit fallback/default/baseline rows.",
+    "Unknown provenance.score_source values are non-evidence unless a future contract explicitly supports them."
   ]
 }
