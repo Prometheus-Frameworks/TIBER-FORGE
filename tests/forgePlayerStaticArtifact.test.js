@@ -19,9 +19,13 @@ const promotedArtifactPath = path.resolve(process.cwd(), DEFAULT_OUTPUT_PATH);
 const generatedBaselineFixturePath = path.resolve(process.cwd(), DEFAULT_GENERATED_BASELINE_SEASON_PATHS[0]);
 const realCanonicalPlayerIds = [
   'tiber-data-player-2025-bijan-robinson',
+  'tiber-data-player-2025-devon-achane',
   'tiber-data-player-2025-jamarr-chase',
   'tiber-data-player-2025-josh-allen',
-  'tiber-data-player-2025-sam-laporta'
+  'tiber-data-player-2025-justin-herbert',
+  'tiber-data-player-2025-puka-nacua',
+  'tiber-data-player-2025-sam-laporta',
+  'tiber-data-player-2025-travis-kelce'
 ];
 
 async function buildFixtureStaticArtifact() {
@@ -51,7 +55,8 @@ test('FORGE_PLAYER_STATIC_V1 builder emits player-specific evidence rows with ex
 
   for (const row of artifact.rows.filter((candidate) => candidate.provenance.score_source === 'player_specific')) {
     assert.equal(row.schema_version, 'forge_player_static_v1');
-    assert.ok(row.player_id.startsWith('cohort-') || row.player_id.startsWith('tiber-data-player-2025-'));
+    assert.ok(row.player_id.startsWith('tiber-data-player-2025-'));
+    assert.ok(!row.player_id.startsWith('cohort-'));
     assert.equal(row.provenance.score_source, 'player_specific');
     assert.equal(row.provenance.source_provider, 'TIBER-Data');
     assert.equal(row.provenance.input_mode, 'source-backed-cohort');
@@ -92,21 +97,32 @@ test('FORGE_PLAYER_STATIC_V1 builder explicitly labels generated baseline rows a
 });
 
 
-test('FORGE_PLAYER_STATIC_V1 player-specific coverage includes real canonical player ids without duplicate canonical ids', async () => {
+test('FORGE_PLAYER_STATIC_V1 player-specific coverage uses only real canonical player ids without duplicate canonical ids', async () => {
   const artifact = await buildFixtureStaticArtifact();
   const playerSpecificRows = artifact.rows.filter((row) => row.provenance.score_source === 'player_specific');
   const canonicalIds = artifact.rows.map((row) => row.player_id);
   const playerSpecificIds = playerSpecificRows.map((row) => row.player_id);
-  const syntheticCohortRows = playerSpecificRows.filter((row) => row.player_id.startsWith('cohort-'));
+  const placeholderRows = playerSpecificRows.filter((row) => row.player_id.startsWith('cohort-'));
 
   assert.equal(playerSpecificRows.length, 8);
-  assert.ok(playerSpecificRows.length > 2);
   assert.equal(new Set(canonicalIds).size, canonicalIds.length);
-  assert.deepEqual([...playerSpecificIds].filter((id) => realCanonicalPlayerIds.includes(id)).sort(), realCanonicalPlayerIds);
-  assert.equal(syntheticCohortRows.length, 4);
+  assert.deepEqual([...playerSpecificIds].sort(), realCanonicalPlayerIds);
+  assert.equal(placeholderRows.length, 0);
 });
 
-test('FORGE_PLAYER_STATIC_V1 real player-specific rows preserve TIBER-Data provenance semantics', async () => {
+
+test('FORGE_PLAYER_STATIC_V1 builder preserves duplicate canonical player id guard', async () => {
+  const ingestion = await ingestSourceBackedCohortArtifact(cohortFixturePath);
+  const duplicateInputs = [...ingestion.inputs, { ...ingestion.inputs[0] }];
+  const rankings = rankSeasonPlayers(ingestion.inputs);
+
+  assert.throws(
+    () => buildForgePlayerStaticArtifact(duplicateInputs, rankings),
+    /Duplicate canonical player_id supplied to FORGE_PLAYER_STATIC_V1 builder/
+  );
+});
+
+test('FORGE_PLAYER_STATIC_V1 player-specific rows preserve TIBER-Data provenance semantics', async () => {
   const artifact = await buildFixtureStaticArtifact();
   const realRows = artifact.rows.filter((row) => realCanonicalPlayerIds.includes(row.player_id));
 

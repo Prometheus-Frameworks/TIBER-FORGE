@@ -241,8 +241,8 @@
       ]
     },
     {
-      "playerId": "cohort-wr-2",
-      "playerName": "Governed Cohort Slot Receiver",
+      "playerId": "tiber-data-player-2025-puka-nacua",
+      "playerName": "Puka Nacua",
       "position": "WR",
       "team": "LAR",
       "seasonTotal": {
@@ -254,7 +254,11 @@
         "receivingYards": 160,
         "receivingTd": 1,
         "totalTd": 1,
-        "featureCoverage": 1
+        "featureCoverage": 1,
+        "playerId": "tiber-data-player-2025-puka-nacua",
+        "playerName": "Puka Nacua",
+        "position": "WR",
+        "team": "LAR"
       },
       "weeklyRows": [
         {
@@ -265,7 +269,11 @@
           "receptions": 6,
           "receivingYards": 71,
           "receivingTd": 0,
-          "totalTd": 0
+          "totalTd": 0,
+          "playerId": "tiber-data-player-2025-puka-nacua",
+          "playerName": "Puka Nacua",
+          "position": "WR",
+          "team": "LAR"
         },
         {
           "week": 2,
@@ -275,13 +283,17 @@
           "receptions": 6,
           "receivingYards": 89,
           "receivingTd": 1,
-          "totalTd": 1
+          "totalTd": 1,
+          "playerId": "tiber-data-player-2025-puka-nacua",
+          "playerName": "Puka Nacua",
+          "position": "WR",
+          "team": "LAR"
         }
       ]
     },
     {
-      "playerId": "cohort-rb-2",
-      "playerName": "Governed Cohort Passing Down Back",
+      "playerId": "tiber-data-player-2025-devon-achane",
+      "playerName": "De'Von Achane",
       "position": "RB",
       "team": "MIA",
       "seasonTotal": {
@@ -296,7 +308,11 @@
         "receivingYards": 45,
         "receivingTd": 0,
         "totalTd": 1,
-        "featureCoverage": 1
+        "featureCoverage": 1,
+        "playerId": "tiber-data-player-2025-devon-achane",
+        "playerName": "De'Von Achane",
+        "position": "RB",
+        "team": "MIA"
       },
       "weeklyRows": [
         {
@@ -310,7 +326,11 @@
           "rushingTd": 0,
           "receivingYards": 18,
           "receivingTd": 0,
-          "totalTd": 0
+          "totalTd": 0,
+          "playerId": "tiber-data-player-2025-devon-achane",
+          "playerName": "De'Von Achane",
+          "position": "RB",
+          "team": "MIA"
         },
         {
           "week": 2,
@@ -323,13 +343,17 @@
           "rushingTd": 1,
           "receivingYards": 27,
           "receivingTd": 0,
-          "totalTd": 1
+          "totalTd": 1,
+          "playerId": "tiber-data-player-2025-devon-achane",
+          "playerName": "De'Von Achane",
+          "position": "RB",
+          "team": "MIA"
         }
       ]
     },
     {
-      "playerId": "cohort-qb-2",
-      "playerName": "Governed Cohort Pocket Passer",
+      "playerId": "tiber-data-player-2025-justin-herbert",
+      "playerName": "Justin Herbert",
       "position": "QB",
       "team": "LAC",
       "seasonTotal": {
@@ -347,7 +371,11 @@
         "featureCoverage": 1,
         "qualityFlags": [
           "stat_review_pending"
-        ]
+        ],
+        "playerId": "tiber-data-player-2025-justin-herbert",
+        "playerName": "Justin Herbert",
+        "position": "QB",
+        "team": "LAC"
       },
       "weeklyRows": [
         {
@@ -361,7 +389,11 @@
           "carries": 4,
           "rushingYards": 18,
           "rushingTd": 0,
-          "totalTd": 2
+          "totalTd": 2,
+          "playerId": "tiber-data-player-2025-justin-herbert",
+          "playerName": "Justin Herbert",
+          "position": "QB",
+          "team": "LAC"
         },
         {
           "week": 2,
@@ -377,13 +409,17 @@
           "totalTd": 1,
           "qualityFlags": [
             "stat_review_pending"
-          ]
+          ],
+          "playerId": "tiber-data-player-2025-justin-herbert",
+          "playerName": "Justin Herbert",
+          "position": "QB",
+          "team": "LAC"
         }
       ]
     },
     {
-      "playerId": "cohort-te-2",
-      "playerName": "Governed Cohort Inline Tight End",
+      "playerId": "tiber-data-player-2025-travis-kelce",
+      "playerName": "Travis Kelce",
       "position": "TE",
       "team": "KC",
       "seasonTotal": {
@@ -395,7 +431,11 @@
         "receivingYards": 84,
         "receivingTd": 1,
         "totalTd": 1,
-        "featureCoverage": 1
+        "featureCoverage": 1,
+        "playerId": "tiber-data-player-2025-travis-kelce",
+        "playerName": "Travis Kelce",
+        "position": "TE",
+        "team": "KC"
       },
       "weeklyRows": [
         {
@@ -406,7 +446,11 @@
           "receptions": 3,
           "receivingYards": 28,
           "receivingTd": 0,
-          "totalTd": 0
+          "totalTd": 0,
+          "playerId": "tiber-data-player-2025-travis-kelce",
+          "playerName": "Travis Kelce",
+          "position": "TE",
+          "team": "KC"
         },
         {
           "week": 2,
@@ -416,7 +460,11 @@
           "receptions": 5,
           "receivingYards": 56,
           "receivingTd": 1,
-          "totalTd": 1
+          "totalTd": 1,
+          "playerId": "tiber-data-player-2025-travis-kelce",
+          "playerName": "Travis Kelce",
+          "position": "TE",
+          "team": "KC"
         }
       ]
     }
