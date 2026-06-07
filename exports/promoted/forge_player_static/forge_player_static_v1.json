@@ -1248,8 +1248,8 @@
     },
     {
       "schema_version": "forge_player_static_v1",
-      "player_id": "cohort-wr-2",
-      "player_name": "Governed Cohort Slot Receiver",
+      "player_id": "tiber-data-player-2025-puka-nacua",
+      "player_name": "Puka Nacua",
       "position": "WR",
       "team": "LAR",
       "forge_alpha": 30.24,
@@ -1327,8 +1327,8 @@
     },
     {
       "schema_version": "forge_player_static_v1",
-      "player_id": "cohort-te-2",
-      "player_name": "Governed Cohort Inline Tight End",
+      "player_id": "tiber-data-player-2025-travis-kelce",
+      "player_name": "Travis Kelce",
       "position": "TE",
       "team": "KC",
       "forge_alpha": 29.43,
@@ -1406,8 +1406,8 @@
     },
     {
       "schema_version": "forge_player_static_v1",
-      "player_id": "cohort-rb-2",
-      "player_name": "Governed Cohort Passing Down Back",
+      "player_id": "tiber-data-player-2025-devon-achane",
+      "player_name": "De'Von Achane",
       "position": "RB",
       "team": "MIA",
       "forge_alpha": 28.57,
@@ -1565,8 +1565,8 @@
     },
     {
       "schema_version": "forge_player_static_v1",
-      "player_id": "cohort-qb-2",
-      "player_name": "Governed Cohort Pocket Passer",
+      "player_id": "tiber-data-player-2025-justin-herbert",
+      "player_name": "Justin Herbert",
       "position": "QB",
       "team": "LAC",
       "forge_alpha": 26.88,
