@@ -7,20 +7,29 @@ const { rankSeasonPlayers } = require('../dist/src/services/seasonForgeService.j
 const { buildForgePlayerStaticArtifact } = require('../dist/src/services/playerStaticArtifactService.js');
 
 const DEFAULT_SOURCE_BACKED_COHORT_PATH = 'tests/fixtures/artifacts/forge_player_weekly_ppr_2025.cohort.v1.json';
+const DEFAULT_SOURCE_BACKED_COHORT_PATHS = [
+  DEFAULT_SOURCE_BACKED_COHORT_PATH,
+  'tests/fixtures/artifacts/forge_player_weekly_ppr_2025.management_mapped_source_backfill.v1.json'
+];
 const DEFAULT_GENERATED_BASELINE_SEASON_PATHS = ['tests/fixtures/artifacts/forge_season_player_input_2025.real_players_sample.json'];
 const DEFAULT_OUTPUT_PATH = 'exports/promoted/forge_player_static/forge_player_static_v1.json';
 
 function parseArgs(argv) {
   const options = {
-    sourceBackedCohortPath: DEFAULT_SOURCE_BACKED_COHORT_PATH,
+    sourceBackedCohortPaths: [...DEFAULT_SOURCE_BACKED_COHORT_PATHS],
     generatedBaselineSeasonPaths: [...DEFAULT_GENERATED_BASELINE_SEASON_PATHS],
     outputPath: DEFAULT_OUTPUT_PATH
   };
+  let sourceBackedCohortOverridden = false;
 
   for (let index = 0; index < argv.length; index += 1) {
     const arg = argv[index];
     if (arg === '--source-backed-cohort') {
-      options.sourceBackedCohortPath = argv[++index];
+      if (!sourceBackedCohortOverridden) {
+        options.sourceBackedCohortPaths = [];
+        sourceBackedCohortOverridden = true;
+      }
+      options.sourceBackedCohortPaths.push(argv[++index]);
     } else if (arg === '--generated-baseline-season') {
       options.generatedBaselineSeasonPaths.push(argv[++index]);
     } else if (arg === '--no-generated-baselines') {
@@ -38,7 +47,7 @@ function parseArgs(argv) {
 }
 
 function printHelp() {
-  console.log(`Usage: node scripts/build-player-static-artifact.js [--source-backed-cohort <path>] [--generated-baseline-season <path>] [--no-generated-baselines] [--output <path>]\n\nBuilds a promoted FORGE_PLAYER_STATIC_V1 artifact from a validated source-backed TIBER-Data cohort plus explicit generated-baseline season inputs. The output preserves score_source so downstream consumers can reject fallback/default/baseline rows.`);
+  console.log(`Usage: node scripts/build-player-static-artifact.js [--source-backed-cohort <path>] [--generated-baseline-season <path>] [--no-generated-baselines] [--output <path>]\n\nBuilds a promoted FORGE_PLAYER_STATIC_V1 artifact from validated source-backed cohorts plus explicit generated-baseline season inputs. The output preserves score_source so downstream consumers can reject fallback/default/baseline rows.`);
 }
 
 async function main() {
@@ -48,17 +57,19 @@ async function main() {
     return;
   }
 
-  const cohortPath = path.resolve(process.cwd(), options.sourceBackedCohortPath);
+  const cohortPaths = options.sourceBackedCohortPaths.map((cohortPath) => path.resolve(process.cwd(), cohortPath));
   const outputPath = path.resolve(process.cwd(), options.outputPath);
-  const ingestion = await ingestSourceBackedCohortArtifact(cohortPath);
+  const ingestions = await Promise.all(cohortPaths.map((cohortPath) => ingestSourceBackedCohortArtifact(cohortPath)));
+  const ingestion = ingestions[0];
   const generatedBaselineInputs = (await Promise.all(
     options.generatedBaselineSeasonPaths.map((baselinePath) => ingestForgeSeasonArtifact(path.resolve(process.cwd(), baselinePath)))
   )).flat();
-  const inputs = [...ingestion.inputs, ...generatedBaselineInputs];
+  const sourceBackedInputs = ingestions.flatMap((item) => item.inputs);
+  const inputs = [...sourceBackedInputs, ...generatedBaselineInputs];
   const rankings = rankSeasonPlayers(inputs);
   const artifact = buildForgePlayerStaticArtifact(inputs, rankings, {
     generatedAt: ingestion.metadata.asOf,
-    sourceArtifacts: [options.sourceBackedCohortPath, ...options.generatedBaselineSeasonPaths]
+    sourceArtifacts: [...options.sourceBackedCohortPaths, ...options.generatedBaselineSeasonPaths]
   });
 
   await mkdir(path.dirname(outputPath), { recursive: true });
@@ -73,4 +84,4 @@ if (require.main === module) {
   });
 }
 
-module.exports = { DEFAULT_GENERATED_BASELINE_SEASON_PATHS, DEFAULT_OUTPUT_PATH, DEFAULT_SOURCE_BACKED_COHORT_PATH, parseArgs };
+module.exports = { DEFAULT_GENERATED_BASELINE_SEASON_PATHS, DEFAULT_OUTPUT_PATH, DEFAULT_SOURCE_BACKED_COHORT_PATH, DEFAULT_SOURCE_BACKED_COHORT_PATHS, parseArgs };

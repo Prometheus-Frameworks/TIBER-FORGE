@@ -12,12 +12,11 @@ The promoted repository artifact is:
 exports/promoted/forge_player_static/forge_player_static_v1.json
 ```
 
-Rebuild it from a validated source-backed cohort plus the default generated-baseline season universe with:
+Rebuild it from the default validated source-backed cohorts plus the default generated-baseline season universe with:
 
 ```bash
 npm run build
 node scripts/build-player-static-artifact.js \
-  --source-backed-cohort tests/fixtures/artifacts/forge_player_weekly_ppr_2025.cohort.v1.json \
   --output exports/promoted/forge_player_static/forge_player_static_v1.json
 ```
 
@@ -27,18 +26,20 @@ node scripts/build-player-static-artifact.js \
 The promoted repository artifact now contains a broader deterministic player universe and materially more true source-backed rows than the original two-row source-backed proof:
 
 - 24 `player_specific` rows from the governed TIBER-Data source-backed cohort at `tests/fixtures/artifacts/forge_player_weekly_ppr_2025.cohort.v1.json`.
-- All 24 `player_specific` rows are keyed by real canonical TIBER-Data player identities. The source-backed lane now covers a small cross-position cohort: Josh Allen, Lamar Jackson, Jalen Hurts, Patrick Mahomes, C.J. Stroud, Bijan Robinson, De'Von Achane, Jahmyr Gibbs, Breece Hall, Jonathan Taylor, Saquon Barkley, Ja'Marr Chase, Puka Nacua, Justin Jefferson, CeeDee Lamb, Amon-Ra St. Brown, Nico Collins, Sam LaPorta, Travis Kelce, Brock Bowers, Trey McBride, George Kittle, and Mark Andrews.
+- 21 additional `player_specific` rows from the Management mapped source-backed evidence artifact at `tests/fixtures/artifacts/forge_player_weekly_ppr_2025.management_mapped_source_backfill.v1.json`.
+- All 45 `player_specific` rows are keyed by real canonical TIBER-Data player identities. The newly covered Management-mapped identities are Calvin Austin III, Christian McCaffrey, Deebo Samuel Sr., Derrick Henry, Gardner Minshew II, Harold Fannin Jr., Jalen Tolbert, Jameis Winston, Kendrick Bourne, Ladd McConkey, Luther Burden III, Mac Jones, Malik Davis, Marvin Mims Jr., Rico Dowdle, Ryan Flournoy, T.J. Hockenson, Terrance Ferguson, Travis Hunter, Tyquan Thornton, and Xavier Worthy.
+- `tiber-data-player-2025-frank-gore-jr` remains omitted because this repo does not currently carry source-backed FORGE evidence for that mapped candidate.
 - No governed `cohort-` placeholder IDs remain in the `player_specific` lane.
 - 14 `generated_baseline` rows from `tests/fixtures/artifacts/forge_season_player_input_2025.real_players_sample.json`.
-- 38 total rows ordered deterministically by FORGE score descending, then canonical `player_id` ascending for score ties.
+- 59 total rows ordered deterministically by FORGE score descending, then canonical `player_id` ascending for score ties.
 
-The source-backed cohort is the only lane that currently counts as true player-specific FORGE evidence. Canonical TIBER-Data IDs in that lane use `provenance.score_source = "player_specific"`, `source_provider = "TIBER-Data"`, and the source cohort build ID. The generated-baseline rows expand roster-evaluation lookup visibility, but they are not live source-backed evidence. Consumers must continue to gate on `row.provenance.score_source` and may only treat `player_specific` rows as true player-specific FORGE evidence.
+The source-backed cohort lanes are the only lanes that currently count as true player-specific FORGE evidence. Canonical TIBER-Data IDs in those lanes use `provenance.score_source = "player_specific"`, retain their source provider (`TIBER-Data` or `FantasyPros`), and retain the source cohort build ID. The generated-baseline rows expand roster-evaluation lookup visibility, but they are not live source-backed evidence. Consumers must continue to gate on `row.provenance.score_source` and may only treat `player_specific` rows as true player-specific FORGE evidence.
 
-To rebuild only the governed source-backed cohort, pass `--no-generated-baselines` to the builder. To add another explicit baseline universe, pass one or more `--generated-baseline-season <path>` arguments; those rows remain `generated_baseline` when their season inputs carry `fixtureSemantics: sample-only-retrospective-fixture`.
+To rebuild only source-backed rows, pass `--no-generated-baselines` to the builder. To override the default source-backed cohorts, pass one or more `--source-backed-cohort <path>` arguments. To add another explicit baseline universe, pass one or more `--generated-baseline-season <path>` arguments; those rows remain `generated_baseline` when their season inputs carry `fixtureSemantics: sample-only-retrospective-fixture`.
 
 ## Current coverage limits and next expansion stage
 
-This pass expands the cleaned source-backed lane from 8 to 24 real canonical TIBER-Data player identities while keeping every generated/default row in the `generated_baseline` lane. Coverage remains intentionally small: 24 real canonical `player_specific` rows and 14 generated-baseline visibility rows. It does not add TeamState, Role-and-opportunity, Point Prediction, Team Direction, age, market, route evidence, or full-universe source coverage. The next coverage stage still belongs at the input/source boundary: expand the governed TIBER-Data source-backed cohort with additional real player rows keyed by canonical identity and real source-backed evidence. FORGE should compile supplied rows as `player_specific`; it should not upgrade generated/default rows to player-specific without true player-specific upstream evidence.
+This pass expands the cleaned source-backed lanes to 45 real canonical TIBER-Data player identities while keeping every generated/default row in the `generated_baseline` lane. Coverage remains intentionally bounded: 45 real canonical `player_specific` rows and 14 generated-baseline visibility rows. It does not add TeamState, Role-and-opportunity, Point Prediction, Team Direction, age, market, route evidence, or full-universe source coverage. The next coverage stage still belongs at the input/source boundary: expand the governed TIBER-Data source-backed cohort with additional real player rows keyed by canonical identity and real source-backed evidence. FORGE should compile supplied rows as `player_specific`; it should not upgrade generated/default rows to player-specific without true player-specific upstream evidence.
 
 ## Contract summary
 
