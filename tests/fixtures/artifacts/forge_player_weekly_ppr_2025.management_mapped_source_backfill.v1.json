@@ -1,0 +1,1179 @@
+{
+  "artifactId": "forge_player_weekly_ppr_2025.management_mapped_source_backfill.v1",
+  "schemaVersion": "1.0.0",
+  "artifactType": "forge_player_weekly_ppr_2025_cohort",
+  "source": {
+    "provider": "FantasyPros",
+    "seasonType": "REG",
+    "identityProvider": "TIBER-Data canonical football identity map",
+    "evidenceWindow": "2025 full-season PPR management roster rows",
+    "statTableUrls": [
+      "https://www.fantasypros.com/nfl/stats/qb.php?range=full&roster=consensus&scoring=PPR&year=2025",
+      "https://www.fantasypros.com/nfl/stats/rb.php?range=full&roster=consensus&scoring=PPR&year=2025",
+      "https://www.fantasypros.com/nfl/stats/wr.php?range=full&roster=consensus&scoring=PPR&year=2025",
+      "https://www.fantasypros.com/nfl/stats/te.php?range=full&roster=consensus&scoring=PPR&year=2025"
+    ],
+    "aggregation": "Full-season rows represented as one week-17 validation row so season totals remain auditable without creating weekly detail FORGE does not possess."
+  },
+  "asOf": "2026-01-08T00:00:00.000Z",
+  "sourceUpdatedAt": "2026-01-08T00:00:00.000Z",
+  "buildId": "fantasypros-2025-management-source-build-001",
+  "season": 2025,
+  "players": [
+    {
+      "playerId": "tiber-data-player-2025-christian-mccaffrey",
+      "playerName": "Christian McCaffrey",
+      "position": "RB",
+      "team": "SF",
+      "seasonTotal": {
+        "games": 17,
+        "pprPoints": 416.6,
+        "fantasyPointsPerGame": 24.5,
+        "carries": 311,
+        "rushingYards": 1202,
+        "rushingTd": 10,
+        "targets": 129,
+        "receptions": 102,
+        "receivingYards": 924,
+        "receivingTd": 7,
+        "totalTd": 17,
+        "featureCoverage": 1,
+        "qualityFlags": [
+          "fantasypros_2025_ppr_table",
+          "season_aggregate_single_row"
+        ],
+        "playerId": "tiber-data-player-2025-christian-mccaffrey",
+        "playerName": "Christian McCaffrey",
+        "position": "RB",
+        "team": "SF",
+        "season": 2025
+      },
+      "weeklyRows": [
+        {
+          "games": 17,
+          "pprPoints": 416.6,
+          "fantasyPointsPerGame": 24.5,
+          "carries": 311,
+          "rushingYards": 1202,
+          "rushingTd": 10,
+          "targets": 129,
+          "receptions": 102,
+          "receivingYards": 924,
+          "receivingTd": 7,
+          "totalTd": 17,
+          "featureCoverage": 1,
+          "qualityFlags": [
+            "fantasypros_2025_ppr_table",
+            "season_aggregate_single_row"
+          ],
+          "playerId": "tiber-data-player-2025-christian-mccaffrey",
+          "playerName": "Christian McCaffrey",
+          "position": "RB",
+          "team": "SF",
+          "season": 2025,
+          "week": 17
+        }
+      ]
+    },
+    {
+      "playerId": "tiber-data-player-2025-derrick-henry",
+      "playerName": "Derrick Henry",
+      "position": "RB",
+      "team": "BAL",
+      "seasonTotal": {
+        "games": 17,
+        "pprPoints": 279.5,
+        "fantasyPointsPerGame": 16.4,
+        "carries": 307,
+        "rushingYards": 1595,
+        "rushingTd": 16,
+        "targets": 21,
+        "receptions": 15,
+        "receivingYards": 150,
+        "receivingTd": 0,
+        "totalTd": 16,
+        "featureCoverage": 1,
+        "qualityFlags": [
+          "fantasypros_2025_ppr_table",
+          "season_aggregate_single_row"
+        ],
+        "playerId": "tiber-data-player-2025-derrick-henry",
+        "playerName": "Derrick Henry",
+        "position": "RB",
+        "team": "BAL",
+        "season": 2025
+      },
+      "weeklyRows": [
+        {
+          "games": 17,
+          "pprPoints": 279.5,
+          "fantasyPointsPerGame": 16.4,
+          "carries": 307,
+          "rushingYards": 1595,
+          "rushingTd": 16,
+          "targets": 21,
+          "receptions": 15,
+          "receivingYards": 150,
+          "receivingTd": 0,
+          "totalTd": 16,
+          "featureCoverage": 1,
+          "qualityFlags": [
+            "fantasypros_2025_ppr_table",
+            "season_aggregate_single_row"
+          ],
+          "playerId": "tiber-data-player-2025-derrick-henry",
+          "playerName": "Derrick Henry",
+          "position": "RB",
+          "team": "BAL",
+          "season": 2025,
+          "week": 17
+        }
+      ]
+    },
+    {
+      "playerId": "tiber-data-player-2025-rico-dowdle",
+      "playerName": "Rico Dowdle",
+      "position": "RB",
+      "team": "CAR",
+      "seasonTotal": {
+        "games": 17,
+        "pprPoints": 216.3,
+        "fantasyPointsPerGame": 12.7,
+        "carries": 236,
+        "rushingYards": 1076,
+        "rushingTd": 6,
+        "targets": 50,
+        "receptions": 39,
+        "receivingYards": 297,
+        "receivingTd": 1,
+        "totalTd": 7,
+        "featureCoverage": 1,
+        "qualityFlags": [
+          "fantasypros_2025_ppr_table",
+          "season_aggregate_single_row"
+        ],
+        "playerId": "tiber-data-player-2025-rico-dowdle",
+        "playerName": "Rico Dowdle",
+        "position": "RB",
+        "team": "CAR",
+        "season": 2025
+      },
+      "weeklyRows": [
+        {
+          "games": 17,
+          "pprPoints": 216.3,
+          "fantasyPointsPerGame": 12.7,
+          "carries": 236,
+          "rushingYards": 1076,
+          "rushingTd": 6,
+          "targets": 50,
+          "receptions": 39,
+          "receivingYards": 297,
+          "receivingTd": 1,
+          "totalTd": 7,
+          "featureCoverage": 1,
+          "qualityFlags": [
+            "fantasypros_2025_ppr_table",
+            "season_aggregate_single_row"
+          ],
+          "playerId": "tiber-data-player-2025-rico-dowdle",
+          "playerName": "Rico Dowdle",
+          "position": "RB",
+          "team": "CAR",
+          "season": 2025,
+          "week": 17
+        }
+      ]
+    },
+    {
+      "playerId": "tiber-data-player-2025-malik-davis",
+      "playerName": "Malik Davis",
+      "position": "RB",
+      "team": "DAL",
+      "seasonTotal": {
+        "games": 10,
+        "pprPoints": 40.6,
+        "fantasyPointsPerGame": 4.1,
+        "carries": 52,
+        "rushingYards": 250,
+        "rushingTd": 2,
+        "targets": 5,
+        "receptions": 2,
+        "receivingYards": 16,
+        "receivingTd": 0,
+        "totalTd": 2,
+        "featureCoverage": 1,
+        "qualityFlags": [
+          "fantasypros_2025_ppr_table",
+          "season_aggregate_single_row"
+        ],
+        "playerId": "tiber-data-player-2025-malik-davis",
+        "playerName": "Malik Davis",
+        "position": "RB",
+        "team": "DAL",
+        "season": 2025
+      },
+      "weeklyRows": [
+        {
+          "games": 10,
+          "pprPoints": 40.6,
+          "fantasyPointsPerGame": 4.1,
+          "carries": 52,
+          "rushingYards": 250,
+          "rushingTd": 2,
+          "targets": 5,
+          "receptions": 2,
+          "receivingYards": 16,
+          "receivingTd": 0,
+          "totalTd": 2,
+          "featureCoverage": 1,
+          "qualityFlags": [
+            "fantasypros_2025_ppr_table",
+            "season_aggregate_single_row"
+          ],
+          "playerId": "tiber-data-player-2025-malik-davis",
+          "playerName": "Malik Davis",
+          "position": "RB",
+          "team": "DAL",
+          "season": 2025,
+          "week": 17
+        }
+      ]
+    },
+    {
+      "playerId": "tiber-data-player-2025-jameis-winston",
+      "playerName": "Jameis Winston",
+      "position": "QB",
+      "team": "NYG",
+      "seasonTotal": {
+        "games": 3,
+        "pprPoints": 45.2,
+        "fantasyPointsPerGame": 15.1,
+        "passingAttempts": 66,
+        "passingYards": 567,
+        "passingTd": 2,
+        "interceptions": 2,
+        "carries": 7,
+        "rushingYards": 23,
+        "rushingTd": 1,
+        "totalTd": 3,
+        "featureCoverage": 1,
+        "qualityFlags": [
+          "fantasypros_2025_ppr_table",
+          "season_aggregate_single_row"
+        ],
+        "playerId": "tiber-data-player-2025-jameis-winston",
+        "playerName": "Jameis Winston",
+        "position": "QB",
+        "team": "NYG",
+        "season": 2025
+      },
+      "weeklyRows": [
+        {
+          "games": 3,
+          "pprPoints": 45.2,
+          "fantasyPointsPerGame": 15.1,
+          "passingAttempts": 66,
+          "passingYards": 567,
+          "passingTd": 2,
+          "interceptions": 2,
+          "carries": 7,
+          "rushingYards": 23,
+          "rushingTd": 1,
+          "totalTd": 3,
+          "featureCoverage": 1,
+          "qualityFlags": [
+            "fantasypros_2025_ppr_table",
+            "season_aggregate_single_row"
+          ],
+          "playerId": "tiber-data-player-2025-jameis-winston",
+          "playerName": "Jameis Winston",
+          "position": "QB",
+          "team": "NYG",
+          "season": 2025,
+          "week": 17
+        }
+      ]
+    },
+    {
+      "playerId": "tiber-data-player-2025-mac-jones",
+      "playerName": "Mac Jones",
+      "position": "QB",
+      "team": "SF",
+      "seasonTotal": {
+        "games": 11,
+        "pprPoints": 136.2,
+        "fantasyPointsPerGame": 12.4,
+        "passingAttempts": 289,
+        "passingYards": 2151,
+        "passingTd": 13,
+        "interceptions": 6,
+        "carries": 36,
+        "rushingYards": 60,
+        "rushingTd": 0,
+        "totalTd": 13,
+        "featureCoverage": 1,
+        "qualityFlags": [
+          "fantasypros_2025_ppr_table",
+          "season_aggregate_single_row"
+        ],
+        "playerId": "tiber-data-player-2025-mac-jones",
+        "playerName": "Mac Jones",
+        "position": "QB",
+        "team": "SF",
+        "season": 2025
+      },
+      "weeklyRows": [
+        {
+          "games": 11,
+          "pprPoints": 136.2,
+          "fantasyPointsPerGame": 12.4,
+          "passingAttempts": 289,
+          "passingYards": 2151,
+          "passingTd": 13,
+          "interceptions": 6,
+          "carries": 36,
+          "rushingYards": 60,
+          "rushingTd": 0,
+          "totalTd": 13,
+          "featureCoverage": 1,
+          "qualityFlags": [
+            "fantasypros_2025_ppr_table",
+            "season_aggregate_single_row"
+          ],
+          "playerId": "tiber-data-player-2025-mac-jones",
+          "playerName": "Mac Jones",
+          "position": "QB",
+          "team": "SF",
+          "season": 2025,
+          "week": 17
+        }
+      ]
+    },
+    {
+      "playerId": "tiber-data-player-2025-gardner-minshew",
+      "playerName": "Gardner Minshew II",
+      "position": "QB",
+      "team": "KC",
+      "seasonTotal": {
+        "games": 4,
+        "pprPoints": 0.7,
+        "fantasyPointsPerGame": 0.2,
+        "passingAttempts": 13,
+        "passingYards": 37,
+        "passingTd": 0,
+        "interceptions": 1,
+        "carries": 6,
+        "rushingYards": 2,
+        "rushingTd": 0,
+        "totalTd": 0,
+        "featureCoverage": 1,
+        "qualityFlags": [
+          "fantasypros_2025_ppr_table",
+          "season_aggregate_single_row"
+        ],
+        "playerId": "tiber-data-player-2025-gardner-minshew",
+        "playerName": "Gardner Minshew II",
+        "position": "QB",
+        "team": "KC",
+        "season": 2025
+      },
+      "weeklyRows": [
+        {
+          "games": 4,
+          "pprPoints": 0.7,
+          "fantasyPointsPerGame": 0.2,
+          "passingAttempts": 13,
+          "passingYards": 37,
+          "passingTd": 0,
+          "interceptions": 1,
+          "carries": 6,
+          "rushingYards": 2,
+          "rushingTd": 0,
+          "totalTd": 0,
+          "featureCoverage": 1,
+          "qualityFlags": [
+            "fantasypros_2025_ppr_table",
+            "season_aggregate_single_row"
+          ],
+          "playerId": "tiber-data-player-2025-gardner-minshew",
+          "playerName": "Gardner Minshew II",
+          "position": "QB",
+          "team": "KC",
+          "season": 2025,
+          "week": 17
+        }
+      ]
+    },
+    {
+      "playerId": "tiber-data-player-2025-xavier-worthy",
+      "playerName": "Xavier Worthy",
+      "position": "WR",
+      "team": "KC",
+      "seasonTotal": {
+        "games": 14,
+        "pprPoints": 109.9,
+        "fantasyPointsPerGame": 7.9,
+        "targets": 73,
+        "receptions": 42,
+        "receivingYards": 532,
+        "receivingTd": 1,
+        "carries": 11,
+        "rushingYards": 87,
+        "rushingTd": 0,
+        "totalTd": 1,
+        "featureCoverage": 1,
+        "qualityFlags": [
+          "fantasypros_2025_ppr_table",
+          "season_aggregate_single_row"
+        ],
+        "playerId": "tiber-data-player-2025-xavier-worthy",
+        "playerName": "Xavier Worthy",
+        "position": "WR",
+        "team": "KC",
+        "season": 2025
+      },
+      "weeklyRows": [
+        {
+          "games": 14,
+          "pprPoints": 109.9,
+          "fantasyPointsPerGame": 7.9,
+          "targets": 73,
+          "receptions": 42,
+          "receivingYards": 532,
+          "receivingTd": 1,
+          "carries": 11,
+          "rushingYards": 87,
+          "rushingTd": 0,
+          "totalTd": 1,
+          "featureCoverage": 1,
+          "qualityFlags": [
+            "fantasypros_2025_ppr_table",
+            "season_aggregate_single_row"
+          ],
+          "playerId": "tiber-data-player-2025-xavier-worthy",
+          "playerName": "Xavier Worthy",
+          "position": "WR",
+          "team": "KC",
+          "season": 2025,
+          "week": 17
+        }
+      ]
+    },
+    {
+      "playerId": "tiber-data-player-2025-ladd-mcconkey",
+      "playerName": "Ladd McConkey",
+      "position": "WR",
+      "team": "LAC",
+      "seasonTotal": {
+        "games": 16,
+        "pprPoints": 180.9,
+        "fantasyPointsPerGame": 11.3,
+        "targets": 106,
+        "receptions": 66,
+        "receivingYards": 789,
+        "receivingTd": 6,
+        "carries": 0,
+        "rushingYards": 0,
+        "rushingTd": 0,
+        "totalTd": 6,
+        "featureCoverage": 1,
+        "qualityFlags": [
+          "fantasypros_2025_ppr_table",
+          "season_aggregate_single_row"
+        ],
+        "playerId": "tiber-data-player-2025-ladd-mcconkey",
+        "playerName": "Ladd McConkey",
+        "position": "WR",
+        "team": "LAC",
+        "season": 2025
+      },
+      "weeklyRows": [
+        {
+          "games": 16,
+          "pprPoints": 180.9,
+          "fantasyPointsPerGame": 11.3,
+          "targets": 106,
+          "receptions": 66,
+          "receivingYards": 789,
+          "receivingTd": 6,
+          "carries": 0,
+          "rushingYards": 0,
+          "rushingTd": 0,
+          "totalTd": 6,
+          "featureCoverage": 1,
+          "qualityFlags": [
+            "fantasypros_2025_ppr_table",
+            "season_aggregate_single_row"
+          ],
+          "playerId": "tiber-data-player-2025-ladd-mcconkey",
+          "playerName": "Ladd McConkey",
+          "position": "WR",
+          "team": "LAC",
+          "season": 2025,
+          "week": 17
+        }
+      ]
+    },
+    {
+      "playerId": "tiber-data-player-2025-ryan-flournoy",
+      "playerName": "Ryan Flournoy",
+      "position": "WR",
+      "team": "DAL",
+      "seasonTotal": {
+        "games": 15,
+        "pprPoints": 114.0,
+        "fantasyPointsPerGame": 7.6,
+        "targets": 56,
+        "receptions": 40,
+        "receivingYards": 475,
+        "receivingTd": 4,
+        "carries": 4,
+        "rushingYards": 25,
+        "rushingTd": 0,
+        "totalTd": 4,
+        "featureCoverage": 1,
+        "qualityFlags": [
+          "fantasypros_2025_ppr_table",
+          "season_aggregate_single_row"
+        ],
+        "playerId": "tiber-data-player-2025-ryan-flournoy",
+        "playerName": "Ryan Flournoy",
+        "position": "WR",
+        "team": "DAL",
+        "season": 2025
+      },
+      "weeklyRows": [
+        {
+          "games": 15,
+          "pprPoints": 114.0,
+          "fantasyPointsPerGame": 7.6,
+          "targets": 56,
+          "receptions": 40,
+          "receivingYards": 475,
+          "receivingTd": 4,
+          "carries": 4,
+          "rushingYards": 25,
+          "rushingTd": 0,
+          "totalTd": 4,
+          "featureCoverage": 1,
+          "qualityFlags": [
+            "fantasypros_2025_ppr_table",
+            "season_aggregate_single_row"
+          ],
+          "playerId": "tiber-data-player-2025-ryan-flournoy",
+          "playerName": "Ryan Flournoy",
+          "position": "WR",
+          "team": "DAL",
+          "season": 2025,
+          "week": 17
+        }
+      ]
+    },
+    {
+      "playerId": "tiber-data-player-2025-luther-burden-iii",
+      "playerName": "Luther Burden III",
+      "position": "WR",
+      "team": "CHI",
+      "seasonTotal": {
+        "games": 15,
+        "pprPoints": 127.9,
+        "fantasyPointsPerGame": 8.5,
+        "targets": 60,
+        "receptions": 47,
+        "receivingYards": 652,
+        "receivingTd": 2,
+        "carries": 6,
+        "rushingYards": 37,
+        "rushingTd": 0,
+        "totalTd": 2,
+        "featureCoverage": 1,
+        "qualityFlags": [
+          "fantasypros_2025_ppr_table",
+          "season_aggregate_single_row"
+        ],
+        "playerId": "tiber-data-player-2025-luther-burden-iii",
+        "playerName": "Luther Burden III",
+        "position": "WR",
+        "team": "CHI",
+        "season": 2025
+      },
+      "weeklyRows": [
+        {
+          "games": 15,
+          "pprPoints": 127.9,
+          "fantasyPointsPerGame": 8.5,
+          "targets": 60,
+          "receptions": 47,
+          "receivingYards": 652,
+          "receivingTd": 2,
+          "carries": 6,
+          "rushingYards": 37,
+          "rushingTd": 0,
+          "totalTd": 2,
+          "featureCoverage": 1,
+          "qualityFlags": [
+            "fantasypros_2025_ppr_table",
+            "season_aggregate_single_row"
+          ],
+          "playerId": "tiber-data-player-2025-luther-burden-iii",
+          "playerName": "Luther Burden III",
+          "position": "WR",
+          "team": "CHI",
+          "season": 2025,
+          "week": 17
+        }
+      ]
+    },
+    {
+      "playerId": "tiber-data-player-2025-travis-hunter",
+      "playerName": "Travis Hunter",
+      "position": "WR",
+      "team": "JAC",
+      "seasonTotal": {
+        "games": 7,
+        "pprPoints": 63.8,
+        "fantasyPointsPerGame": 9.1,
+        "targets": 45,
+        "receptions": 28,
+        "receivingYards": 298,
+        "receivingTd": 1,
+        "carries": 1,
+        "rushingYards": 0,
+        "rushingTd": 0,
+        "totalTd": 1,
+        "featureCoverage": 1,
+        "qualityFlags": [
+          "fantasypros_2025_ppr_table",
+          "season_aggregate_single_row"
+        ],
+        "playerId": "tiber-data-player-2025-travis-hunter",
+        "playerName": "Travis Hunter",
+        "position": "WR",
+        "team": "JAC",
+        "season": 2025
+      },
+      "weeklyRows": [
+        {
+          "games": 7,
+          "pprPoints": 63.8,
+          "fantasyPointsPerGame": 9.1,
+          "targets": 45,
+          "receptions": 28,
+          "receivingYards": 298,
+          "receivingTd": 1,
+          "carries": 1,
+          "rushingYards": 0,
+          "rushingTd": 0,
+          "totalTd": 1,
+          "featureCoverage": 1,
+          "qualityFlags": [
+            "fantasypros_2025_ppr_table",
+            "season_aggregate_single_row"
+          ],
+          "playerId": "tiber-data-player-2025-travis-hunter",
+          "playerName": "Travis Hunter",
+          "position": "WR",
+          "team": "JAC",
+          "season": 2025,
+          "week": 17
+        }
+      ]
+    },
+    {
+      "playerId": "tiber-data-player-2025-deebo-samuel-sr",
+      "playerName": "Deebo Samuel Sr.",
+      "position": "WR",
+      "team": "WAS",
+      "seasonTotal": {
+        "games": 16,
+        "pprPoints": 188.2,
+        "fantasyPointsPerGame": 11.8,
+        "targets": 99,
+        "receptions": 72,
+        "receivingYards": 727,
+        "receivingTd": 5,
+        "carries": 17,
+        "rushingYards": 75,
+        "rushingTd": 1,
+        "totalTd": 6,
+        "featureCoverage": 1,
+        "qualityFlags": [
+          "fantasypros_2025_ppr_table",
+          "season_aggregate_single_row"
+        ],
+        "playerId": "tiber-data-player-2025-deebo-samuel-sr",
+        "playerName": "Deebo Samuel Sr.",
+        "position": "WR",
+        "team": "WAS",
+        "season": 2025
+      },
+      "weeklyRows": [
+        {
+          "games": 16,
+          "pprPoints": 188.2,
+          "fantasyPointsPerGame": 11.8,
+          "targets": 99,
+          "receptions": 72,
+          "receivingYards": 727,
+          "receivingTd": 5,
+          "carries": 17,
+          "rushingYards": 75,
+          "rushingTd": 1,
+          "totalTd": 6,
+          "featureCoverage": 1,
+          "qualityFlags": [
+            "fantasypros_2025_ppr_table",
+            "season_aggregate_single_row"
+          ],
+          "playerId": "tiber-data-player-2025-deebo-samuel-sr",
+          "playerName": "Deebo Samuel Sr.",
+          "position": "WR",
+          "team": "WAS",
+          "season": 2025,
+          "week": 17
+        }
+      ]
+    },
+    {
+      "playerId": "tiber-data-player-2025-kendrick-bourne",
+      "playerName": "Kendrick Bourne",
+      "position": "WR",
+      "team": "SF",
+      "seasonTotal": {
+        "games": 16,
+        "pprPoints": 92.1,
+        "fantasyPointsPerGame": 5.8,
+        "targets": 53,
+        "receptions": 37,
+        "receivingYards": 551,
+        "receivingTd": 0,
+        "carries": 0,
+        "rushingYards": 0,
+        "rushingTd": 0,
+        "totalTd": 0,
+        "featureCoverage": 1,
+        "qualityFlags": [
+          "fantasypros_2025_ppr_table",
+          "season_aggregate_single_row"
+        ],
+        "playerId": "tiber-data-player-2025-kendrick-bourne",
+        "playerName": "Kendrick Bourne",
+        "position": "WR",
+        "team": "SF",
+        "season": 2025
+      },
+      "weeklyRows": [
+        {
+          "games": 16,
+          "pprPoints": 92.1,
+          "fantasyPointsPerGame": 5.8,
+          "targets": 53,
+          "receptions": 37,
+          "receivingYards": 551,
+          "receivingTd": 0,
+          "carries": 0,
+          "rushingYards": 0,
+          "rushingTd": 0,
+          "totalTd": 0,
+          "featureCoverage": 1,
+          "qualityFlags": [
+            "fantasypros_2025_ppr_table",
+            "season_aggregate_single_row"
+          ],
+          "playerId": "tiber-data-player-2025-kendrick-bourne",
+          "playerName": "Kendrick Bourne",
+          "position": "WR",
+          "team": "SF",
+          "season": 2025,
+          "week": 17
+        }
+      ]
+    },
+    {
+      "playerId": "tiber-data-player-2025-jalen-tolbert",
+      "playerName": "Jalen Tolbert",
+      "position": "WR",
+      "team": "DAL",
+      "seasonTotal": {
+        "games": 13,
+        "pprPoints": 46.3,
+        "fantasyPointsPerGame": 3.6,
+        "targets": 34,
+        "receptions": 18,
+        "receivingYards": 203,
+        "receivingTd": 1,
+        "carries": 0,
+        "rushingYards": 0,
+        "rushingTd": 0,
+        "totalTd": 1,
+        "featureCoverage": 1,
+        "qualityFlags": [
+          "fantasypros_2025_ppr_table",
+          "season_aggregate_single_row"
+        ],
+        "playerId": "tiber-data-player-2025-jalen-tolbert",
+        "playerName": "Jalen Tolbert",
+        "position": "WR",
+        "team": "DAL",
+        "season": 2025
+      },
+      "weeklyRows": [
+        {
+          "games": 13,
+          "pprPoints": 46.3,
+          "fantasyPointsPerGame": 3.6,
+          "targets": 34,
+          "receptions": 18,
+          "receivingYards": 203,
+          "receivingTd": 1,
+          "carries": 0,
+          "rushingYards": 0,
+          "rushingTd": 0,
+          "totalTd": 1,
+          "featureCoverage": 1,
+          "qualityFlags": [
+            "fantasypros_2025_ppr_table",
+            "season_aggregate_single_row"
+          ],
+          "playerId": "tiber-data-player-2025-jalen-tolbert",
+          "playerName": "Jalen Tolbert",
+          "position": "WR",
+          "team": "DAL",
+          "season": 2025,
+          "week": 17
+        }
+      ]
+    },
+    {
+      "playerId": "tiber-data-player-2025-calvin-austin-iii",
+      "playerName": "Calvin Austin III",
+      "position": "WR",
+      "team": "PIT",
+      "seasonTotal": {
+        "games": 14,
+        "pprPoints": 86.2,
+        "fantasyPointsPerGame": 6.2,
+        "targets": 55,
+        "receptions": 31,
+        "receivingYards": 372,
+        "receivingTd": 3,
+        "carries": 0,
+        "rushingYards": 0,
+        "rushingTd": 0,
+        "totalTd": 3,
+        "featureCoverage": 1,
+        "qualityFlags": [
+          "fantasypros_2025_ppr_table",
+          "season_aggregate_single_row"
+        ],
+        "playerId": "tiber-data-player-2025-calvin-austin-iii",
+        "playerName": "Calvin Austin III",
+        "position": "WR",
+        "team": "PIT",
+        "season": 2025
+      },
+      "weeklyRows": [
+        {
+          "games": 14,
+          "pprPoints": 86.2,
+          "fantasyPointsPerGame": 6.2,
+          "targets": 55,
+          "receptions": 31,
+          "receivingYards": 372,
+          "receivingTd": 3,
+          "carries": 0,
+          "rushingYards": 0,
+          "rushingTd": 0,
+          "totalTd": 3,
+          "featureCoverage": 1,
+          "qualityFlags": [
+            "fantasypros_2025_ppr_table",
+            "season_aggregate_single_row"
+          ],
+          "playerId": "tiber-data-player-2025-calvin-austin-iii",
+          "playerName": "Calvin Austin III",
+          "position": "WR",
+          "team": "PIT",
+          "season": 2025,
+          "week": 17
+        }
+      ]
+    },
+    {
+      "playerId": "tiber-data-player-2025-tyquan-thornton",
+      "playerName": "Tyquan Thornton",
+      "position": "WR",
+      "team": "KC",
+      "seasonTotal": {
+        "games": 14,
+        "pprPoints": 80.8,
+        "fantasyPointsPerGame": 5.8,
+        "targets": 37,
+        "receptions": 19,
+        "receivingYards": 438,
+        "receivingTd": 3,
+        "carries": 0,
+        "rushingYards": 0,
+        "rushingTd": 0,
+        "totalTd": 3,
+        "featureCoverage": 1,
+        "qualityFlags": [
+          "fantasypros_2025_ppr_table",
+          "season_aggregate_single_row"
+        ],
+        "playerId": "tiber-data-player-2025-tyquan-thornton",
+        "playerName": "Tyquan Thornton",
+        "position": "WR",
+        "team": "KC",
+        "season": 2025
+      },
+      "weeklyRows": [
+        {
+          "games": 14,
+          "pprPoints": 80.8,
+          "fantasyPointsPerGame": 5.8,
+          "targets": 37,
+          "receptions": 19,
+          "receivingYards": 438,
+          "receivingTd": 3,
+          "carries": 0,
+          "rushingYards": 0,
+          "rushingTd": 0,
+          "totalTd": 3,
+          "featureCoverage": 1,
+          "qualityFlags": [
+            "fantasypros_2025_ppr_table",
+            "season_aggregate_single_row"
+          ],
+          "playerId": "tiber-data-player-2025-tyquan-thornton",
+          "playerName": "Tyquan Thornton",
+          "position": "WR",
+          "team": "KC",
+          "season": 2025,
+          "week": 17
+        }
+      ]
+    },
+    {
+      "playerId": "tiber-data-player-2025-marvin-mims-jr",
+      "playerName": "Marvin Mims Jr.",
+      "position": "WR",
+      "team": "DEN",
+      "seasonTotal": {
+        "games": 16,
+        "pprPoints": 93.0,
+        "fantasyPointsPerGame": 5.8,
+        "targets": 51,
+        "receptions": 37,
+        "receivingYards": 322,
+        "receivingTd": 1,
+        "carries": 12,
+        "rushingYards": 78,
+        "rushingTd": 1,
+        "totalTd": 2,
+        "featureCoverage": 1,
+        "qualityFlags": [
+          "fantasypros_2025_ppr_table",
+          "season_aggregate_single_row"
+        ],
+        "playerId": "tiber-data-player-2025-marvin-mims-jr",
+        "playerName": "Marvin Mims Jr.",
+        "position": "WR",
+        "team": "DEN",
+        "season": 2025
+      },
+      "weeklyRows": [
+        {
+          "games": 16,
+          "pprPoints": 93.0,
+          "fantasyPointsPerGame": 5.8,
+          "targets": 51,
+          "receptions": 37,
+          "receivingYards": 322,
+          "receivingTd": 1,
+          "carries": 12,
+          "rushingYards": 78,
+          "rushingTd": 1,
+          "totalTd": 2,
+          "featureCoverage": 1,
+          "qualityFlags": [
+            "fantasypros_2025_ppr_table",
+            "season_aggregate_single_row"
+          ],
+          "playerId": "tiber-data-player-2025-marvin-mims-jr",
+          "playerName": "Marvin Mims Jr.",
+          "position": "WR",
+          "team": "DEN",
+          "season": 2025,
+          "week": 17
+        }
+      ]
+    },
+    {
+      "playerId": "tiber-data-player-2025-terrance-ferguson",
+      "playerName": "Terrance Ferguson",
+      "position": "TE",
+      "team": "LAR",
+      "seasonTotal": {
+        "games": 13,
+        "pprPoints": 52.1,
+        "fantasyPointsPerGame": 4.0,
+        "targets": 25,
+        "receptions": 11,
+        "receivingYards": 231,
+        "receivingTd": 3,
+        "carries": 1,
+        "rushingYards": 0,
+        "rushingTd": 0,
+        "totalTd": 3,
+        "featureCoverage": 1,
+        "qualityFlags": [
+          "fantasypros_2025_ppr_table",
+          "season_aggregate_single_row"
+        ],
+        "playerId": "tiber-data-player-2025-terrance-ferguson",
+        "playerName": "Terrance Ferguson",
+        "position": "TE",
+        "team": "LAR",
+        "season": 2025
+      },
+      "weeklyRows": [
+        {
+          "games": 13,
+          "pprPoints": 52.1,
+          "fantasyPointsPerGame": 4.0,
+          "targets": 25,
+          "receptions": 11,
+          "receivingYards": 231,
+          "receivingTd": 3,
+          "carries": 1,
+          "rushingYards": 0,
+          "rushingTd": 0,
+          "totalTd": 3,
+          "featureCoverage": 1,
+          "qualityFlags": [
+            "fantasypros_2025_ppr_table",
+            "season_aggregate_single_row"
+          ],
+          "playerId": "tiber-data-player-2025-terrance-ferguson",
+          "playerName": "Terrance Ferguson",
+          "position": "TE",
+          "team": "LAR",
+          "season": 2025,
+          "week": 17
+        }
+      ]
+    },
+    {
+      "playerId": "tiber-data-player-2025-harold-fannin-jr",
+      "playerName": "Harold Fannin Jr.",
+      "position": "TE",
+      "team": "CLE",
+      "seasonTotal": {
+        "games": 16,
+        "pprPoints": 186.4,
+        "fantasyPointsPerGame": 11.7,
+        "targets": 107,
+        "receptions": 72,
+        "receivingYards": 731,
+        "receivingTd": 6,
+        "carries": 7,
+        "rushingYards": 13,
+        "rushingTd": 1,
+        "totalTd": 7,
+        "featureCoverage": 1,
+        "qualityFlags": [
+          "fantasypros_2025_ppr_table",
+          "season_aggregate_single_row"
+        ],
+        "playerId": "tiber-data-player-2025-harold-fannin-jr",
+        "playerName": "Harold Fannin Jr.",
+        "position": "TE",
+        "team": "CLE",
+        "season": 2025
+      },
+      "weeklyRows": [
+        {
+          "games": 16,
+          "pprPoints": 186.4,
+          "fantasyPointsPerGame": 11.7,
+          "targets": 107,
+          "receptions": 72,
+          "receivingYards": 731,
+          "receivingTd": 6,
+          "carries": 7,
+          "rushingYards": 13,
+          "rushingTd": 1,
+          "totalTd": 7,
+          "featureCoverage": 1,
+          "qualityFlags": [
+            "fantasypros_2025_ppr_table",
+            "season_aggregate_single_row"
+          ],
+          "playerId": "tiber-data-player-2025-harold-fannin-jr",
+          "playerName": "Harold Fannin Jr.",
+          "position": "TE",
+          "team": "CLE",
+          "season": 2025,
+          "week": 17
+        }
+      ]
+    },
+    {
+      "playerId": "tiber-data-player-2025-t-j-hockenson",
+      "playerName": "T.J. Hockenson",
+      "position": "TE",
+      "team": "MIN",
+      "seasonTotal": {
+        "games": 15,
+        "pprPoints": 112.8,
+        "fantasyPointsPerGame": 7.5,
+        "targets": 66,
+        "receptions": 51,
+        "receivingYards": 438,
+        "receivingTd": 3,
+        "carries": 1,
+        "rushingYards": 0,
+        "rushingTd": 0,
+        "totalTd": 3,
+        "featureCoverage": 1,
+        "qualityFlags": [
+          "fantasypros_2025_ppr_table",
+          "season_aggregate_single_row"
+        ],
+        "playerId": "tiber-data-player-2025-t-j-hockenson",
+        "playerName": "T.J. Hockenson",
+        "position": "TE",
+        "team": "MIN",
+        "season": 2025
+      },
+      "weeklyRows": [
+        {
+          "games": 15,
+          "pprPoints": 112.8,
+          "fantasyPointsPerGame": 7.5,
+          "targets": 66,
+          "receptions": 51,
+          "receivingYards": 438,
+          "receivingTd": 3,
+          "carries": 1,
+          "rushingYards": 0,
+          "rushingTd": 0,
+          "totalTd": 3,
+          "featureCoverage": 1,
+          "qualityFlags": [
+            "fantasypros_2025_ppr_table",
+            "season_aggregate_single_row"
+          ],
+          "playerId": "tiber-data-player-2025-t-j-hockenson",
+          "playerName": "T.J. Hockenson",
+          "position": "TE",
+          "team": "MIN",
+          "season": 2025,
+          "week": 17
+        }
+      ]
+    }
+  ]
+}
