@@ -1,6 +1,10 @@
 import { ForgeSeasonPosition } from './football';
 
-export const forgePlayerWeeklyPprCohortContract = 'forge_player_weekly_ppr_2025.cohort.v1' as const;
+export type ForgePlayerWeeklyPprCohortContract = `forge_player_weekly_ppr_${number}.cohort.v1`;
+export function forgePlayerWeeklyPprCohortContractForSeason(season: number): ForgePlayerWeeklyPprCohortContract {
+  return `forge_player_weekly_ppr_${season}.cohort.v1`;
+}
+export const forgePlayerWeeklyPprCohortContract = forgePlayerWeeklyPprCohortContractForSeason(2025);
 export const forgePlayerWeeklyPprCohortArtifactType = 'forge_player_weekly_ppr_2025_cohort' as const;
 
 export interface ForgePlayerWeeklyPprSourceMetadataV1 {
@@ -10,10 +14,10 @@ export interface ForgePlayerWeeklyPprSourceMetadataV1 {
 
 export interface ForgePlayerWeeklyPprCohortMetadataV1 {
   artifactId: string;
-  artifactContract: typeof forgePlayerWeeklyPprCohortContract;
+  artifactContract: ForgePlayerWeeklyPprCohortContract;
   schemaVersion: string;
   artifactType: string;
-  season: 2025;
+  season: number;
   buildId: string;
   asOf: string;
   sourceUpdatedAt: string;
@@ -46,7 +50,7 @@ export interface ForgePlayerWeeklyPprWeeklyRowV1 extends ForgePlayerWeeklyPprSta
   playerName: string;
   position: ForgeSeasonPosition;
   team: string;
-  season: 2025;
+  season: number;
   week: number;
 }
 
@@ -55,7 +59,7 @@ export interface ForgePlayerWeeklyPprSeasonTotalV1 extends ForgePlayerWeeklyPprS
   playerName: string;
   position: ForgeSeasonPosition;
   team: string;
-  season: 2025;
+  season: number;
   games: number;
 }
 
@@ -71,14 +75,14 @@ export interface ForgePlayerWeeklyPprPlayerV1 {
 
 export interface ForgePlayerWeeklyPprCohortV1 {
   artifactId: string;
-  artifactContract: typeof forgePlayerWeeklyPprCohortContract;
+  artifactContract: ForgePlayerWeeklyPprCohortContract;
   schemaVersion: string;
   artifactType: string;
   source: ForgePlayerWeeklyPprSourceMetadataV1;
   asOf: string;
   sourceUpdatedAt: string;
   buildId: string;
-  season: 2025;
+  season: number;
   metadata: ForgePlayerWeeklyPprCohortMetadataV1;
   players: ForgePlayerWeeklyPprPlayerV1[];
 }

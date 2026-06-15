@@ -6,10 +6,12 @@ import {
   ForgePlayerWeeklyPprSourceMetadataV1,
   ForgePlayerWeeklyPprStatsV1,
   ForgePlayerWeeklyPprWeeklyRowV1,
-  forgePlayerWeeklyPprCohortContract
+  forgePlayerWeeklyPprCohortContractForSeason
 } from '../contracts/sourceBackedCohort';
 import { ForgeSeasonPosition } from '../contracts/football';
 import { ValidationError } from '../contracts/validation';
+
+const supportedSeasonBounds = { min: 2025, max: 2035, integer: true } as const;
 
 const positions = ['QB', 'RB', 'WR', 'TE'] as const;
 const forbiddenSemanticTerms = ['fixture', 'sample', 'offline', 'projection', 'projected'] as const;
@@ -185,22 +187,23 @@ function validateMetadata(value: Record<string, unknown>, path: string, errors: 
   const artifactId = ensureString(value.artifactId, `${path}.artifactId`, errors);
   const schemaVersion = ensureString(value.schemaVersion, `${path}.schemaVersion`, errors);
   const artifactType = ensureString(value.artifactType, `${path}.artifactType`, errors);
-  const season = ensureNumber(value.season, `${path}.season`, errors, { min: 2025, max: 2025, integer: true });
+  const season = ensureNumber(value.season, `${path}.season`, errors, supportedSeasonBounds);
   const buildId = ensureString(value.buildId, `${path}.buildId`, errors);
   const asOf = ensureIsoDate(value.asOf, `${path}.asOf`, errors);
   const sourceUpdatedAt = ensureIsoDate(value.sourceUpdatedAt, `${path}.sourceUpdatedAt`, errors);
   const source = validateSource(value.source, `${path}.source`, errors);
 
-  if (!artifactId || !schemaVersion || !artifactType || season !== 2025 || !buildId || !asOf || !sourceUpdatedAt || !source) return undefined;
-  return { artifactId, artifactContract: forgePlayerWeeklyPprCohortContract, schemaVersion, artifactType, season: 2025, buildId, asOf, sourceUpdatedAt, sourceProvider: source.provider, source };
+  if (!artifactId || !schemaVersion || !artifactType || season === undefined || !buildId || !asOf || !sourceUpdatedAt || !source) return undefined;
+  return { artifactId, artifactContract: forgePlayerWeeklyPprCohortContractForSeason(season), schemaVersion, artifactType, season, buildId, asOf, sourceUpdatedAt, sourceProvider: source.provider, source };
 }
 
-function readPlayerIdentity(player: Record<string, unknown>, path: string, errors: ErrorList): { playerId?: string; playerName?: string; position?: ForgeSeasonPosition; team?: string } {
+function readPlayerIdentity(player: Record<string, unknown>, path: string, errors: ErrorList, cohortSeason: number): { playerId?: string; playerName?: string; position?: ForgeSeasonPosition; team?: string; season?: number } {
   return {
     playerId: ensureString(player.playerId ?? player.id, `${path}.playerId`, errors),
     playerName: ensureString(player.playerName ?? player.name ?? player.fullName, `${path}.playerName`, errors),
     position: ensurePosition(player.position, `${path}.position`, errors),
-    team: ensureString(player.team ?? player.recentTeam, `${path}.team`, errors)
+    team: ensureString(player.team ?? player.recentTeam, `${path}.team`, errors),
+    season: player.season === undefined ? cohortSeason : ensureNumber(player.season, `${path}.season`, errors, supportedSeasonBounds)
   };
 }
 
@@ -210,10 +213,10 @@ function validateWeeklyRow(value: unknown, path: string, identity: Required<Retu
     return undefined;
   }
   const week = ensureNumber(value.week, `${path}.week`, errors, { min: 1, max: 25, integer: true });
-  const season = value.season === undefined ? 2025 : ensureNumber(value.season, `${path}.season`, errors, { min: 2025, max: 2025, integer: true });
+  const season = value.season === undefined ? identity.season : ensureNumber(value.season, `${path}.season`, errors, supportedSeasonBounds);
   const stats = parseStats(value, path, errors, false);
-  if (week === undefined || season !== 2025 || !stats) return undefined;
-  return { ...stats, ...identity, season: 2025, week };
+  if (week === undefined || season === undefined || !stats) return undefined;
+  return { ...stats, ...identity, season, week };
 }
 
 function validateSeasonTotal(value: unknown, path: string, identity: Required<ReturnType<typeof readPlayerIdentity>>, errors: ErrorList): ForgePlayerWeeklyPprSeasonTotalV1 | undefined {
@@ -221,10 +224,10 @@ function validateSeasonTotal(value: unknown, path: string, identity: Required<Re
     errors.push(`${path} must be an object.`);
     return undefined;
   }
-  const season = value.season === undefined ? 2025 : ensureNumber(value.season, `${path}.season`, errors, { min: 2025, max: 2025, integer: true });
+  const season = value.season === undefined ? identity.season : ensureNumber(value.season, `${path}.season`, errors, supportedSeasonBounds);
   const stats = parseStats(value, path, errors, true);
-  if (season !== 2025 || !stats || stats.games === undefined) return undefined;
-  return { ...stats, ...identity, season: 2025, games: stats.games };
+  if (season === undefined || !stats || stats.games === undefined) return undefined;
+  return { ...stats, ...identity, season, games: stats.games };
 }
 
 function rounded(value: number): number {
@@ -244,12 +247,12 @@ function validateSeasonTotalSums(player: ForgePlayerWeeklyPprPlayerV1, path: str
   }
 }
 
-function validatePlayer(value: unknown, path: string, errors: ErrorList): ForgePlayerWeeklyPprPlayerV1 | undefined {
+function validatePlayer(value: unknown, path: string, errors: ErrorList, cohortSeason: number): ForgePlayerWeeklyPprPlayerV1 | undefined {
   if (!isObject(value)) {
     errors.push(`${path} must be an object.`);
     return undefined;
   }
-  const identity = readPlayerIdentity(value, path, errors);
+  const identity = readPlayerIdentity(value, path, errors, cohortSeason);
   if (!identity.playerId || !identity.playerName || !identity.position || !identity.team) return undefined;
   const requiredIdentity = identity as Required<typeof identity>;
   if (!Array.isArray(value.weeklyRows) || value.weeklyRows.length === 0) errors.push(`${path}.weeklyRows must be a non-empty array.`);
@@ -273,7 +276,7 @@ export function validateForgePlayerWeeklyPprCohortV1(value: unknown, path = 'sou
   const metadata = validateMetadata(value, path, errors);
   if (!Array.isArray(value.players) || value.players.length === 0) errors.push(`${path}.players must be a non-empty array.`);
   const players = Array.isArray(value.players)
-    ? value.players.map((player, index) => validatePlayer(player, `${path}.players[${index}]`, errors)).filter((player): player is ForgePlayerWeeklyPprPlayerV1 => Boolean(player))
+    ? value.players.map((player, index) => validatePlayer(player, `${path}.players[${index}]`, errors, metadata?.season ?? 2025)).filter((player): player is ForgePlayerWeeklyPprPlayerV1 => Boolean(player))
     : [];
 
   if (errors.length > 0 || !metadata) throw new ValidationError('SOURCE_BACKED_COHORT_INVALID_SHAPE', errors, 'Source-backed cohort artifact validation failed.');
@@ -286,7 +289,7 @@ export function validateForgePlayerWeeklyPprCohortV1(value: unknown, path = 'sou
     asOf: metadata.asOf,
     sourceUpdatedAt: metadata.sourceUpdatedAt,
     buildId: metadata.buildId,
-    season: 2025,
+    season: metadata.season,
     metadata,
     players
   };

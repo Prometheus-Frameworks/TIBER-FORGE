@@ -160,7 +160,7 @@ export function gradeSeasonPlayer(input: ForgeSeasonPlayerInputV1): ForgeSeasonP
 
 export function rankSeasonPlayers(
   inputs: ForgeSeasonPlayerInputV1[],
-  options: { artifactPath?: string; cohortMetadata?: { buildId: string; sourceProvider: string; season: 2025 } } = {}
+  options: { artifactPath?: string; cohortMetadata?: { buildId: string; sourceProvider: string; season: number } } = {}
 ): ForgeSeasonRankingsResult {
   const rankings = inputs
     .map(gradeSeasonPlayer)
@@ -170,7 +170,7 @@ export function rankSeasonPlayers(
   const inputMode = inputs[0]?.inputMode ?? 'fixture';
 
   return {
-    season: 2025,
+    season: inputs[0]?.season ?? options.cohortMetadata?.season ?? 2025,
     sourceSetId: inputs[0]?.sourceSetId ?? 'unknown-season-fixture',
     inputMode,
     cohortMetadata: options.cohortMetadata

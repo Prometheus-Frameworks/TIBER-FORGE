@@ -32,7 +32,7 @@ export function toForgeSeasonInputsFromSourceBackedCohort(cohort: ReturnType<typ
       playerName: total.playerName,
       position: total.position,
       team: total.team,
-      season: 2025,
+      season: total.season,
       games: total.games,
       pprPoints: total.pprPoints,
       fantasyPointsPerGame,
