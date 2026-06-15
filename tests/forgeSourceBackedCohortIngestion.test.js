@@ -42,6 +42,24 @@ test('valid source-backed cohort artifact loads successfully', async () => {
   assert.ok(ingestion.inputs.every((input) => input.sourceBackedCohort?.artifactContract === 'forge_player_weekly_ppr_2025.cohort.v1'));
 });
 
+
+test('2026 source-backed cohort artifact loads and keeps the numeric season', async () => {
+  const futurePath = await writeMutatedArtifact((artifact) => {
+    artifact.season = 2026;
+    artifact.buildId = 'td-2026-cohort-build-001';
+  });
+
+  const ingestion = await ingestSourceBackedCohortArtifact(futurePath);
+  const result = rankSeasonPlayers(ingestion.inputs, { artifactPath: futurePath, cohortMetadata: ingestion.metadata });
+
+  assert.equal(ingestion.metadata.season, 2026);
+  assert.equal(ingestion.metadata.artifactContract, 'forge_player_weekly_ppr_2026.cohort.v1');
+  assert.ok(ingestion.inputs.every((input) => input.season === 2026));
+  assert.ok(ingestion.inputs.every((input) => input.sourceBackedCohort?.artifactContract === 'forge_player_weekly_ppr_2026.cohort.v1'));
+  assert.equal(result.season, 2026);
+  assert.equal(result.cohortMetadata.season, 2026);
+});
+
 test('malformed source-backed cohort artifact fails clearly', async () => {
   const malformedPath = await writeMutatedArtifact((artifact) => {
     artifact.players[0].position = 'K';

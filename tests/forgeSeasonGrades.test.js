@@ -6,6 +6,18 @@ const { rankSeasonPlayers } = require('../dist/src/services/seasonForgeService.j
 
 const fixturePath = path.resolve(process.cwd(), 'tests/fixtures/artifacts/forge_season_player_input_2025.sample.json');
 
+
+async function writeMutatedSeasonArtifact(mutator) {
+  const { mkdtemp, readFile, writeFile } = require('node:fs/promises');
+  const os = require('node:os');
+  const dir = await mkdtemp(path.join(os.tmpdir(), 'forge-season-'));
+  const target = path.join(dir, 'season.json');
+  const artifact = JSON.parse(await readFile(fixturePath, 'utf8'));
+  mutator(artifact);
+  await writeFile(target, JSON.stringify(artifact, null, 2));
+  return target;
+}
+
 async function gradeFixture() {
   const inputs = await ingestForgeSeasonArtifact(fixturePath);
   return rankSeasonPlayers(inputs);
@@ -26,6 +38,36 @@ test('local 2025 season artifact validates as ForgeSeasonPlayerInput/v1 fixture 
   assert.ok(inputs.every((input) => input.contract === 'ForgeSeasonPlayerInput/v1'));
   assert.ok(inputs.every((input) => input.fixtureSemantics === 'sample-only-retrospective-fixture'));
   assert.ok(inputs.every((input) => input.season === 2025));
+});
+
+
+test('season artifact validation accepts future supported seasons without pinning to 2025', async () => {
+  const futurePath = await writeMutatedSeasonArtifact((artifact) => {
+    for (const player of artifact) player.season = 2026;
+  });
+
+  const inputs = await ingestForgeSeasonArtifact(futurePath);
+
+  assert.equal(inputs.length, 10);
+  assert.ok(inputs.every((input) => input.season === 2026));
+  assert.equal(inputs[0].season, 2026);
+});
+
+test('season artifact validation rejects historical junk seasons', async () => {
+  for (const invalidSeason of [2024, 1899]) {
+    const invalidPath = await writeMutatedSeasonArtifact((artifact) => {
+      for (const player of artifact) player.season = invalidSeason;
+    });
+
+    await assert.rejects(
+      () => ingestForgeSeasonArtifact(invalidPath),
+      (error) => {
+        assert.equal(error.code, 'SEASON_ARTIFACT_INVALID_SHAPE');
+        assert.match(`${error.message} ${JSON.stringify(error.details)}`, /season must be >= 2025/);
+        return true;
+      }
+    );
+  }
 });
 
 test('elite QB/RB/WR season samples grade elite or high', async () => {

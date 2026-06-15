@@ -129,7 +129,7 @@ export interface ForgeSeasonPlayerInputV1 {
   fixtureSemantics?: ForgeSeasonFixtureSemantics;
   inputMode?: ForgeSeasonInputMode;
   sourceBackedCohort?: {
-    artifactContract: 'forge_player_weekly_ppr_2025.cohort.v1';
+    artifactContract: `forge_player_weekly_ppr_${number}.cohort.v1`;
     buildId: string;
     sourceProvider: string;
   };
@@ -137,7 +137,7 @@ export interface ForgeSeasonPlayerInputV1 {
   playerName: string;
   position: ForgeSeasonPosition;
   team: string;
-  season: 2025;
+  season: number;
   games: number;
   pprPoints: number;
   fantasyPointsPerGame: number;
@@ -190,7 +190,7 @@ export interface ForgeSeasonPlayerGrade {
 }
 
 export interface ForgeSeasonRankingsResult {
-  season: 2025;
+  season: number;
   sourceSetId: string;
   inputMode?: ForgeSeasonInputMode;
   cohortMetadata?: {
@@ -198,7 +198,7 @@ export interface ForgeSeasonRankingsResult {
     buildId: string;
     sourceProvider: string;
     playerCount: number;
-    season: 2025;
+    season: number;
   };
   count: number;
   rankings: ForgeSeasonPlayerGrade[];

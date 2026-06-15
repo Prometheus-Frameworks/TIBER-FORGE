@@ -624,7 +624,7 @@ function validateForgeSeasonPlayerInput(value: unknown, path: string, errors: st
   const playerName = ensureString(value.playerName, `${path}.playerName`, errors);
   const position = ensureEnum(value.position, seasonPositions, `${path}.position`, errors);
   const team = ensureString(value.team, `${path}.team`, errors);
-  const season = ensureNumber(value.season, `${path}.season`, errors, { min: 2025, max: 2025, integer: true });
+  const season = ensureNumber(value.season, `${path}.season`, errors, { min: 2025, max: 2035, integer: true });
   const games = ensureNumber(value.games, `${path}.games`, errors, { min: 0, max: 17, integer: true });
   const pprPoints = ensureNumber(value.pprPoints, `${path}.pprPoints`, errors, { min: 0, max: 600 });
   const fantasyPointsPerGame = ensureNumber(value.fantasyPointsPerGame, `${path}.fantasyPointsPerGame`, errors, { min: 0, max: 50 });
@@ -665,7 +665,7 @@ function validateForgeSeasonPlayerInput(value: unknown, path: string, errors: st
     playerName,
     position,
     team,
-    season: season as 2025,
+    season,
     games,
     pprPoints,
     fantasyPointsPerGame,
