@@ -447,18 +447,29 @@ test('POST /api/forge/rankings-football/from-artifact supports deterministic der
   });
 });
 
-test('POST /api/forge/rankings-football/from-artifact fails closed for invalid artifact override', async () => {
+test('POST /api/forge/rankings-football/from-artifact rejects every free-form artifact path before ingestion', async () => {
   await withServer(async (baseUrl) => {
-    const response = await fetch(`${baseUrl}/api/forge/rankings-football/from-artifact`, {
-      method: 'POST',
-      headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ artifactPath: 'tests/fixtures/forgeFootballFixtures.ts' })
-    });
-    const body = await response.json();
+    const rejectedPaths = [
+      '../package.json',
+      '/definitely-outside/forge-artifact.json',
+      'tests/fixtures/forgeFootballFixtures.ts'
+    ];
 
-    assert.equal(response.status, 400);
-    assert.equal(body.error.category, 'VALIDATION_ERROR');
-    assert.equal(body.error.code, 'ARTIFACT_INVALID_JSON');
+    for (const artifactPath of rejectedPaths) {
+      const response = await fetch(`${baseUrl}/api/forge/rankings-football/from-artifact`, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ artifactPath })
+      });
+      const body = await response.json();
+      const serializedBody = JSON.stringify(body);
+
+      assert.equal(response.status, 400);
+      assert.equal(body.error.category, 'VALIDATION_ERROR');
+      assert.equal(body.error.code, 'INVALID_REQUEST_BODY');
+      assert.ok(body.error.details.includes('artifactPath is not supported by the HTTP contract; use an artifactKind lane.'));
+      assert.equal(serializedBody.includes(artifactPath), false);
+    }
   });
 });
 

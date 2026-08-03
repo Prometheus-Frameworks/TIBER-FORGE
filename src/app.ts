@@ -204,12 +204,7 @@ function artifactPathForRequest(options: {
   derivedSkillPathTemplate?: string;
   artifactKind: 'sample' | 'derived_qb' | 'derived_skill';
   artifactWeek?: number;
-  overridePath?: string;
 }): string {
-  if (options.overridePath) {
-    return resolve(process.cwd(), options.overridePath);
-  }
-
   if (options.artifactKind === 'derived_skill' && options.artifactWeek !== undefined && options.derivedSkillPathTemplate) {
     const week = String(options.artifactWeek).padStart(2, '0');
     const season = '2024';
@@ -301,8 +296,7 @@ export async function handleRequest(request: IncomingMessage, state: AppState): 
       derivedSkillPath: state.config.FORGE_WEEKLY_DERIVED_SKILL_ARTIFACT_PATH,
       derivedSkillPathTemplate: state.config.FORGE_WEEKLY_DERIVED_SKILL_ARTIFACT_PATH_TEMPLATE,
       artifactKind: artifactRequest.artifactKind ?? 'sample',
-      artifactWeek: artifactRequest.artifactWeek,
-      overridePath: artifactRequest.artifactPath
+      artifactWeek: artifactRequest.artifactWeek
     });
     const artifactKind = artifactRequest.artifactKind ?? 'sample';
     const inputs = await ingestForgeWeeklyArtifact(artifactPath);
@@ -320,7 +314,7 @@ export async function handleRequest(request: IncomingMessage, state: AppState): 
       ...rankings,
       warnings: [
         ...rankings.warnings,
-        `Artifact lane: ${artifactKind}${artifactRequest.artifactWeek !== undefined ? ` (week ${artifactRequest.artifactWeek})` : ''}${artifactRequest.artifactPath ? ' (explicit artifactPath override provided)' : ''}.`,
+        `Artifact lane: ${artifactKind}${artifactRequest.artifactWeek !== undefined ? ` (week ${artifactRequest.artifactWeek})` : ''}.`,
         `Artifact ingestion path: ${artifactPath}.`,
         'Artifact-driven rankings read disk artifacts and are not live TIBER-Data pull parity.'
       ]

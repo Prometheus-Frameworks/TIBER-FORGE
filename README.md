@@ -80,6 +80,8 @@ See [`docs/forge-player-static-v1.md`](docs/forge-player-static-v1.md) for the c
 - `derived_qb`
 - `derived_skill`
 
+The HTTP contract rejects free-form `artifactPath` input. One-off paths remain available only to the local inspection utility through `--artifact-path`; network requests must use a configured `artifactKind` lane.
+
 For `derived_skill`, you can optionally provide `artifactWeek` in the request and drive weekly factory file resolution via `FORGE_WEEKLY_DERIVED_SKILL_ARTIFACT_PATH_TEMPLATE` (supports `{season}` and `{week}`).
 
 Current weekly-factory season segment coverage in this repo is validated through **2024 W1–W6** for the `derived_skill` path.
