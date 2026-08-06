@@ -1,6 +1,10 @@
+import { createHash } from 'node:crypto';
 import { ForgeSeasonPlayerGrade, ForgeSeasonPlayerInputV1, ForgeSeasonRankingsResult } from '../contracts/football';
 
 export const FORGE_PLAYER_STATIC_SCHEMA_VERSION = 'forge_player_static_v1';
+export const FORGE_PLAYER_STATIC_DIGEST_ALGORITHM = 'sha256';
+export const FORGE_PLAYER_STATIC_DIGEST_SCOPE = 'rows';
+export const FORGE_PLAYER_STATIC_DIGEST_CANONICALIZATION = 'json_sorted_keys_no_whitespace_v1';
 export const FORGE_PLAYER_STATIC_MODEL_VERSION = 'forge-player-static-v1.0.0';
 export const FORGE_PLAYER_STATIC_PLAYER_EVIDENCE_SCORE_SOURCE = 'player_specific';
 
@@ -59,6 +63,7 @@ export interface ForgePlayerStaticConsumerManifestV1 {
     malformed_artifact: 'unavailable_forge_evidence';
     duplicate_player_ids: 'invalid_artifact';
     unknown_score_source: 'non_evidence_unless_explicitly_supported';
+    content_digest_mismatch: 'unavailable_forge_evidence';
   };
 }
 
@@ -74,11 +79,19 @@ export interface ForgePlayerStaticConsumerConformanceResult {
   };
 }
 
+export interface ForgePlayerStaticContentDigestV1 {
+  algorithm: typeof FORGE_PLAYER_STATIC_DIGEST_ALGORITHM;
+  scope: typeof FORGE_PLAYER_STATIC_DIGEST_SCOPE;
+  canonicalization: typeof FORGE_PLAYER_STATIC_DIGEST_CANONICALIZATION;
+  value: string;
+}
+
 export interface ForgePlayerStaticArtifactV1 {
   schema_version: typeof FORGE_PLAYER_STATIC_SCHEMA_VERSION;
   artifact_type: 'FORGE_PLAYER_STATIC_V1';
   generated_at: string;
   model_version: typeof FORGE_PLAYER_STATIC_MODEL_VERSION;
+  content_digest: ForgePlayerStaticContentDigestV1;
   row_count: number;
   score_source_policy: {
     player_specific: string;
@@ -93,6 +106,42 @@ export interface ForgePlayerStaticArtifactV1 {
 
 function round(value: number): number {
   return Math.round(value * 100) / 100;
+}
+
+function canonicalJson(value: unknown): string {
+  if (value === null || typeof value === 'number' || typeof value === 'boolean' || typeof value === 'string') {
+    return JSON.stringify(value);
+  }
+  if (Array.isArray(value)) {
+    return `[${value.map((item) => canonicalJson(item)).join(',')}]`;
+  }
+  if (typeof value === 'object') {
+    const record = value as Record<string, unknown>;
+    const keys = Object.keys(record).sort();
+    return `{${keys.map((key) => `${JSON.stringify(key)}:${canonicalJson(record[key])}`).join(',')}}`;
+  }
+  throw new Error(`Cannot canonicalize non-JSON value of type ${typeof value} for FORGE_PLAYER_STATIC_V1 digest.`);
+}
+
+/**
+ * Content-addressed digest over the canonicalized rows array. Producers stamp
+ * it at build time; consumers must recompute it over the rows they read and
+ * fail closed on mismatch instead of trusting descriptive provenance.
+ */
+export function computeForgePlayerStaticRowsDigest(rows: unknown): string {
+  if (!Array.isArray(rows)) {
+    throw new Error('FORGE_PLAYER_STATIC_V1 digest scope is the rows array; received a non-array.');
+  }
+  return createHash('sha256').update(canonicalJson(rows), 'utf8').digest('hex');
+}
+
+export function buildForgePlayerStaticContentDigest(rows: unknown): ForgePlayerStaticContentDigestV1 {
+  return {
+    algorithm: FORGE_PLAYER_STATIC_DIGEST_ALGORITHM,
+    scope: FORGE_PLAYER_STATIC_DIGEST_SCOPE,
+    canonicalization: FORGE_PLAYER_STATIC_DIGEST_CANONICALIZATION,
+    value: computeForgePlayerStaticRowsDigest(rows)
+  };
 }
 
 function seasonComponent(grade: ForgeSeasonPlayerGrade, key: string): number | null {
@@ -203,7 +252,8 @@ function consumerManifest(): ForgePlayerStaticConsumerManifestV1 {
       missing_artifact: 'unavailable_forge_evidence',
       malformed_artifact: 'unavailable_forge_evidence',
       duplicate_player_ids: 'invalid_artifact',
-      unknown_score_source: 'non_evidence_unless_explicitly_supported'
+      unknown_score_source: 'non_evidence_unless_explicitly_supported',
+      content_digest_mismatch: 'unavailable_forge_evidence'
     }
   };
 }
@@ -276,6 +326,7 @@ export function buildForgePlayerStaticArtifact(
     artifact_type: 'FORGE_PLAYER_STATIC_V1',
     generated_at: generatedAt,
     model_version: FORGE_PLAYER_STATIC_MODEL_VERSION,
+    content_digest: buildForgePlayerStaticContentDigest(rows),
     row_count: rows.length,
     score_source_policy: {
       player_specific: 'The row is compiled from source-backed player identity and player-specific statistical evidence supplied to FORGE. This is the only score_source that counts as player-specific FORGE evidence.',
@@ -349,6 +400,31 @@ export function validateForgePlayerStaticConsumerContract(value: unknown): Forge
   }
   if (!isRecord(value.consumer_manifest)) {
     result.errors.push('consumer_manifest is required for downstream consumption.');
+  }
+
+  if (value.content_digest === undefined) {
+    result.warnings.push(
+      'content_digest is missing: this artifact predates integrity stamping, so substitution cannot be detected. Rebuild with a current builder.'
+    );
+  } else if (!isRecord(value.content_digest)) {
+    result.errors.push('content_digest must be an object when present.');
+  } else {
+    const digest = value.content_digest;
+    if (
+      digest.algorithm !== FORGE_PLAYER_STATIC_DIGEST_ALGORITHM ||
+      digest.scope !== FORGE_PLAYER_STATIC_DIGEST_SCOPE ||
+      digest.canonicalization !== FORGE_PLAYER_STATIC_DIGEST_CANONICALIZATION
+    ) {
+      result.errors.push(
+        `content_digest must declare algorithm=${FORGE_PLAYER_STATIC_DIGEST_ALGORITHM}, scope=${FORGE_PLAYER_STATIC_DIGEST_SCOPE}, canonicalization=${FORGE_PLAYER_STATIC_DIGEST_CANONICALIZATION}.`
+      );
+    } else if (!hasNonEmptyString(digest.value) || !/^[0-9a-f]{64}$/.test(digest.value)) {
+      result.errors.push('content_digest.value must be a 64-character lowercase hex sha256.');
+    } else if (Array.isArray(value.rows) && computeForgePlayerStaticRowsDigest(value.rows) !== digest.value) {
+      result.errors.push(
+        'content_digest does not match the recomputed digest of rows: the artifact content has been altered or substituted and must be treated as unavailable FORGE evidence.'
+      );
+    }
   }
 
   const rows = Array.isArray(value.rows) ? value.rows : [];
