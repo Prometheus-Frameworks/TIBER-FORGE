@@ -11,7 +11,7 @@ const execFileAsync = promisify(execFile);
 const { ingestSourceBackedCohortArtifact } = require('../dist/src/ingestion/sourceBackedCohortArtifact.js');
 const { ingestForgeSeasonArtifact } = require('../dist/src/ingestion/forgeSeasonArtifact.js');
 const { rankSeasonPlayers } = require('../dist/src/services/seasonForgeService.js');
-const { buildForgePlayerStaticArtifact, validateForgePlayerStaticConsumerContract } = require('../dist/src/services/playerStaticArtifactService.js');
+const { buildForgePlayerStaticArtifact, computeForgePlayerStaticRowsDigest, validateForgePlayerStaticConsumerContract } = require('../dist/src/services/playerStaticArtifactService.js');
 const { DEFAULT_GENERATED_BASELINE_SEASON_PATHS, DEFAULT_OUTPUT_PATH, DEFAULT_SOURCE_BACKED_COHORT_PATHS, parseArgs } = require('../scripts/build-player-static-artifact.js');
 
 const cohortFixturePaths = DEFAULT_SOURCE_BACKED_COHORT_PATHS.map((cohortPath) => path.resolve(process.cwd(), cohortPath));
@@ -175,7 +175,10 @@ test('FORGE_PLAYER_STATIC_V1 consumer conformance treats unknown score_source as
   };
   const unknownSourceArtifact = {
     ...promoted,
-    rows
+    rows,
+    // Simulates a producer-emitted artifact with an unknown score_source, so
+    // the producer-side digest covers the mutated rows.
+    content_digest: { ...promoted.content_digest, value: computeForgePlayerStaticRowsDigest(rows) }
   };
   const conformance = validateForgePlayerStaticConsumerContract(unknownSourceArtifact);
 
@@ -335,4 +338,48 @@ test('player static artifact script arguments parse explicitly', () => {
     generatedBaselineSeasonPaths: [],
     outputPath: 'static.json'
   });
+});
+
+test('FORGE_PLAYER_STATIC_V1 builder stamps a deterministic recomputable content digest', async () => {
+  const artifact = await buildFixtureStaticArtifact();
+
+  assert.equal(artifact.content_digest.algorithm, 'sha256');
+  assert.equal(artifact.content_digest.scope, 'rows');
+  assert.equal(artifact.content_digest.canonicalization, 'json_sorted_keys_no_whitespace_v1');
+  assert.match(artifact.content_digest.value, /^[0-9a-f]{64}$/);
+  assert.equal(computeForgePlayerStaticRowsDigest(artifact.rows), artifact.content_digest.value);
+
+  const rebuilt = await buildFixtureStaticArtifact();
+  assert.equal(rebuilt.content_digest.value, artifact.content_digest.value);
+});
+
+test('FORGE_PLAYER_STATIC_V1 consumer conformance fails closed on content digest mismatch', async () => {
+  const artifact = await buildFixtureStaticArtifact();
+
+  const clean = validateForgePlayerStaticConsumerContract(artifact);
+  assert.equal(clean.valid, true);
+  assert.ok(!clean.warnings.some((warning) => /content_digest/i.test(warning)));
+
+  const tamperedRows = artifact.rows.map((row, index) =>
+    index === 0 ? { ...row, forge_alpha: row.forge_alpha + 1 } : row
+  );
+  const tampered = validateForgePlayerStaticConsumerContract({ ...artifact, rows: tamperedRows });
+  assert.equal(tampered.valid, false);
+  assert.ok(tampered.errors.some((error) => /content_digest does not match/i.test(error)));
+
+  const wrongValue = validateForgePlayerStaticConsumerContract({
+    ...artifact,
+    content_digest: { ...artifact.content_digest, value: 'a'.repeat(64) }
+  });
+  assert.equal(wrongValue.valid, false);
+  assert.ok(wrongValue.errors.some((error) => /content_digest does not match/i.test(error)));
+});
+
+test('FORGE_PLAYER_STATIC_V1 consumer conformance warns when content digest is absent', async () => {
+  const artifact = await buildFixtureStaticArtifact();
+  const { content_digest: _omitted, ...legacyArtifact } = artifact;
+
+  const conformance = validateForgePlayerStaticConsumerContract(legacyArtifact);
+  assert.equal(conformance.valid, true);
+  assert.ok(conformance.warnings.some((warning) => /content_digest is missing/i.test(warning)));
 });

@@ -3,6 +3,12 @@
   "artifact_type": "FORGE_PLAYER_STATIC_V1",
   "generated_at": "2026-01-08T00:00:00.000Z",
   "model_version": "forge-player-static-v1.0.0",
+  "content_digest": {
+    "algorithm": "sha256",
+    "scope": "rows",
+    "canonicalization": "json_sorted_keys_no_whitespace_v1",
+    "value": "4d89871ae59d6740662f9ddf1d02745184de69cc22519d363a041a87a7c3578e"
+  },
   "row_count": 59,
   "score_source_policy": {
     "player_specific": "The row is compiled from source-backed player identity and player-specific statistical evidence supplied to FORGE. This is the only score_source that counts as player-specific FORGE evidence.",
@@ -45,7 +51,8 @@
       "missing_artifact": "unavailable_forge_evidence",
       "malformed_artifact": "unavailable_forge_evidence",
       "duplicate_player_ids": "invalid_artifact",
-      "unknown_score_source": "non_evidence_unless_explicitly_supported"
+      "unknown_score_source": "non_evidence_unless_explicitly_supported",
+      "content_digest_mismatch": "unavailable_forge_evidence"
     }
   },
   "source_artifacts": [
