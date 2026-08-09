@@ -49,7 +49,7 @@
     }
   },
   "source_artifacts": [
-    "/home/user/TIBER-Data/data/gold/forge/forge_player_weekly_ppr_2025.cohort.v1.json"
+    "data/source-backed/forge_player_weekly_ppr_2025.cohort.v1.json"
   ],
   "rows": [
     {
@@ -109,7 +109,7 @@
         "generated_at": "2026-04-27T00:00:00Z",
         "model_version": "forge-player-static-v1.0.0",
         "source_artifacts": [
-          "/home/user/TIBER-Data/data/gold/forge/forge_player_weekly_ppr_2025.cohort.v1.json"
+          "data/source-backed/forge_player_weekly_ppr_2025.cohort.v1.json"
         ],
         "source_set_id": "forge-player-weekly-ppr-2025:cohort:v1:source-backed",
         "source_provider": "nflverse via nflreadpy",
@@ -186,7 +186,7 @@
         "generated_at": "2026-04-27T00:00:00Z",
         "model_version": "forge-player-static-v1.0.0",
         "source_artifacts": [
-          "/home/user/TIBER-Data/data/gold/forge/forge_player_weekly_ppr_2025.cohort.v1.json"
+          "data/source-backed/forge_player_weekly_ppr_2025.cohort.v1.json"
         ],
         "source_set_id": "forge-player-weekly-ppr-2025:cohort:v1:source-backed",
         "source_provider": "nflverse via nflreadpy",
@@ -263,7 +263,7 @@
         "generated_at": "2026-04-27T00:00:00Z",
         "model_version": "forge-player-static-v1.0.0",
         "source_artifacts": [
-          "/home/user/TIBER-Data/data/gold/forge/forge_player_weekly_ppr_2025.cohort.v1.json"
+          "data/source-backed/forge_player_weekly_ppr_2025.cohort.v1.json"
         ],
         "source_set_id": "forge-player-weekly-ppr-2025:cohort:v1:source-backed",
         "source_provider": "nflverse via nflreadpy",
@@ -340,7 +340,7 @@
         "generated_at": "2026-04-27T00:00:00Z",
         "model_version": "forge-player-static-v1.0.0",
         "source_artifacts": [
-          "/home/user/TIBER-Data/data/gold/forge/forge_player_weekly_ppr_2025.cohort.v1.json"
+          "data/source-backed/forge_player_weekly_ppr_2025.cohort.v1.json"
         ],
         "source_set_id": "forge-player-weekly-ppr-2025:cohort:v1:source-backed",
         "source_provider": "nflverse via nflreadpy",
@@ -417,7 +417,7 @@
         "generated_at": "2026-04-27T00:00:00Z",
         "model_version": "forge-player-static-v1.0.0",
         "source_artifacts": [
-          "/home/user/TIBER-Data/data/gold/forge/forge_player_weekly_ppr_2025.cohort.v1.json"
+          "data/source-backed/forge_player_weekly_ppr_2025.cohort.v1.json"
         ],
         "source_set_id": "forge-player-weekly-ppr-2025:cohort:v1:source-backed",
         "source_provider": "nflverse via nflreadpy",
@@ -494,7 +494,7 @@
         "generated_at": "2026-04-27T00:00:00Z",
         "model_version": "forge-player-static-v1.0.0",
         "source_artifacts": [
-          "/home/user/TIBER-Data/data/gold/forge/forge_player_weekly_ppr_2025.cohort.v1.json"
+          "data/source-backed/forge_player_weekly_ppr_2025.cohort.v1.json"
         ],
         "source_set_id": "forge-player-weekly-ppr-2025:cohort:v1:source-backed",
         "source_provider": "nflverse via nflreadpy",
@@ -571,7 +571,7 @@
         "generated_at": "2026-04-27T00:00:00Z",
         "model_version": "forge-player-static-v1.0.0",
         "source_artifacts": [
-          "/home/user/TIBER-Data/data/gold/forge/forge_player_weekly_ppr_2025.cohort.v1.json"
+          "data/source-backed/forge_player_weekly_ppr_2025.cohort.v1.json"
         ],
         "source_set_id": "forge-player-weekly-ppr-2025:cohort:v1:source-backed",
         "source_provider": "nflverse via nflreadpy",
@@ -648,7 +648,7 @@
         "generated_at": "2026-04-27T00:00:00Z",
         "model_version": "forge-player-static-v1.0.0",
         "source_artifacts": [
-          "/home/user/TIBER-Data/data/gold/forge/forge_player_weekly_ppr_2025.cohort.v1.json"
+          "data/source-backed/forge_player_weekly_ppr_2025.cohort.v1.json"
         ],
         "source_set_id": "forge-player-weekly-ppr-2025:cohort:v1:source-backed",
         "source_provider": "nflverse via nflreadpy",
@@ -725,7 +725,7 @@
         "generated_at": "2026-04-27T00:00:00Z",
         "model_version": "forge-player-static-v1.0.0",
         "source_artifacts": [
-          "/home/user/TIBER-Data/data/gold/forge/forge_player_weekly_ppr_2025.cohort.v1.json"
+          "data/source-backed/forge_player_weekly_ppr_2025.cohort.v1.json"
         ],
         "source_set_id": "forge-player-weekly-ppr-2025:cohort:v1:source-backed",
         "source_provider": "nflverse via nflreadpy",
@@ -802,7 +802,7 @@
         "generated_at": "2026-04-27T00:00:00Z",
         "model_version": "forge-player-static-v1.0.0",
         "source_artifacts": [
-          "/home/user/TIBER-Data/data/gold/forge/forge_player_weekly_ppr_2025.cohort.v1.json"
+          "data/source-backed/forge_player_weekly_ppr_2025.cohort.v1.json"
         ],
         "source_set_id": "forge-player-weekly-ppr-2025:cohort:v1:source-backed",
         "source_provider": "nflverse via nflreadpy",
@@ -879,7 +879,7 @@
         "generated_at": "2026-04-27T00:00:00Z",
         "model_version": "forge-player-static-v1.0.0",
         "source_artifacts": [
-          "/home/user/TIBER-Data/data/gold/forge/forge_player_weekly_ppr_2025.cohort.v1.json"
+          "data/source-backed/forge_player_weekly_ppr_2025.cohort.v1.json"
         ],
         "source_set_id": "forge-player-weekly-ppr-2025:cohort:v1:source-backed",
         "source_provider": "nflverse via nflreadpy",
@@ -956,7 +956,7 @@
         "generated_at": "2026-04-27T00:00:00Z",
         "model_version": "forge-player-static-v1.0.0",
         "source_artifacts": [
-          "/home/user/TIBER-Data/data/gold/forge/forge_player_weekly_ppr_2025.cohort.v1.json"
+          "data/source-backed/forge_player_weekly_ppr_2025.cohort.v1.json"
         ],
         "source_set_id": "forge-player-weekly-ppr-2025:cohort:v1:source-backed",
         "source_provider": "nflverse via nflreadpy",
@@ -1033,7 +1033,7 @@
         "generated_at": "2026-04-27T00:00:00Z",
         "model_version": "forge-player-static-v1.0.0",
         "source_artifacts": [
-          "/home/user/TIBER-Data/data/gold/forge/forge_player_weekly_ppr_2025.cohort.v1.json"
+          "data/source-backed/forge_player_weekly_ppr_2025.cohort.v1.json"
         ],
         "source_set_id": "forge-player-weekly-ppr-2025:cohort:v1:source-backed",
         "source_provider": "nflverse via nflreadpy",
@@ -1110,7 +1110,7 @@
         "generated_at": "2026-04-27T00:00:00Z",
         "model_version": "forge-player-static-v1.0.0",
         "source_artifacts": [
-          "/home/user/TIBER-Data/data/gold/forge/forge_player_weekly_ppr_2025.cohort.v1.json"
+          "data/source-backed/forge_player_weekly_ppr_2025.cohort.v1.json"
         ],
         "source_set_id": "forge-player-weekly-ppr-2025:cohort:v1:source-backed",
         "source_provider": "nflverse via nflreadpy",
@@ -1187,7 +1187,7 @@
         "generated_at": "2026-04-27T00:00:00Z",
         "model_version": "forge-player-static-v1.0.0",
         "source_artifacts": [
-          "/home/user/TIBER-Data/data/gold/forge/forge_player_weekly_ppr_2025.cohort.v1.json"
+          "data/source-backed/forge_player_weekly_ppr_2025.cohort.v1.json"
         ],
         "source_set_id": "forge-player-weekly-ppr-2025:cohort:v1:source-backed",
         "source_provider": "nflverse via nflreadpy",
@@ -1264,7 +1264,7 @@
         "generated_at": "2026-04-27T00:00:00Z",
         "model_version": "forge-player-static-v1.0.0",
         "source_artifacts": [
-          "/home/user/TIBER-Data/data/gold/forge/forge_player_weekly_ppr_2025.cohort.v1.json"
+          "data/source-backed/forge_player_weekly_ppr_2025.cohort.v1.json"
         ],
         "source_set_id": "forge-player-weekly-ppr-2025:cohort:v1:source-backed",
         "source_provider": "nflverse via nflreadpy",
@@ -1341,7 +1341,7 @@
         "generated_at": "2026-04-27T00:00:00Z",
         "model_version": "forge-player-static-v1.0.0",
         "source_artifacts": [
-          "/home/user/TIBER-Data/data/gold/forge/forge_player_weekly_ppr_2025.cohort.v1.json"
+          "data/source-backed/forge_player_weekly_ppr_2025.cohort.v1.json"
         ],
         "source_set_id": "forge-player-weekly-ppr-2025:cohort:v1:source-backed",
         "source_provider": "nflverse via nflreadpy",
@@ -1418,7 +1418,7 @@
         "generated_at": "2026-04-27T00:00:00Z",
         "model_version": "forge-player-static-v1.0.0",
         "source_artifacts": [
-          "/home/user/TIBER-Data/data/gold/forge/forge_player_weekly_ppr_2025.cohort.v1.json"
+          "data/source-backed/forge_player_weekly_ppr_2025.cohort.v1.json"
         ],
         "source_set_id": "forge-player-weekly-ppr-2025:cohort:v1:source-backed",
         "source_provider": "nflverse via nflreadpy",
@@ -1495,7 +1495,7 @@
         "generated_at": "2026-04-27T00:00:00Z",
         "model_version": "forge-player-static-v1.0.0",
         "source_artifacts": [
-          "/home/user/TIBER-Data/data/gold/forge/forge_player_weekly_ppr_2025.cohort.v1.json"
+          "data/source-backed/forge_player_weekly_ppr_2025.cohort.v1.json"
         ],
         "source_set_id": "forge-player-weekly-ppr-2025:cohort:v1:source-backed",
         "source_provider": "nflverse via nflreadpy",
@@ -1572,7 +1572,7 @@
         "generated_at": "2026-04-27T00:00:00Z",
         "model_version": "forge-player-static-v1.0.0",
         "source_artifacts": [
-          "/home/user/TIBER-Data/data/gold/forge/forge_player_weekly_ppr_2025.cohort.v1.json"
+          "data/source-backed/forge_player_weekly_ppr_2025.cohort.v1.json"
         ],
         "source_set_id": "forge-player-weekly-ppr-2025:cohort:v1:source-backed",
         "source_provider": "nflverse via nflreadpy",
@@ -1649,7 +1649,7 @@
         "generated_at": "2026-04-27T00:00:00Z",
         "model_version": "forge-player-static-v1.0.0",
         "source_artifacts": [
-          "/home/user/TIBER-Data/data/gold/forge/forge_player_weekly_ppr_2025.cohort.v1.json"
+          "data/source-backed/forge_player_weekly_ppr_2025.cohort.v1.json"
         ],
         "source_set_id": "forge-player-weekly-ppr-2025:cohort:v1:source-backed",
         "source_provider": "nflverse via nflreadpy",
@@ -1726,7 +1726,7 @@
         "generated_at": "2026-04-27T00:00:00Z",
         "model_version": "forge-player-static-v1.0.0",
         "source_artifacts": [
-          "/home/user/TIBER-Data/data/gold/forge/forge_player_weekly_ppr_2025.cohort.v1.json"
+          "data/source-backed/forge_player_weekly_ppr_2025.cohort.v1.json"
         ],
         "source_set_id": "forge-player-weekly-ppr-2025:cohort:v1:source-backed",
         "source_provider": "nflverse via nflreadpy",
@@ -1803,7 +1803,7 @@
         "generated_at": "2026-04-27T00:00:00Z",
         "model_version": "forge-player-static-v1.0.0",
         "source_artifacts": [
-          "/home/user/TIBER-Data/data/gold/forge/forge_player_weekly_ppr_2025.cohort.v1.json"
+          "data/source-backed/forge_player_weekly_ppr_2025.cohort.v1.json"
         ],
         "source_set_id": "forge-player-weekly-ppr-2025:cohort:v1:source-backed",
         "source_provider": "nflverse via nflreadpy",
@@ -1880,7 +1880,7 @@
         "generated_at": "2026-04-27T00:00:00Z",
         "model_version": "forge-player-static-v1.0.0",
         "source_artifacts": [
-          "/home/user/TIBER-Data/data/gold/forge/forge_player_weekly_ppr_2025.cohort.v1.json"
+          "data/source-backed/forge_player_weekly_ppr_2025.cohort.v1.json"
         ],
         "source_set_id": "forge-player-weekly-ppr-2025:cohort:v1:source-backed",
         "source_provider": "nflverse via nflreadpy",
@@ -1957,7 +1957,7 @@
         "generated_at": "2026-04-27T00:00:00Z",
         "model_version": "forge-player-static-v1.0.0",
         "source_artifacts": [
-          "/home/user/TIBER-Data/data/gold/forge/forge_player_weekly_ppr_2025.cohort.v1.json"
+          "data/source-backed/forge_player_weekly_ppr_2025.cohort.v1.json"
         ],
         "source_set_id": "forge-player-weekly-ppr-2025:cohort:v1:source-backed",
         "source_provider": "nflverse via nflreadpy",
@@ -2034,7 +2034,7 @@
         "generated_at": "2026-04-27T00:00:00Z",
         "model_version": "forge-player-static-v1.0.0",
         "source_artifacts": [
-          "/home/user/TIBER-Data/data/gold/forge/forge_player_weekly_ppr_2025.cohort.v1.json"
+          "data/source-backed/forge_player_weekly_ppr_2025.cohort.v1.json"
         ],
         "source_set_id": "forge-player-weekly-ppr-2025:cohort:v1:source-backed",
         "source_provider": "nflverse via nflreadpy",
@@ -2111,7 +2111,7 @@
         "generated_at": "2026-04-27T00:00:00Z",
         "model_version": "forge-player-static-v1.0.0",
         "source_artifacts": [
-          "/home/user/TIBER-Data/data/gold/forge/forge_player_weekly_ppr_2025.cohort.v1.json"
+          "data/source-backed/forge_player_weekly_ppr_2025.cohort.v1.json"
         ],
         "source_set_id": "forge-player-weekly-ppr-2025:cohort:v1:source-backed",
         "source_provider": "nflverse via nflreadpy",
@@ -2188,7 +2188,7 @@
         "generated_at": "2026-04-27T00:00:00Z",
         "model_version": "forge-player-static-v1.0.0",
         "source_artifacts": [
-          "/home/user/TIBER-Data/data/gold/forge/forge_player_weekly_ppr_2025.cohort.v1.json"
+          "data/source-backed/forge_player_weekly_ppr_2025.cohort.v1.json"
         ],
         "source_set_id": "forge-player-weekly-ppr-2025:cohort:v1:source-backed",
         "source_provider": "nflverse via nflreadpy",
@@ -2266,7 +2266,7 @@
         "generated_at": "2026-04-27T00:00:00Z",
         "model_version": "forge-player-static-v1.0.0",
         "source_artifacts": [
-          "/home/user/TIBER-Data/data/gold/forge/forge_player_weekly_ppr_2025.cohort.v1.json"
+          "data/source-backed/forge_player_weekly_ppr_2025.cohort.v1.json"
         ],
         "source_set_id": "forge-player-weekly-ppr-2025:cohort:v1:source-backed",
         "source_provider": "nflverse via nflreadpy",
@@ -2344,7 +2344,7 @@
         "generated_at": "2026-04-27T00:00:00Z",
         "model_version": "forge-player-static-v1.0.0",
         "source_artifacts": [
-          "/home/user/TIBER-Data/data/gold/forge/forge_player_weekly_ppr_2025.cohort.v1.json"
+          "data/source-backed/forge_player_weekly_ppr_2025.cohort.v1.json"
         ],
         "source_set_id": "forge-player-weekly-ppr-2025:cohort:v1:source-backed",
         "source_provider": "nflverse via nflreadpy",
@@ -2421,7 +2421,7 @@
         "generated_at": "2026-04-27T00:00:00Z",
         "model_version": "forge-player-static-v1.0.0",
         "source_artifacts": [
-          "/home/user/TIBER-Data/data/gold/forge/forge_player_weekly_ppr_2025.cohort.v1.json"
+          "data/source-backed/forge_player_weekly_ppr_2025.cohort.v1.json"
         ],
         "source_set_id": "forge-player-weekly-ppr-2025:cohort:v1:source-backed",
         "source_provider": "nflverse via nflreadpy",
@@ -2499,7 +2499,7 @@
         "generated_at": "2026-04-27T00:00:00Z",
         "model_version": "forge-player-static-v1.0.0",
         "source_artifacts": [
-          "/home/user/TIBER-Data/data/gold/forge/forge_player_weekly_ppr_2025.cohort.v1.json"
+          "data/source-backed/forge_player_weekly_ppr_2025.cohort.v1.json"
         ],
         "source_set_id": "forge-player-weekly-ppr-2025:cohort:v1:source-backed",
         "source_provider": "nflverse via nflreadpy",
@@ -2577,7 +2577,7 @@
         "generated_at": "2026-04-27T00:00:00Z",
         "model_version": "forge-player-static-v1.0.0",
         "source_artifacts": [
-          "/home/user/TIBER-Data/data/gold/forge/forge_player_weekly_ppr_2025.cohort.v1.json"
+          "data/source-backed/forge_player_weekly_ppr_2025.cohort.v1.json"
         ],
         "source_set_id": "forge-player-weekly-ppr-2025:cohort:v1:source-backed",
         "source_provider": "nflverse via nflreadpy",
@@ -2654,7 +2654,7 @@
         "generated_at": "2026-04-27T00:00:00Z",
         "model_version": "forge-player-static-v1.0.0",
         "source_artifacts": [
-          "/home/user/TIBER-Data/data/gold/forge/forge_player_weekly_ppr_2025.cohort.v1.json"
+          "data/source-backed/forge_player_weekly_ppr_2025.cohort.v1.json"
         ],
         "source_set_id": "forge-player-weekly-ppr-2025:cohort:v1:source-backed",
         "source_provider": "nflverse via nflreadpy",
@@ -2732,7 +2732,7 @@
         "generated_at": "2026-04-27T00:00:00Z",
         "model_version": "forge-player-static-v1.0.0",
         "source_artifacts": [
-          "/home/user/TIBER-Data/data/gold/forge/forge_player_weekly_ppr_2025.cohort.v1.json"
+          "data/source-backed/forge_player_weekly_ppr_2025.cohort.v1.json"
         ],
         "source_set_id": "forge-player-weekly-ppr-2025:cohort:v1:source-backed",
         "source_provider": "nflverse via nflreadpy",
@@ -2810,7 +2810,7 @@
         "generated_at": "2026-04-27T00:00:00Z",
         "model_version": "forge-player-static-v1.0.0",
         "source_artifacts": [
-          "/home/user/TIBER-Data/data/gold/forge/forge_player_weekly_ppr_2025.cohort.v1.json"
+          "data/source-backed/forge_player_weekly_ppr_2025.cohort.v1.json"
         ],
         "source_set_id": "forge-player-weekly-ppr-2025:cohort:v1:source-backed",
         "source_provider": "nflverse via nflreadpy",
@@ -2888,7 +2888,7 @@
         "generated_at": "2026-04-27T00:00:00Z",
         "model_version": "forge-player-static-v1.0.0",
         "source_artifacts": [
-          "/home/user/TIBER-Data/data/gold/forge/forge_player_weekly_ppr_2025.cohort.v1.json"
+          "data/source-backed/forge_player_weekly_ppr_2025.cohort.v1.json"
         ],
         "source_set_id": "forge-player-weekly-ppr-2025:cohort:v1:source-backed",
         "source_provider": "nflverse via nflreadpy",
@@ -2966,7 +2966,7 @@
         "generated_at": "2026-04-27T00:00:00Z",
         "model_version": "forge-player-static-v1.0.0",
         "source_artifacts": [
-          "/home/user/TIBER-Data/data/gold/forge/forge_player_weekly_ppr_2025.cohort.v1.json"
+          "data/source-backed/forge_player_weekly_ppr_2025.cohort.v1.json"
         ],
         "source_set_id": "forge-player-weekly-ppr-2025:cohort:v1:source-backed",
         "source_provider": "nflverse via nflreadpy",
@@ -3044,7 +3044,7 @@
         "generated_at": "2026-04-27T00:00:00Z",
         "model_version": "forge-player-static-v1.0.0",
         "source_artifacts": [
-          "/home/user/TIBER-Data/data/gold/forge/forge_player_weekly_ppr_2025.cohort.v1.json"
+          "data/source-backed/forge_player_weekly_ppr_2025.cohort.v1.json"
         ],
         "source_set_id": "forge-player-weekly-ppr-2025:cohort:v1:source-backed",
         "source_provider": "nflverse via nflreadpy",
@@ -3122,7 +3122,7 @@
         "generated_at": "2026-04-27T00:00:00Z",
         "model_version": "forge-player-static-v1.0.0",
         "source_artifacts": [
-          "/home/user/TIBER-Data/data/gold/forge/forge_player_weekly_ppr_2025.cohort.v1.json"
+          "data/source-backed/forge_player_weekly_ppr_2025.cohort.v1.json"
         ],
         "source_set_id": "forge-player-weekly-ppr-2025:cohort:v1:source-backed",
         "source_provider": "nflverse via nflreadpy",
@@ -3200,7 +3200,7 @@
         "generated_at": "2026-04-27T00:00:00Z",
         "model_version": "forge-player-static-v1.0.0",
         "source_artifacts": [
-          "/home/user/TIBER-Data/data/gold/forge/forge_player_weekly_ppr_2025.cohort.v1.json"
+          "data/source-backed/forge_player_weekly_ppr_2025.cohort.v1.json"
         ],
         "source_set_id": "forge-player-weekly-ppr-2025:cohort:v1:source-backed",
         "source_provider": "nflverse via nflreadpy",
@@ -3278,7 +3278,7 @@
         "generated_at": "2026-04-27T00:00:00Z",
         "model_version": "forge-player-static-v1.0.0",
         "source_artifacts": [
-          "/home/user/TIBER-Data/data/gold/forge/forge_player_weekly_ppr_2025.cohort.v1.json"
+          "data/source-backed/forge_player_weekly_ppr_2025.cohort.v1.json"
         ],
         "source_set_id": "forge-player-weekly-ppr-2025:cohort:v1:source-backed",
         "source_provider": "nflverse via nflreadpy",
@@ -3356,7 +3356,7 @@
         "generated_at": "2026-04-27T00:00:00Z",
         "model_version": "forge-player-static-v1.0.0",
         "source_artifacts": [
-          "/home/user/TIBER-Data/data/gold/forge/forge_player_weekly_ppr_2025.cohort.v1.json"
+          "data/source-backed/forge_player_weekly_ppr_2025.cohort.v1.json"
         ],
         "source_set_id": "forge-player-weekly-ppr-2025:cohort:v1:source-backed",
         "source_provider": "nflverse via nflreadpy",
@@ -3434,7 +3434,7 @@
         "generated_at": "2026-04-27T00:00:00Z",
         "model_version": "forge-player-static-v1.0.0",
         "source_artifacts": [
-          "/home/user/TIBER-Data/data/gold/forge/forge_player_weekly_ppr_2025.cohort.v1.json"
+          "data/source-backed/forge_player_weekly_ppr_2025.cohort.v1.json"
         ],
         "source_set_id": "forge-player-weekly-ppr-2025:cohort:v1:source-backed",
         "source_provider": "nflverse via nflreadpy",
@@ -3512,7 +3512,7 @@
         "generated_at": "2026-04-27T00:00:00Z",
         "model_version": "forge-player-static-v1.0.0",
         "source_artifacts": [
-          "/home/user/TIBER-Data/data/gold/forge/forge_player_weekly_ppr_2025.cohort.v1.json"
+          "data/source-backed/forge_player_weekly_ppr_2025.cohort.v1.json"
         ],
         "source_set_id": "forge-player-weekly-ppr-2025:cohort:v1:source-backed",
         "source_provider": "nflverse via nflreadpy",
@@ -3590,7 +3590,7 @@
         "generated_at": "2026-04-27T00:00:00Z",
         "model_version": "forge-player-static-v1.0.0",
         "source_artifacts": [
-          "/home/user/TIBER-Data/data/gold/forge/forge_player_weekly_ppr_2025.cohort.v1.json"
+          "data/source-backed/forge_player_weekly_ppr_2025.cohort.v1.json"
         ],
         "source_set_id": "forge-player-weekly-ppr-2025:cohort:v1:source-backed",
         "source_provider": "nflverse via nflreadpy",
@@ -3668,7 +3668,7 @@
         "generated_at": "2026-04-27T00:00:00Z",
         "model_version": "forge-player-static-v1.0.0",
         "source_artifacts": [
-          "/home/user/TIBER-Data/data/gold/forge/forge_player_weekly_ppr_2025.cohort.v1.json"
+          "data/source-backed/forge_player_weekly_ppr_2025.cohort.v1.json"
         ],
         "source_set_id": "forge-player-weekly-ppr-2025:cohort:v1:source-backed",
         "source_provider": "nflverse via nflreadpy",
@@ -3746,7 +3746,7 @@
         "generated_at": "2026-04-27T00:00:00Z",
         "model_version": "forge-player-static-v1.0.0",
         "source_artifacts": [
-          "/home/user/TIBER-Data/data/gold/forge/forge_player_weekly_ppr_2025.cohort.v1.json"
+          "data/source-backed/forge_player_weekly_ppr_2025.cohort.v1.json"
         ],
         "source_set_id": "forge-player-weekly-ppr-2025:cohort:v1:source-backed",
         "source_provider": "nflverse via nflreadpy",
@@ -3824,7 +3824,7 @@
         "generated_at": "2026-04-27T00:00:00Z",
         "model_version": "forge-player-static-v1.0.0",
         "source_artifacts": [
-          "/home/user/TIBER-Data/data/gold/forge/forge_player_weekly_ppr_2025.cohort.v1.json"
+          "data/source-backed/forge_player_weekly_ppr_2025.cohort.v1.json"
         ],
         "source_set_id": "forge-player-weekly-ppr-2025:cohort:v1:source-backed",
         "source_provider": "nflverse via nflreadpy",
@@ -3902,7 +3902,7 @@
         "generated_at": "2026-04-27T00:00:00Z",
         "model_version": "forge-player-static-v1.0.0",
         "source_artifacts": [
-          "/home/user/TIBER-Data/data/gold/forge/forge_player_weekly_ppr_2025.cohort.v1.json"
+          "data/source-backed/forge_player_weekly_ppr_2025.cohort.v1.json"
         ],
         "source_set_id": "forge-player-weekly-ppr-2025:cohort:v1:source-backed",
         "source_provider": "nflverse via nflreadpy",

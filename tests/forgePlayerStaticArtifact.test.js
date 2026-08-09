@@ -17,63 +17,78 @@ const { DEFAULT_GENERATED_BASELINE_SEASON_PATHS, DEFAULT_OUTPUT_PATH, DEFAULT_SO
 const cohortFixturePaths = DEFAULT_SOURCE_BACKED_COHORT_PATHS.map((cohortPath) => path.resolve(process.cwd(), cohortPath));
 const primaryCohortFixturePath = cohortFixturePaths[0];
 const promotedArtifactPath = path.resolve(process.cwd(), DEFAULT_OUTPUT_PATH);
-const generatedBaselineFixturePath = path.resolve(process.cwd(), DEFAULT_GENERATED_BASELINE_SEASON_PATHS[0]);
+const generatedBaselineFixturePath = path.resolve(process.cwd(), 'tests/fixtures/artifacts/forge_season_player_input_2025.real_players_sample.json');
 const realCanonicalPlayerIds = [
-  'tiber-data-player-2025-amon-ra-st-brown',
-  'tiber-data-player-2025-bijan-robinson',
-  'tiber-data-player-2025-breece-hall',
-  'tiber-data-player-2025-brock-bowers',
-  'tiber-data-player-2025-calvin-austin-iii',
-  'tiber-data-player-2025-ceedee-lamb',
-  'tiber-data-player-2025-christian-mccaffrey',
-  'tiber-data-player-2025-cj-stroud',
-  'tiber-data-player-2025-deebo-samuel-sr',
-  'tiber-data-player-2025-derrick-henry',
-  'tiber-data-player-2025-devon-achane',
-  'tiber-data-player-2025-gardner-minshew',
-  'tiber-data-player-2025-george-kittle',
-  'tiber-data-player-2025-harold-fannin-jr',
-  'tiber-data-player-2025-jahmyr-gibbs',
-  'tiber-data-player-2025-jalen-hurts',
-  'tiber-data-player-2025-jalen-tolbert',
-  'tiber-data-player-2025-jamarr-chase',
-  'tiber-data-player-2025-jameis-winston',
-  'tiber-data-player-2025-jonathan-taylor',
-  'tiber-data-player-2025-josh-allen',
-  'tiber-data-player-2025-justin-herbert',
-  'tiber-data-player-2025-justin-jefferson',
-  'tiber-data-player-2025-kendrick-bourne',
-  'tiber-data-player-2025-ladd-mcconkey',
-  'tiber-data-player-2025-lamar-jackson',
-  'tiber-data-player-2025-luther-burden-iii',
-  'tiber-data-player-2025-mac-jones',
-  'tiber-data-player-2025-malik-davis',
-  'tiber-data-player-2025-mark-andrews',
-  'tiber-data-player-2025-marvin-mims-jr',
-  'tiber-data-player-2025-nico-collins',
-  'tiber-data-player-2025-patrick-mahomes',
-  'tiber-data-player-2025-puka-nacua',
-  'tiber-data-player-2025-rico-dowdle',
-  'tiber-data-player-2025-ryan-flournoy',
-  'tiber-data-player-2025-sam-laporta',
-  'tiber-data-player-2025-saquon-barkley',
-  'tiber-data-player-2025-t-j-hockenson',
-  'tiber-data-player-2025-terrance-ferguson',
-  'tiber-data-player-2025-travis-hunter',
-  'tiber-data-player-2025-travis-kelce',
-  'tiber-data-player-2025-trey-mcbride',
-  'tiber-data-player-2025-tyquan-thornton',
-  'tiber-data-player-2025-xavier-worthy'
+  '00-0023459',
+  '00-0026498',
+  '00-0031381',
+  '00-0031408',
+  '00-0032764',
+  '00-0033040',
+  '00-0033077',
+  '00-0033106',
+  '00-0033119',
+  '00-0033280',
+  '00-0033873',
+  '00-0034753',
+  '00-0034844',
+  '00-0034855',
+  '00-0034857',
+  '00-0034869',
+  '00-0035700',
+  '00-0035710',
+  '00-0036223',
+  '00-0036264',
+  '00-0036275',
+  '00-0036355',
+  '00-0036389',
+  '00-0036554',
+  '00-0036900',
+  '00-0036919',
+  '00-0036963',
+  '00-0036971',
+  '00-0036973',
+  '00-0036997',
+  '00-0037239',
+  '00-0037240',
+  '00-0037247',
+  '00-0037248',
+  '00-0037744',
+  '00-0037840',
+  '00-0038542',
+  '00-0038543',
+  '00-0038597',
+  '00-0039040',
+  '00-0039064',
+  '00-0039075',
+  '00-0039139',
+  '00-0039150',
+  '00-0039338',
+  '00-0039732',
+  '00-0039851',
+  '00-0039918',
+  '00-0040122',
+  '00-0040691'
 ];
 
 async function buildFixtureStaticArtifact() {
+  const ingestions = await Promise.all(cohortFixturePaths.map((cohortPath) => ingestSourceBackedCohortArtifact(cohortPath)));
+  const inputs = ingestions.flatMap((ingestion) => ingestion.inputs);
+  const rankings = rankSeasonPlayers(inputs);
+  return buildForgePlayerStaticArtifact(inputs, rankings, {
+    generatedAt: ingestions[0].metadata.asOf,
+    sourceArtifacts: [...DEFAULT_SOURCE_BACKED_COHORT_PATHS]
+  });
+}
+
+async function buildStaticArtifactWithGeneratedBaselines() {
   const ingestions = await Promise.all(cohortFixturePaths.map((cohortPath) => ingestSourceBackedCohortArtifact(cohortPath)));
   const generatedBaselineInputs = await ingestForgeSeasonArtifact(generatedBaselineFixturePath);
   const inputs = [...ingestions.flatMap((ingestion) => ingestion.inputs), ...generatedBaselineInputs];
   const rankings = rankSeasonPlayers(inputs);
   return buildForgePlayerStaticArtifact(inputs, rankings, {
     generatedAt: ingestions[0].metadata.asOf,
-    sourceArtifacts: [...DEFAULT_SOURCE_BACKED_COHORT_PATHS, ...DEFAULT_GENERATED_BASELINE_SEASON_PATHS]
+    sourceArtifacts: [...DEFAULT_SOURCE_BACKED_COHORT_PATHS, generatedBaselineFixturePath]
   });
 }
 
@@ -82,22 +97,22 @@ test('FORGE_PLAYER_STATIC_V1 builder emits player-specific evidence rows with ex
 
   assert.equal(artifact.schema_version, 'forge_player_static_v1');
   assert.equal(artifact.artifact_type, 'FORGE_PLAYER_STATIC_V1');
-  assert.equal(artifact.row_count, 59);
+  assert.equal(artifact.row_count, 50);
 
   const sourceCounts = artifact.rows.reduce((counts, row) => {
     counts[row.provenance.score_source] = (counts[row.provenance.score_source] ?? 0) + 1;
     return counts;
   }, {});
-  assert.deepEqual(sourceCounts, { player_specific: 45, generated_baseline: 14 });
+  assert.deepEqual(sourceCounts, { player_specific: 50 });
   assert.ok(sourceCounts.player_specific > 8);
   assert.ok(artifact.warnings.some((warning) => /evidence compiler artifact/i.test(warning)));
 
   for (const row of artifact.rows.filter((candidate) => candidate.provenance.score_source === 'player_specific')) {
     assert.equal(row.schema_version, 'forge_player_static_v1');
-    assert.ok(row.player_id.startsWith('tiber-data-player-2025-'));
+    assert.match(row.player_id, /^00-\d{7}$/);
     assert.ok(!row.player_id.startsWith('cohort-'));
     assert.equal(row.provenance.score_source, 'player_specific');
-    assert.ok(['TIBER-Data', 'FantasyPros'].includes(row.provenance.source_provider));
+    assert.equal(row.provenance.source_provider, 'nflverse via nflreadpy');
     assert.equal(row.provenance.input_mode, 'source-backed-cohort');
     assert.equal(row.components.production_profile.evidence_status, 'player_specific');
     assert.equal(row.components.role_security.evidence_status, 'player_specific');
@@ -126,8 +141,8 @@ test('FORGE_PLAYER_STATIC_V1 promoted artifact satisfies downstream consumer con
   assert.deepEqual(conformance.errors, []);
   assert.deepEqual(conformance.warnings, []);
   assert.deepEqual(conformance.counters, {
-    player_specific_coverage: 45,
-    generated_baseline_visibility: 14,
+    player_specific_coverage: 50,
+    generated_baseline_visibility: 0,
     unresolved_identity_misses: 0,
     unsupported_missing_artifact_state: 0
   });
@@ -164,7 +179,7 @@ test('FORGE_PLAYER_STATIC_V1 consumer conformance fails closed for missing, malf
 
 test('FORGE_PLAYER_STATIC_V1 consumer conformance treats unknown score_source as non-evidence', async () => {
   const promoted = JSON.parse(await readFile(promotedArtifactPath, 'utf8'));
-  const generatedBaselineIndex = promoted.rows.findIndex((row) => row.provenance.score_source === 'generated_baseline');
+  const generatedBaselineIndex = 0;
   const rows = [...promoted.rows];
   rows[generatedBaselineIndex] = {
     ...rows[generatedBaselineIndex],
@@ -180,17 +195,19 @@ test('FORGE_PLAYER_STATIC_V1 consumer conformance treats unknown score_source as
   const conformance = validateForgePlayerStaticConsumerContract(unknownSourceArtifact);
 
   assert.equal(conformance.valid, true);
-  assert.equal(conformance.counters.player_specific_coverage, 45);
-  assert.equal(conformance.counters.generated_baseline_visibility, 13);
+  assert.equal(conformance.counters.player_specific_coverage, 49);
+  assert.equal(conformance.counters.generated_baseline_visibility, 0);
   assert.ok(conformance.warnings.some((warning) => /not explicitly supported and must be treated as non-evidence/i.test(warning)));
 });
 
 test('FORGE_PLAYER_STATIC_V1 builder explicitly labels generated baseline rows as non-player-specific', async () => {
-  const artifact = await buildFixtureStaticArtifact();
+  const defaultArtifact = await buildFixtureStaticArtifact();
+  assert.equal(defaultArtifact.rows.filter((row) => row.provenance.score_source === 'generated_baseline').length, 0);
+
+  const artifact = await buildStaticArtifactWithGeneratedBaselines();
   const generatedBaselineRows = artifact.rows.filter((row) => row.provenance.score_source === 'generated_baseline');
 
-  assert.equal(generatedBaselineRows.length, 14);
-  assert.ok(generatedBaselineRows.some((row) => row.player_name === 'Ja\'Marr Chase'));
+  assert.ok(generatedBaselineRows.length > 0);
 
   for (const row of generatedBaselineRows) {
     assert.equal(row.provenance.input_mode, 'fixture');
@@ -219,52 +236,32 @@ test('FORGE_PLAYER_STATIC_V1 player-specific coverage uses only real canonical p
 
 
 
-const newlyMappedManagementPromotions = [
-  'tiber-data-player-2025-calvin-austin-iii',
-  'tiber-data-player-2025-christian-mccaffrey',
-  'tiber-data-player-2025-deebo-samuel-sr',
-  'tiber-data-player-2025-derrick-henry',
-  'tiber-data-player-2025-gardner-minshew',
-  'tiber-data-player-2025-harold-fannin-jr',
-  'tiber-data-player-2025-jalen-tolbert',
-  'tiber-data-player-2025-jameis-winston',
-  'tiber-data-player-2025-kendrick-bourne',
-  'tiber-data-player-2025-ladd-mcconkey',
-  'tiber-data-player-2025-luther-burden-iii',
-  'tiber-data-player-2025-mac-jones',
-  'tiber-data-player-2025-malik-davis',
-  'tiber-data-player-2025-marvin-mims-jr',
-  'tiber-data-player-2025-rico-dowdle',
-  'tiber-data-player-2025-ryan-flournoy',
-  'tiber-data-player-2025-t-j-hockenson',
-  'tiber-data-player-2025-terrance-ferguson',
-  'tiber-data-player-2025-travis-hunter',
-  'tiber-data-player-2025-tyquan-thornton',
-  'tiber-data-player-2025-xavier-worthy'
+const requestedRealCohortPlayers = [
+  "Ja'Marr Chase",
+  'Josh Allen',
+  'Bijan Robinson',
+  'Brock Bowers',
+  'Amon-Ra St. Brown',
+  'Christian McCaffrey',
+  'Tyreek Hill',
+  'Jameson Williams',
+  'Mike Evans',
+  'Mark Andrews'
 ];
 
-const omittedManagementCandidates = [
-  'tiber-data-player-2025-frank-gore-jr'
-];
-
-test('FORGE_PLAYER_STATIC_V1 promotes only evidence-backed newly mapped Management candidates', async () => {
+test('FORGE_PLAYER_STATIC_V1 includes the requested real-cohort players as player-specific evidence', async () => {
   const artifact = await buildFixtureStaticArtifact();
-  const rowsByPlayerId = new Map(artifact.rows.map((row) => [row.player_id, row]));
+  const rowsByName = new Map(artifact.rows.map((row) => [row.player_name, row]));
 
-  for (const playerId of newlyMappedManagementPromotions) {
-    const row = rowsByPlayerId.get(playerId);
-    assert.ok(row, `${playerId} should have a player-specific static row.`);
+  for (const playerName of requestedRealCohortPlayers) {
+    const row = rowsByName.get(playerName);
+    assert.ok(row, `${playerName} should have a player-specific static row.`);
     assert.equal(row.provenance.score_source, 'player_specific');
     assert.equal(row.provenance.input_mode, 'source-backed-cohort');
     assert.ok(row.provenance.source_provider);
     assert.ok(row.provenance.source_set_id);
-    assert.ok(row.provenance.source_updated_at);
     assert.equal(row.components.production_profile.evidence_status, 'player_specific');
     assert.equal(row.components.role_security.evidence_status, 'player_specific');
-  }
-
-  for (const playerId of omittedManagementCandidates) {
-    assert.equal(rowsByPlayerId.has(playerId), false, `${playerId} should not be silently promoted without source-backed FORGE evidence.`);
   }
 });
 
@@ -281,16 +278,16 @@ test('FORGE_PLAYER_STATIC_V1 builder preserves duplicate canonical player id gua
 
 test('FORGE_PLAYER_STATIC_V1 player-specific rows preserve TIBER-Data provenance semantics', async () => {
   const artifact = await buildFixtureStaticArtifact();
-  const realRows = artifact.rows.filter((row) => row.provenance.source_set_id === 'td-2025-cohort-build-001');
+  const realRows = artifact.rows.filter((row) => row.provenance.source_set_id === 'forge-player-weekly-ppr-2025:cohort:v1:source-backed');
 
-  assert.equal(realRows.length, 24);
-  assert.deepEqual(artifact.source_artifacts, [...DEFAULT_SOURCE_BACKED_COHORT_PATHS, ...DEFAULT_GENERATED_BASELINE_SEASON_PATHS]);
+  assert.equal(realRows.length, 50);
+  assert.deepEqual(artifact.source_artifacts, [...DEFAULT_SOURCE_BACKED_COHORT_PATHS]);
 
   for (const row of realRows) {
     assert.equal(row.provenance.score_source, 'player_specific');
-    assert.equal(row.provenance.source_provider, 'TIBER-Data');
+    assert.equal(row.provenance.source_provider, 'nflverse via nflreadpy');
     assert.equal(row.provenance.input_mode, 'source-backed-cohort');
-    assert.equal(row.provenance.source_set_id, 'td-2025-cohort-build-001');
+
     assert.deepEqual(row.provenance.source_artifacts, artifact.source_artifacts);
     assert.ok(row.evidence_summary.some((item) => /score_source=player_specific/i.test(item)));
   }
@@ -318,10 +315,10 @@ test('player static artifact script can write a deterministic promoted artifact 
   const { stdout } = await execFileAsync(process.execPath, ['scripts/build-player-static-artifact.js', '--output', outputPath], { cwd: process.cwd() });
   const written = JSON.parse(await readFile(outputPath, 'utf8'));
 
-  assert.match(stdout, /Wrote FORGE_PLAYER_STATIC_V1 \(59 rows\)/);
+  assert.match(stdout, /Wrote FORGE_PLAYER_STATIC_V1 \(50 rows\)/);
   assert.equal(written.artifact_type, 'FORGE_PLAYER_STATIC_V1');
-  assert.equal(written.rows.filter((row) => row.provenance.score_source === 'player_specific').length, 45);
-  assert.equal(written.rows.filter((row) => row.provenance.score_source === 'generated_baseline').length, 14);
+  assert.equal(written.rows.filter((row) => row.provenance.score_source === 'player_specific').length, 50);
+  assert.equal(written.rows.filter((row) => row.provenance.score_source === 'generated_baseline').length, 0);
 });
 
 test('player static artifact script arguments parse explicitly', () => {
