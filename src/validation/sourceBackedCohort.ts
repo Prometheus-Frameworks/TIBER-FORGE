@@ -150,7 +150,11 @@ function statValue(value: Record<string, unknown>, field: StatField, path: strin
     if (required) errors.push(`${path}.${field} must be present.`);
     return undefined;
   }
-  return ensureNumber(raw, `${path}.${field}`, errors, { min: 0, max: field === 'pprPoints' ? 700 : 10000, integer: field !== 'pprPoints' });
+  // Negative weekly values are legitimate football for yardage fields (a lost-yardage
+  // week) and for pprPoints (interceptions/fumbles can outweigh production). Counts
+  // remain non-negative.
+  const allowsNegative = field === 'rushingYards' || field === 'receivingYards' || field === 'pprPoints';
+  return ensureNumber(raw, `${path}.${field}`, errors, { min: allowsNegative ? -100 : 0, max: field === 'pprPoints' ? 700 : 10000, integer: field !== 'pprPoints' });
 }
 
 function parseStats(value: Record<string, unknown>, path: string, errors: ErrorList, requireGames: boolean): ForgePlayerWeeklyPprStatsV1 | undefined {

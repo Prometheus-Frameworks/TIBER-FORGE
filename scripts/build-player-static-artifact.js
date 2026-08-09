@@ -6,12 +6,11 @@ const { ingestForgeSeasonArtifact } = require('../dist/src/ingestion/forgeSeason
 const { rankSeasonPlayers } = require('../dist/src/services/seasonForgeService.js');
 const { buildForgePlayerStaticArtifact } = require('../dist/src/services/playerStaticArtifactService.js');
 
-const DEFAULT_SOURCE_BACKED_COHORT_PATH = 'tests/fixtures/artifacts/forge_player_weekly_ppr_2025.cohort.v1.json';
+const DEFAULT_SOURCE_BACKED_COHORT_PATH = 'data/source-backed/forge_player_weekly_ppr_2025.cohort.v1.json';
 const DEFAULT_SOURCE_BACKED_COHORT_PATHS = [
-  DEFAULT_SOURCE_BACKED_COHORT_PATH,
-  'tests/fixtures/artifacts/forge_player_weekly_ppr_2025.management_mapped_source_backfill.v1.json'
+  DEFAULT_SOURCE_BACKED_COHORT_PATH
 ];
-const DEFAULT_GENERATED_BASELINE_SEASON_PATHS = ['tests/fixtures/artifacts/forge_season_player_input_2025.real_players_sample.json'];
+const DEFAULT_GENERATED_BASELINE_SEASON_PATHS = [];
 const DEFAULT_OUTPUT_PATH = 'exports/promoted/forge_player_static/forge_player_static_v1.json';
 
 function parseArgs(argv) {
