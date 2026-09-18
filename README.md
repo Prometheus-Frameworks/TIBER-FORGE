@@ -1,5 +1,7 @@
 # TIBER-FORGE
 
+> **[TIBER Now — what works, what we’re building, and what’s still conceptual](https://github.com/Prometheus-Frameworks/TIBER-Fantasy/blob/main/docs/TIBER_NOW.md)**
+
 `TIBER-FORGE` is a standalone, contract-driven fantasy signal grading layer focused on a deterministic football lane.
 
 It is intentionally early and constrained: useful for local development, artifact-based evaluation, and sanity-checking score outputs, but **not** a production-complete system. FORGE sits downstream of governed source truth from `TIBER-Data`, team-environment interpretation from `TIBER-Teamstate`, and player-role interpretation from `Role-and-opportunity`; it grades fantasy relevance from those inputs rather than owning raw source truth or product presentation.
